@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "headCode": "<script async src=\"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8948943457943464\"\n     crossorigin=\"anonymous\"></script>",
+  "slots": {
+    "play-left": {
+      "code": ""
+    },
+    "play-right": {
+      "code": ""
+    },
+    "play-bottom": {
+      "code": ""
+    },
+    "home-bottom": {
+      "code": ""
+    }
+  }
+}
