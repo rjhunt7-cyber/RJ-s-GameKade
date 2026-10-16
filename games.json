@@ -1,0 +1,13 @@
+{
+  "games": [
+    {
+      "id": "grave-rush",
+      "title": "Grave Rush",
+      "path": "games/grave-rush.html",
+      "kind": "file",
+      "added": "2026-10-16T15:16:43.961Z"
+    }
+  ],
+  "count": 1,
+  "updated": "2026-10-16T15:16:43.961Z"
+}
