@@ -23,8 +23,16 @@
       "kind": "file",
       "added": "2026-10-16T20:08:01.193Z",
       "thumbnail": "games/knightmares.jpg?v=mvbekxqr"
+    },
+    {
+      "id": "rjs-nutty-adventure",
+      "title": "Rjs Nutty Adventure",
+      "path": "games/rjs-nutty-adventure.html",
+      "kind": "file",
+      "added": "2026-10-16T21:59:27.621Z",
+      "thumbnail": "games/rjs-nutty-adventure.jpg?v=mvbifxzo"
     }
   ],
-  "count": 3,
-  "updated": "2026-10-16T20:49:09.576Z"
+  "count": 4,
+  "updated": "2026-10-16T21:59:27.622Z"
 }
