@@ -1,0 +1,2150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RJ's Gamekade</title>
+<meta name="description" content="Free games you can play right in your browser.">
+<meta name="theme-color" content="#081028">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNSAyNSIgd2lkdGg9IjI1IiBoZWlnaHQ9IjI1IiBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iUkoiPjxwYXRoIGZpbGw9IiMwODA4MjAiIGQ9Ik0zIDBoMXYxaC0xek0xOCAwaDF2MWgtMXpNMiAxaDF2MWgtMXpNNCAxaDF2MWgtMXpNMTcgMWgxdjFoLTF6TTE5IDFoMXYxaC0xek0zIDJoMXYxaC0xek01IDJoMXYxaC0xek0xNiAyaDF2MWgtMXpNMTkgMmgxdjFoLTF6TTMgM2gxdjFoLTF6TTYgM2gxdjFoLTF6TTE2IDNoMXYxaC0xek0xOSAzaDF2MWgtMXpNMyA0aDF2MWgtMXpNNyA0aDF2MWgtMXpNMTUgNGgxdjFoLTF6TTE5IDRoMXYxaC0xek0zIDVoMXYxaC0xek04IDVoN3YxaC03ek0xOSA1aDF2MWgtMXpNNCA2aDF2MWgtMXpNNiA2aDJ2MWgtMnpNMTUgNmgydjFoLTJ6TTE5IDZoMXYxaC0xek00IDdoMnYxaC0yek0xNyA3aDF2MWgtMXpNMTkgN2gxdjFoLTF6TTQgOGgxdjFoLTF6TTE4IDhoMnYxaC0yek0yIDloMnYxaC0yek0xOSA5aDF2MWgtMXpNMSAxMGgxdjFoLTF6TTIwIDEwaDF2MWgtMXpNMCAxMWgxdjFoLTF6TTIwIDExaDF2MWgtMXpNMCAxMmgxdjFoLTF6TTIwIDEyaDF2MWgtMXpNMCAxM2gxdjFoLTF6TTIwIDEzaDF2MWgtMXpNMCAxNGgxdjFoLTF6TTcgMTRoNHYxaC00ek0xMyAxNGgzdjFoLTN6TTE5IDE0aDF2MWgtMXpNMCAxNWgxdjFoLTF6TTkgMTVoMnYxaC0yek0xNSAxNWgxdjFoLTF6TTE5IDE1aDN2MWgtM3pNMSAxNmgxdjFoLTF6TTkgMTZoMnYxaC0yek0xNSAxNmgxdjFoLTF6TTIyIDE2aDJ2MWgtMnpNMiAxN2gydjFoLTJ6TTI0IDE3aDF2MWgtMXpNMyAxOGgxdjFoLTF6TTI0IDE4aDF2MWgtMXpNNCAxOWgxdjFoLTF6TTIzIDE5aDF2MWgtMXpNNCAyMGgxdjFoLTF6TTIxIDIwaDF2MWgtMXpNMjMgMjBoMXYxaC0xek00IDIxaDF2MWgtMXpNMTUgMjFoOHYxaC04ek01IDIyaDN2MWgtM3pNMTUgMjJoMXYxaC0xek0yMSAyMmgxdjFoLTF6TTggMjNoN3YxaC03ek0xNiAyM2g1djFoLTV6Ii8+PHBhdGggZmlsbD0iI2EwNDgxOCIgZD0iTTMgMWgxdjFoLTF6TTE4IDFoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmOGEwNDgiIGQ9Ik00IDJoMXYxaC0xek01IDNoMXYxaC0xek0xNyAzaDF2MWgtMXpNNiA0aDF2MWgtMXpNMTcgNGgxdjFoLTF6TTE3IDVoMXYxaC0xek0yMyAxN2gxdjFoLTF6TTUgMTloNXYxaC01ek01IDIwaDV2MWgtNXpNNSAyMWg1djFoLTV6Ii8+PHBhdGggZmlsbD0iI2UwNzAyOCIgZD0iTTE3IDJoMnYxaC0yek00IDNoMXYxaC0xek0xOCAzaDF2MWgtMXpNNCA0aDJ2MWgtMnpNMTYgNGgxdjFoLTF6TTE4IDRoMXYxaC0xek00IDVoMnYxaC0yek03IDVoMXYxaC0xek0xNSA1aDJ2MWgtMnpNMTggNWgxdjFoLTF6TTUgNmgxdjFoLTF6TTE3IDZoMnYxaC0yek0xOCA3aDF2MWgtMXpNMTEgMTRoMnYxaC0yek0xNiAxNGgzdjFoLTN6TTExIDE1aDJ2MWgtMnpNMTYgMTVoM3YxaC0zek02IDE2aDF2MWgtMXpNMTEgMTZoMnYxaC0yek0xNiAxNmg2djFoLTZ6TTQgMTdoMTF2MWgtMTF6TTIxIDE3aDF2MWgtMXpNNCAxOGgxMHYxaC0xMHpNMTAgMTloNHYxaC00ek0yMiAxOWgxdjFoLTF6TTEwIDIwaDR2MWgtNHpNMjIgMjBoMXYxaC0xek0xMCAyMWg1djFoLTV6TTggMjJoN3YxaC03eiIvPjxwYXRoIGZpbGw9IiNmOGUwYjAiIGQ9Ik02IDVoMXYxaC0xek0xNSAxN2g2djFoLTZ6TTE0IDE4aDh2MWgtOHpNMTQgMTloOHYxaC04ek0xNCAyMGg3djFoLTd6Ii8+PHBhdGggZmlsbD0iI2Y4YzgzOCIgZD0iTTggNmg3djFoLTd6TTYgN2gxMXYxaC0xMXpNNSA4aDEzdjFoLTEzek00IDloMTV2MWgtMTV6TTIgMTBoMTh2MWgtMTh6TTEgMTFoMTl2MWgtMTl6TTEgMTJoMXYxaC0xek0xIDEzaDF2MWgtMXpNMSAxNGg2djFoLTZ6TTEgMTVoNnYxaC02ek0yIDE2aDR2MWgtNHoiLz48cGF0aCBmaWxsPSIjYzg5MDIwIiBkPSJNMiAxMmgxOHYxaC0xOHpNMiAxM2gxOHYxaC0xOHoiLz48cGF0aCBmaWxsPSIjZjhmOGY4IiBkPSJNNyAxNWgydjFoLTJ6TTEzIDE1aDJ2MWgtMnpNNyAxNmgydjFoLTJ6TTEzIDE2aDJ2MWgtMnpNMTggMjJoMnYxaC0yeiIvPjxwYXRoIGZpbGw9IiM2MDIwMzAiIGQ9Ik0yMiAxN2gxdjFoLTF6TTIyIDE4aDJ2MWgtMnoiLz48cGF0aCBmaWxsPSIjODAxODI4IiBkPSJNMTYgMjJoMnYxaC0yek0yMCAyMmgxdjFoLTF6Ii8+PC9zdmc+">
+<!--
+  RJ's Gamekade: the whole arcade in one file.
+  Upload this file to GitHub Pages (see README.md), then add games from the
+  live site: open  your-site-address/#/owner
+-->
+<style>
+/* ==========================================================================
+   RJ's Gamekade — 16-bit pixel stylesheet
+   Everything sits on a 4px grid. Font sizes are multiples of 8px so every
+   letter pixel lands on whole screen pixels. No gradients, no blur, no
+   rounded corners: just hard pixels.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Gamekade Pixel';
+  /* The font is built in (base64) so it also loads when the arcade is opened
+     with a double-click. The same font is in fonts/ for design tools. */
+  src: url(data:font/woff;base64,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) format('woff');
+  font-display: swap;
+}
+
+/* ---- Palette: real SNES 15-bit colors ---------------------------------- */
+:root {
+  --night:    #081028;  /* page background */
+  --deep:     #102050;  /* dark panels */
+  --dusk:     #183878;  /* far skyline, quiet panels */
+  --arcade:   #2048a8;  /* main blue: buttons, cartridges */
+  --arcade-hi:#3868d0;  /* bevel highlight */
+  --electric: #38c8f8;  /* highlights, active edges */
+  --ice:      #b8e0f8;  /* soft text accents */
+  --moon:     #f0f8f8;  /* main text */
+  --ink:      #080820;  /* outlines and hard shadows */
+  --fur:      #e07028;  /* RJ orange */
+  --coin:     #f8c838;  /* yellow highlight */
+  --coin-dk:  #c89020;
+
+  --font: 'Gamekade Pixel', 'Press Start 2P', ui-monospace, 'Cascadia Mono', Consolas, 'Courier New', monospace;
+  --gutter: 24px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html {
+  background: var(--night);
+  color: var(--moon);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 24px;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: none;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, p { margin: 0; font-weight: normal; }
+img { display: block; max-width: 100%; }
+a { color: var(--electric); }
+button, input { font: inherit; color: inherit; }
+::selection { background: var(--coin); color: var(--ink); }
+
+.svg-pixel, .rj, .px-icon { shape-rendering: crispEdges; image-rendering: pixelated; }
+.px-icon { display: inline-block; flex: none; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Keyboard focus: a chunky coin-yellow frame */
+:focus { outline: none; }
+:focus-visible { outline: 4px solid var(--coin); outline-offset: 6px; }
+
+/* ---- The pixel box --------------------------------------------------------
+   Notched corners come from four hard ink "edges"; the drop shadow is the
+   same notched shape shifted down-right by --lift. */
+.px {
+  --bg: var(--arcade);
+  --hi: var(--arcade-hi);
+  --lo: var(--deep);
+  --edge: var(--ink);
+  --shade: var(--ink);
+  --lift: 8px;
+  background: var(--bg);
+  box-shadow:
+    inset 0 4px 0 0 var(--hi),
+    inset 0 -4px 0 0 var(--lo),
+    0 -4px 0 0 var(--edge), 0 4px 0 0 var(--edge),
+    -4px 0 0 0 var(--edge), 4px 0 0 0 var(--edge),
+    calc(var(--lift) - 4px) var(--lift) 0 0 var(--shade),
+    calc(var(--lift) + 4px) var(--lift) 0 0 var(--shade),
+    var(--lift) calc(var(--lift) - 4px) 0 0 var(--shade),
+    var(--lift) calc(var(--lift) + 4px) 0 0 var(--shade);
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 0;
+  color: var(--moon);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 80ms steps(2, end);
+}
+.btn:hover { --bg: var(--arcade-hi); --hi: #5088e8; color: var(--coin); }
+.btn:active { transform: translate(4px, 4px); --lift: 4px; }
+.btn--quiet { --bg: var(--deep); --hi: var(--dusk); --lo: var(--ink); }
+.btn--quiet:hover { --bg: var(--dusk); --hi: var(--arcade); }
+.btn--coin { --bg: var(--coin); --hi: #f8e078; --lo: var(--coin-dk); color: var(--ink); }
+.btn--coin:hover { --bg: #f8d858; --hi: #f8f0a8; color: var(--ink); }
+.btn[aria-pressed="true"] { --bg: var(--electric); --hi: #a8f0f8; --lo: #1890c0; color: var(--ink); }
+
+/* ==========================================================================
+   HOME — night-city marquee
+   ========================================================================== */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  background:
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjQiIHdpZHRoPSIzMjAiIGhlaWdodD0iNjQiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTEyNCAzOWgxdjNoLTF6TTEyMyA0MGgzdjFoLTN6Ii8+PHBhdGggZmlsbD0iIzM4YzhmOCIgZD0iTTE5MSA2MGgxdjFoLTF6Ii8+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTI5OSA2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjQyIDE4aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjMzhjOGY4IiBkPSJNMTAwIDQ3aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjMzhjOGY4IiBkPSJNMjc5IDU1aDF2M2gtMXpNMjc4IDU2aDN2MWgtM3oiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjA1IDQyaDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMTIwIDQyaDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjY5IDI2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMzQgMTJoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNiOGUwZjgiIGQ9Ik0xNTcgNTFoMXYzaC0xek0xNTYgNTJoM3YxaC0zeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0xMzkgMzJoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yMjAgMjdoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik03MCA1OGgxdjFoLTF6Ii8+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTUxIDRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0yNTYgMTVoMXYzaC0xek0yNTUgMTZoM3YxaC0zeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0yMjUgNTFoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yMTcgMzRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yOTUgMjRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0zMDEgMTZoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0xNyA1NmgxdjNoLTF6TTE2IDU3aDN2MWgtM3oiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMzEyIDQ0aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMTY5IDM2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjZjBmOGY4IiBkPSJNMTEwIDQyaDF2MWgtMXoiLz48L3N2Zz4=") repeat left top / 640px 128px,
+    var(--night);
+}
+/* dithered horizon glow: a checkerboard band, no gradients */
+.marquee::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 64px;
+  height: 64px;
+  background:
+    conic-gradient(var(--deep) 25%, transparent 0 50%, var(--deep) 0 75%, transparent 0) 0 0 / 8px 8px;
+}
+.marquee::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 64px;
+  background: var(--deep);
+  z-index: 0;
+}
+.marquee__city {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 128px;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjQiIHdpZHRoPSIzMjAiIGhlaWdodD0iNjQiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+PHBhdGggZmlsbD0iIzE4Mzg3OCIgZD0iTTAgMTRoMTZ2NTBoLTE2ek02IDExaDR2M2gtNHpNNyA4aDJ2M2gtMnpNMTYgMjRoMTZ2NDBoLTE2ek0yMiAyMWg0djNoLTR6TTMyIDEyaDE4djUyaC0xOHpNMzkgOWg0djNoLTR6TTQwIDZoMnYzaC0yek01MCAxNWgyNHY0OWgtMjR6TTYwIDEyaDR2M2gtNHpNNjEgOWgydjNoLTJ6TTc0IDE0aDI0djUwaC0yNHpNODQgMTFoNHYzaC00ek05OCAxNWgxNHY0OWgtMTR6TTExMiAxOGgxOHY0NmgtMTh6TTExMyAxNmgxNnYyaC0xNnpNMTMwIDI0aDE2djQwaC0xNnpNMTM2IDIxaDR2M2gtNHpNMTM3IDE4aDJ2M2gtMnpNMTQ2IDI2aDE4djM4aC0xOHpNMTUzIDIzaDR2M2gtNHpNMTY0IDE2aDI0djQ4aC0yNHpNMTc0IDEzaDR2M2gtNHpNMTc1IDEwaDJ2M2gtMnpNMTg4IDIyaDI0djQyaC0yNHpNMjEyIDI4aDE4djM2aC0xOHpNMjE5IDI1aDR2M2gtNHpNMjIwIDIyaDJ2M2gtMnpNMjMwIDE3aDIwdjQ3aC0yMHpNMjM4IDE0aDR2M2gtNHpNMjM5IDExaDJ2M2gtMnpNMjUwIDE2aDIwdjQ4aC0yMHpNMjU4IDEzaDR2M2gtNHpNMjcwIDEzaDE0djUxaC0xNHpNMjc1IDEwaDR2M2gtNHpNMjg0IDEwaDI0djU0aC0yNHpNMjk0IDdoNHYzaC00ek0zMDggMjFoMTJ2NDNoLTEyek0zMTIgMThoNHYzaC00ek0zMTMgMTVoMnYzaC0yeiIvPjxwYXRoIGZpbGw9IiMyMDQ4YTgiIGQ9Ik01IDE3aDF2MmgtMXpNMiAyMWgxdjJoLTF6TTUgMjFoMXYyaC0xek0xMSAyMWgxdjJoLTF6TTUgMjVoMXYyaC0xek04IDI5aDF2MmgtMXpNMiAzM2gxdjJoLTF6TTUgMzNoMXYyaC0xek0xMSAzM2gxdjJoLTF6TTUgNDFoMXYyaC0xek0xMSA0MWgxdjJoLTF6TTIgNDVoMXYyaC0xek04IDUzaDF2MmgtMXpNMTEgNTNoMXYyaC0xek01IDU3aDF2MmgtMXpNMTggMjdoMXYyaC0xek0yNyAyN2gxdjJoLTF6TTIxIDMxaDF2MmgtMXpNMjcgNDNoMXYyaC0xek0yNyA1MWgxdjJoLTF6TTIxIDU1aDF2MmgtMXpNMjQgNTVoMXYyaC0xek0yNyA1NWgxdjJoLTF6TTIxIDU5aDF2MmgtMXpNMjQgNTloMXYyaC0xek0zNyAxNWgxdjJoLTF6TTQzIDE5aDF2MmgtMXpNNDYgMTloMXYyaC0xek0zNCAyM2gxdjJoLTF6TTQwIDIzaDF2MmgtMXpNNDYgMjNoMXYyaC0xek0zNyAyN2gxdjJoLTF6TTM0IDMxaDF2MmgtMXpNNDYgMzloMXYyaC0xek00MCA0M2gxdjJoLTF6TTQ2IDQzaDF2MmgtMXpNNDYgNDdoMXYyaC0xek0zNCA1MWgxdjJoLTF6TTM3IDU1aDF2MmgtMXpNMzcgNTloMXYyaC0xek01MiAyMmgxdjJoLTF6TTY3IDIyaDF2MmgtMXpNNjcgMjZoMXYyaC0xek03MCAyNmgxdjJoLTF6TTU4IDMwaDF2MmgtMXpNNTUgMzRoMXYyaC0xek01NSAzOGgxdjJoLTF6TTU4IDM4aDF2MmgtMXpNNTUgNDJoMXYyaC0xek03MCA0MmgxdjJoLTF6TTU4IDQ2aDF2MmgtMXpNNzAgNDZoMXYyaC0xek02NCA1MGgxdjJoLTF6TTY3IDUwaDF2MmgtMXpNNTIgNTRoMXYyaC0xek01NSA1OGgxdjJoLTF6TTYxIDU4aDF2MmgtMXpNNzAgNThoMXYyaC0xek03OSAxN2gxdjJoLTF6TTg4IDE3aDF2MmgtMXpNNzkgMjFoMXYyaC0xek05MSAyNWgxdjJoLTF6TTc2IDI5aDF2MmgtMXpNNzkgMjloMXYyaC0xek04NSAyOWgxdjJoLTF6TTg4IDMzaDF2MmgtMXpNOTQgMzNoMXYyaC0xek03OSA0OWgxdjJoLTF6TTgyIDQ5aDF2MmgtMXpNODggNDloMXYyaC0xek05MSA0OWgxdjJoLTF6TTk0IDQ5aDF2MmgtMXpNODUgNTNoMXYyaC0xek05NCA1M2gxdjJoLTF6TTgyIDU3aDF2MmgtMXpNMTA5IDE4aDF2MmgtMXpNMTAwIDMwaDF2MmgtMXpNMTA2IDMwaDF2MmgtMXpNMTAwIDM0aDF2MmgtMXpNMTA5IDM0aDF2MmgtMXpNMTAwIDUwaDF2MmgtMXpNMTA5IDUwaDF2MmgtMXpNMTAwIDU0aDF2MmgtMXpNMTA5IDU0aDF2MmgtMXpNMTAzIDU4aDF2MmgtMXpNMTA2IDU4aDF2MmgtMXpNMTI2IDIxaDF2MmgtMXpNMTIzIDI1aDF2MmgtMXpNMTI2IDI5aDF2MmgtMXpNMTE0IDMzaDF2MmgtMXpNMTI2IDMzaDF2MmgtMXpNMTIzIDQxaDF2MmgtMXpNMTI2IDQxaDF2MmgtMXpNMTE0IDQ1aDF2MmgtMXpNMTIzIDQ1aDF2MmgtMXpNMTIwIDQ5aDF2MmgtMXpNMTE3IDUzaDF2MmgtMXpNMTIzIDU3aDF2MmgtMXpNMTI2IDU3aDF2MmgtMXpNMTQxIDI3aDF2MmgtMXpNMTM1IDMxaDF2MmgtMXpNMTM4IDMxaDF2MmgtMXpNMTMyIDM1aDF2MmgtMXpNMTQxIDM1aDF2MmgtMXpNMTM1IDM5aDF2MmgtMXpNMTQxIDM5aDF2MmgtMXpNMTMyIDQ3aDF2MmgtMXpNMTQxIDQ3aDF2MmgtMXpNMTMyIDU5aDF2MmgtMXpNMTU3IDMzaDF2MmgtMXpNMTYwIDMzaDF2MmgtMXpNMTQ4IDM3aDF2MmgtMXpNMTU0IDM3aDF2MmgtMXpNMTYwIDQxaDF2MmgtMXpNMTQ4IDQ5aDF2MmgtMXpNMTU3IDQ5aDF2MmgtMXpNMTUxIDUzaDF2MmgtMXpNMTc4IDE5aDF2MmgtMXpNMTgxIDE5aDF2MmgtMXpNMTY2IDI3aDF2MmgtMXpNMTcyIDI3aDF2MmgtMXpNMTgxIDI3aDF2MmgtMXpNMTc4IDMxaDF2MmgtMXpNMTg0IDMxaDF2MmgtMXpNMTY5IDM1aDF2MmgtMXpNMTc4IDM1aDF2MmgtMXpNMTcyIDM5aDF2MmgtMXpNMTgxIDM5aDF2MmgtMXpNMTg0IDM5aDF2MmgtMXpNMTc1IDQzaDF2MmgtMXpNMTY2IDQ3aDF2MmgtMXpNMTc1IDQ3aDF2MmgtMXpNMTY5IDU1aDF2MmgtMXpNMTcyIDU1aDF2MmgtMXpNMTg0IDU1aDF2MmgtMXpNMTcyIDU5aDF2MmgtMXpNMTk2IDI1aDF2MmgtMXpNMTkzIDI5aDF2MmgtMXpNMTk5IDI5aDF2MmgtMXpNMTkwIDM3aDF2MmgtMXpNMTkzIDM3aDF2MmgtMXpNMTk2IDM3aDF2MmgtMXpNMjA1IDM3aDF2MmgtMXpNMTk2IDQxaDF2MmgtMXpNMTk5IDQxaDF2MmgtMXpNMjAyIDQxaDF2MmgtMXpNMjA4IDQxaDF2MmgtMXpNMTkwIDQ1aDF2MmgtMXpNMTk5IDQ5aDF2MmgtMXpNMjA4IDQ5aDF2MmgtMXpNMTk5IDUzaDF2MmgtMXpNMjA1IDUzaDF2MmgtMXpNMjAyIDU3aDF2MmgtMXpNMjA1IDU3aDF2MmgtMXpNMjE3IDM1aDF2MmgtMXpNMjIwIDM1aDF2MmgtMXpNMjI2IDM1aDF2MmgtMXpNMjI2IDM5aDF2MmgtMXpNMjE3IDQzaDF2MmgtMXpNMjIwIDQzaDF2MmgtMXpNMjI2IDQzaDF2MmgtMXpNMjE3IDUxaDF2MmgtMXpNMjI2IDUxaDF2MmgtMXpNMjIwIDU1aDF2MmgtMXpNMjIzIDU5aDF2MmgtMXpNMjM1IDIwaDF2MmgtMXpNMjM4IDIwaDF2MmgtMXpNMjQ3IDIwaDF2MmgtMXpNMjMyIDI0aDF2MmgtMXpNMjM4IDI4aDF2MmgtMXpNMjQ3IDI4aDF2MmgtMXpNMjM1IDMyaDF2MmgtMXpNMjQxIDMyaDF2MmgtMXpNMjM1IDM2aDF2MmgtMXpNMjM1IDQwaDF2MmgtMXpNMjQ0IDQwaDF2MmgtMXpNMjQ3IDQwaDF2MmgtMXpNMjQxIDQ0aDF2MmgtMXpNMjM1IDQ4aDF2MmgtMXpNMjM4IDQ4aDF2MmgtMXpNMjQxIDQ4aDF2MmgtMXpNMjQ0IDQ4aDF2MmgtMXpNMjM1IDU2aDF2MmgtMXpNMjM4IDU2aDF2MmgtMXpNMjQxIDU2aDF2MmgtMXpNMjU4IDE5aDF2MmgtMXpNMjY0IDE5aDF2MmgtMXpNMjY3IDIzaDF2MmgtMXpNMjY3IDI3aDF2MmgtMXpNMjUyIDMxaDF2MmgtMXpNMjU1IDMxaDF2MmgtMXpNMjUyIDM1aDF2MmgtMXpNMjYxIDM5aDF2MmgtMXpNMjY3IDM5aDF2MmgtMXpNMjUyIDQ3aDF2MmgtMXpNMjU4IDQ3aDF2MmgtMXpNMjUyIDUxaDF2MmgtMXpNMjU1IDUxaDF2MmgtMXpNMjU4IDU1aDF2MmgtMXpNMjU1IDU5aDF2MmgtMXpNMjYxIDU5aDF2MmgtMXpNMjY0IDU5aDF2MmgtMXpNMjc1IDE2aDF2MmgtMXpNMjc4IDE2aDF2MmgtMXpNMjc1IDIwaDF2MmgtMXpNMjcyIDMyaDF2MmgtMXpNMjc1IDMyaDF2MmgtMXpNMjcyIDM2aDF2MmgtMXpNMjc1IDM2aDF2MmgtMXpNMjgxIDM2aDF2MmgtMXpNMjc4IDQwaDF2MmgtMXpNMjcyIDQ0aDF2MmgtMXpNMjc1IDQ0aDF2MmgtMXpNMjgxIDQ0aDF2MmgtMXpNMjgxIDQ4aDF2MmgtMXpNMjcyIDUyaDF2MmgtMXpNMjgxIDUyaDF2MmgtMXpNMjcyIDU2aDF2MmgtMXpNMjc4IDU2aDF2MmgtMXpNMjg5IDEzaDF2MmgtMXpNMjk1IDEzaDF2MmgtMXpNMjk4IDEzaDF2MmgtMXpNMjg5IDE3aDF2MmgtMXpNMjkyIDE3aDF2MmgtMXpNMzAxIDE3aDF2MmgtMXpNMjg2IDIxaDF2MmgtMXpNMjk1IDIxaDF2MmgtMXpNMjk4IDIxaDF2MmgtMXpNMjg5IDI1aDF2MmgtMXpNMjkyIDI1aDF2MmgtMXpNMjg5IDMzaDF2MmgtMXpNMjk1IDMzaDF2MmgtMXpNMjk4IDMzaDF2MmgtMXpNMjk4IDM3aDF2MmgtMXpNMzAxIDM3aDF2MmgtMXpNMjkyIDQxaDF2MmgtMXpNMzA0IDQxaDF2MmgtMXpNMjk1IDQ1aDF2MmgtMXpNMjg2IDQ5aDF2MmgtMXpNMjg5IDQ5aDF2MmgtMXpNMzAxIDQ5aDF2MmgtMXpNMjk4IDUzaDF2MmgtMXpNMzA0IDUzaDF2MmgtMXpNMjk1IDU3aDF2MmgtMXpNMjk4IDU3aDF2MmgtMXpNMzE2IDI0aDF2MmgtMXpNMzE2IDI4aDF2MmgtMXpNMzEzIDMyaDF2MmgtMXpNMzEwIDQ4aDF2MmgtMXpNMzEwIDUyaDF2MmgtMXpNMzEzIDU2aDF2MmgtMXoiLz48cGF0aCBmaWxsPSIjMDgxMDI4IiBkPSJNMCAzMGgxMHYzNGgtMTB6TTMgMjdoNHYzaC00ek00IDI0aDJ2M2gtMnpNMTAgNDNoMTJ2MjFoLTEyek0xNCA0MGg0djNoLTR6TTIyIDQ2aDEydjE4aC0xMnpNMjYgNDNoNHYzaC00ek0zNiAzOWgxMHYyNWgtMTB6TTM3IDM3aDh2MmgtOHpNNDYgMzhoMTR2MjZoLTE0ek00NyAzNmgxMnYyaC0xMnpNNjAgNDRoMTB2MjBoLTEwek02MyA0MWg0djNoLTR6TTY0IDM4aDJ2M2gtMnpNNzAgMzJoMjJ2MzJoLTIyek05MiA0NGgxMHYyMGgtMTB6TTk1IDQxaDR2M2gtNHpNOTYgMzhoMnYzaC0yek0xMDQgNDVoMjJ2MTloLTIyek0xMTMgNDJoNHYzaC00ek0xMjYgNDZoMjZ2MThoLTI2ek0xMjcgNDRoMjR2MmgtMjR6TTE1NCA0M2gxOHYyMWgtMTh6TTE3MiAzM2gxOHYzMWgtMTh6TTE3OSAzMGg0djNoLTR6TTE4MCAyN2gydjNoLTJ6TTE5MiA0NGgxMnYyMGgtMTJ6TTE5NiA0MWg0djNoLTR6TTE5NyAzOGgydjNoLTJ6TTIwNCAzMWgyMnYzM2gtMjJ6TTIxMyAyOGg0djNoLTR6TTIxNCAyNWgydjNoLTJ6TTIyNiAyOGgyNnYzNmgtMjZ6TTIzNyAyNWg0djNoLTR6TTIzOCAyMmgydjNoLTJ6TTI1MiA0MGgxNHYyNGgtMTR6TTI1NyAzN2g0djNoLTR6TTI2NiAzNGgxNnYzMGgtMTZ6TTI3MiAzMWg0djNoLTR6TTI4MiAzMWgyNnYzM2gtMjZ6TTI5MyAyOGg0djNoLTR6TTI5NCAyNWgydjNoLTJ6TTMxMCAzNmgxMHYyOGgtMTB6TTMxMSAzNGg4djJoLTh6Ii8+PHBhdGggZmlsbD0iI2Y4YzgzOCIgZD0iTTUgMzdoMnYyaC0yek0yIDQxaDJ2MmgtMnpNMiA1M2gydjJoLTJ6TTI3IDQ5aDJ2MmgtMnpNNDggNDFoMnYyaC0yek01NCA1N2gydjJoLTJ6TTY1IDU1aDJ2MmgtMnpNNzggMzVoMnYyaC0yek03OCAzOWgydjJoLTJ6TTgxIDM5aDJ2MmgtMnpNNzIgNDNoMnYyaC0yek03NSA0M2gydjJoLTJ6TTc4IDQzaDJ2MmgtMnpNODEgNDdoMnYyaC0yek03MiA1NWgydjJoLTJ6TTgxIDU1aDJ2MmgtMnpNMTEyIDUyaDJ2MmgtMnpNMTE1IDUyaDJ2MmgtMnpNMTE4IDUyaDJ2MmgtMnpNMTA2IDU2aDJ2MmgtMnpNMTA5IDU2aDJ2MmgtMnpNMTMxIDUzaDJ2MmgtMnpNMTQzIDUzaDJ2MmgtMnpNMTQzIDU3aDJ2MmgtMnpNMTU5IDQ2aDJ2MmgtMnpNMTYyIDUwaDJ2MmgtMnpNMTY1IDUwaDJ2MmgtMnpNMTYyIDU0aDJ2MmgtMnpNMTgwIDM2aDJ2MmgtMnpNMTc3IDQwaDJ2MmgtMnpNMTc3IDQ0aDJ2MmgtMnpNMTc3IDQ4aDJ2MmgtMnpNMTgzIDQ4aDJ2MmgtMnpNMjAwIDQ3aDJ2MmgtMnpNMjA2IDM0aDJ2MmgtMnpNMjIxIDM0aDJ2MmgtMnpNMjEyIDQyaDJ2MmgtMnpNMjMxIDMxaDJ2MmgtMnpNMjM0IDMxaDJ2MmgtMnpNMjMxIDM5aDJ2MmgtMnpNMjQzIDM5aDJ2MmgtMnpNMjM3IDQ3aDJ2MmgtMnpNMjMxIDU5aDJ2MmgtMnpNMjQ5IDU5aDJ2MmgtMnpNMjYwIDQzaDJ2MmgtMnpNMjU0IDQ3aDJ2MmgtMnpNMjYwIDQ3aDJ2MmgtMnpNMjU0IDUxaDJ2MmgtMnpNMjYzIDU5aDJ2MmgtMnpNMjc3IDQ1aDJ2MmgtMnpNMjY4IDQ5aDJ2MmgtMnpNMjY4IDU3aDJ2MmgtMnpNMjc0IDU3aDJ2MmgtMnpNMzA1IDQ2aDJ2MmgtMnpNMjg0IDUwaDJ2MmgtMnpNMjg3IDU4aDJ2MmgtMnpNMjk2IDU4aDJ2MmgtMnpNMzEyIDM5aDJ2MmgtMnpNMzEyIDQ3aDJ2MmgtMnoiLz48cGF0aCBmaWxsPSIjMzhjOGY4IiBkPSJNMiAzM2gxdjJoLTF6TTUgNDVoMXYyaC0xek01NyA1M2gxdjJoLTF6TTg3IDUxaDF2MmgtMXpNMTI5IDUxaDIwdjJoLTIwek0xNTYgNDZoMXYyaC0xek0xNzcgNTJoMXYyaC0xek0xODYgNTJoMXYyaC0xek0yMTIgMzhoMXYyaC0xek0yMDkgNDJoMXYyaC0xek0yMDkgNTRoMXYyaC0xek0yMjEgNTRoMXYyaC0xek0yMDkgNThoMXYyaC0xek0yNDAgMzFoMXYyaC0xek0yMzEgNTVoMXYyaC0xek0yNzEgNDFoMXYyaC0xek0yODcgMzRoMXYyaC0xek0yOTkgNDZoMXYyaC0xek0zMTIgNTloMXYyaC0xeiIvPjxwYXRoIGZpbGw9IiNlMDcwMjgiIGQ9Ik0xMjggNTBoMjJ2NGgtMjJ6Ii8+PC9zdmc+") repeat-x left bottom / 640px 128px;
+  z-index: 1;
+  pointer-events: none;
+}
+.marquee__inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1632px;
+  margin: 0 auto;
+  padding: 16px var(--gutter) 0;
+  min-height: 184px;
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+}
+.brand {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  color: inherit;
+  text-decoration: none;
+}
+.brand__rj { flex: none; margin-bottom: -4px; }
+.brand__words { padding-bottom: 40px; }
+.logo {
+  display: block;
+  color: var(--coin);
+  /* 6px pixel outline + stepped ink shadow */
+  text-shadow:
+    -6px 0 var(--ink), 6px 0 var(--ink), 0 -6px var(--ink), 0 6px var(--ink),
+    -6px -6px var(--ink), 6px -6px var(--ink), -6px 6px var(--ink), 6px 6px var(--ink),
+    12px 12px var(--ink), 6px 12px var(--ink), 12px 6px var(--ink);
+}
+.logo__small { display: block; font-size: 24px; line-height: 32px; color: var(--electric); margin-left: 4px;
+  text-shadow: -3px 0 var(--ink), 3px 0 var(--ink), 0 -3px var(--ink), 0 3px var(--ink), 6px 6px var(--ink); }
+.logo__big { display: block; font-size: 48px; line-height: 56px; }
+.marquee__tag {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 4px 12px;
+  color: var(--ice);
+  background: var(--ink);
+  box-shadow: 4px 4px 0 0 var(--deep);
+}
+.marquee__tools { margin-left: auto; align-self: flex-start; padding-top: 8px; }
+
+/* twinkling stars (stepped, a handful only) */
+.twinkle {
+  position: absolute;
+  width: 4px; height: 4px;
+  background: var(--moon);
+  box-shadow: 4px 0 0 var(--ice), -4px 0 0 var(--ice), 0 4px 0 var(--ice), 0 -4px 0 var(--ice);
+  animation: twinkle 3.2s steps(1, end) infinite;
+  z-index: 1;
+}
+.twinkle:nth-child(2) { animation-delay: -1.1s; animation-duration: 4.1s; }
+.twinkle:nth-child(3) { animation-delay: -2.3s; animation-duration: 3.7s; }
+@keyframes twinkle { 0%, 70% { opacity: 1; } 71%, 85% { opacity: 0; } 86%, 100% { opacity: 1; } }
+
+/* ==========================================================================
+   Library: toolbar + cartridge shelf
+   ========================================================================== */
+.library {
+  flex: 1;
+  width: 100%;
+  max-width: 1632px;
+  margin: 0 auto;
+  padding: 32px var(--gutter) 48px;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px 32px;
+  margin-bottom: 40px;
+}
+.library__title { font-size: 24px; line-height: 32px; color: var(--moon); }
+.library__count { color: var(--ice); margin-left: 12px; font-size: 16px; }
+.search {
+  --bg: var(--deep); --hi: var(--ink); --lo: var(--dusk); --lift: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 280px;
+  max-width: 480px;
+  min-height: 48px;
+  padding: 0 16px;
+  color: var(--ice);
+  cursor: text;
+}
+.search:focus-within { --edge: var(--electric); color: var(--electric); }
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--moon);
+  outline: none;
+  caret-color: var(--coin);
+}
+.search input::placeholder { color: #7890b8; opacity: 1; }
+.search input::-webkit-search-cancel-button { display: none; }
+.search__clear {
+  display: none;
+  border: 0; padding: 4px; background: none; color: var(--ice); cursor: pointer;
+}
+.search.has-text .search__clear { display: inline-flex; }
+.search__clear:hover { color: var(--coin); }
+.toolbar__end { margin-left: auto; display: flex; gap: 24px; }
+
+.shelf {
+  list-style: none;
+  margin: 0;
+  padding: 0 12px 12px 4px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(224px, 1fr));
+  gap: 40px 36px;
+}
+.shelf[hidden] { display: none; }
+
+/* A game cartridge */
+.cart {
+  --lift: 8px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px 12px 0;
+  color: var(--moon);
+  text-decoration: none;
+  transition: transform 80ms steps(2, end);
+}
+.cart__label {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: var(--ink);
+  box-shadow: 0 0 0 4px var(--ink), inset 0 0 0 4px var(--deep);
+  overflow: hidden;
+}
+.cart__label img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cart__label img.is-placeholder { image-rendering: pixelated; }
+.cart__fallback {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background:
+    conic-gradient(var(--dusk) 25%, transparent 0 50%, var(--dusk) 0 75%, transparent 0) 0 0 / 8px 8px,
+    var(--deep);
+}
+.cart__fallback .rj { margin-bottom: -2px; }
+.cart__name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 48px;
+  margin: 16px 4px 12px;
+  overflow-wrap: anywhere;
+}
+/* grip ridges along the bottom edge of the cartridge */
+.cart::after {
+  content: '';
+  display: block;
+  margin: auto -12px 0;
+  height: 12px;
+  background: repeating-linear-gradient(90deg, var(--deep) 0 8px, transparent 8px 16px) 8px 0 / auto 8px no-repeat;
+  border-bottom: 4px solid var(--deep);
+}
+.cart__play {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: var(--coin);
+  color: var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.cart:hover, .cart:focus-visible {
+  --edge: var(--electric);
+  --lift: 12px;
+  transform: translate(-4px, -4px);
+}
+.cart:hover .cart__name, .cart:focus-visible .cart__name { color: var(--coin); }
+.cart:hover .cart__play, .cart:focus-visible .cart__play { display: inline-flex; }
+.cart:active { transform: translate(0, 0); --lift: 4px; }
+.cart:focus-visible { outline-offset: 10px; }
+
+/* ==========================================================================
+   States: loading, empty, no results, error, 404
+   ========================================================================== */
+.state {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 16px 56px;
+  flex-wrap: wrap;
+}
+.state[hidden] { display: none; }
+.state__rj { flex: none; }
+.state__copy { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; margin-bottom: 72px; max-width: 640px; }
+.state__actions { display: flex; gap: 24px; flex-wrap: wrap; padding-left: 20px; }
+
+.bubble {
+  --bg: var(--moon); --hi: #ffffff; --lo: #c0d0e0; --lift: 8px;
+  position: relative;
+  max-width: 34ch;
+  padding: 20px 24px;
+  margin-left: 20px;
+  color: var(--ink);
+}
+.bubble--big { font-size: 24px; line-height: 32px; max-width: 26ch; }
+/* pixel speech-bubble tail pointing back at RJ */
+.bubble::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  bottom: 12px;
+  width: 24px;
+  height: 20px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 5' shape-rendering='crispEdges'%3E%3Cpath fill='%23080820' d='M0 4h6v1H0zM1 3h1v1H1zM2 2h1v1H2zM3 1h1v1H3zM4 0h2v1H4z'/%3E%3Cpath fill='%23f0f8f8' d='M2 3h4v1H2zM3 2h3v1H3zM4 1h2v1H4z'/%3E%3C/svg%3E") no-repeat 0 0 / 24px 20px;
+}
+.state__hint { color: var(--ice); max-width: 38ch; padding-left: 20px; }
+
+.loading-rj .rj { animation: roll-in 600ms steps(6, end) both; }
+@keyframes roll-in { from { transform: translateX(-96px); } to { transform: translateX(0); } }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.footer {
+  border-top: 4px solid var(--deep);
+  background: var(--ink);
+  color: #8098c0;
+  padding: 20px var(--gutter);
+  text-align: center;
+}
+.footer p { font-size: 16px; }
+
+/* ==========================================================================
+   RJ animation (stepped so it stays pixel-crisp)
+   ========================================================================== */
+.rj .rj-alt { visibility: hidden; }
+.rj--live .rj-blink { animation: rj-blink 4.6s steps(1, end) infinite; }
+.rj--live .rj-tail-a { animation: rj-tail-a 3.8s steps(1, end) infinite; }
+.rj--live .rj-tail-b { animation: rj-tail-b 3.8s steps(1, end) infinite; }
+.rj--live .rj-wheel-a { animation: rj-tail-a 0.4s steps(1, end) infinite; }
+.rj--live .rj-wheel-b { animation: rj-tail-b 0.4s steps(1, end) infinite; }
+.rj--live .rj-bob { animation: rj-bob 0.8s steps(1, end) infinite; }
+@keyframes rj-blink { 0%, 93% { visibility: hidden; } 94%, 97% { visibility: visible; } 98%, 100% { visibility: hidden; } }
+@keyframes rj-tail-a { 0%, 49% { visibility: visible; } 50%, 100% { visibility: hidden; } }
+@keyframes rj-tail-b { 0%, 49% { visibility: hidden; } 50%, 100% { visibility: visible; } }
+@keyframes rj-bob { 0%, 49% { transform: translateY(0); } 50%, 100% { transform: translateY(-1px); } }
+/* the idle tail flick is short: override the 50/50 split */
+.rj--live.rj--idle .rj-tail-a { animation-name: rj-flick-a; }
+.rj--live.rj--idle .rj-tail-b { animation-name: rj-flick-b; }
+@keyframes rj-flick-a { 0%, 79% { visibility: visible; } 80%, 87% { visibility: hidden; } 88%, 100% { visibility: visible; } }
+@keyframes rj-flick-b { 0%, 79% { visibility: hidden; } 80%, 87% { visibility: visible; } 88%, 100% { visibility: hidden; } }
+
+/* ==========================================================================
+   PLAY PAGE
+   ========================================================================== */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px var(--gutter);
+  background:
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjQiIHdpZHRoPSIzMjAiIGhlaWdodD0iNjQiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTEyNCAzOWgxdjNoLTF6TTEyMyA0MGgzdjFoLTN6Ii8+PHBhdGggZmlsbD0iIzM4YzhmOCIgZD0iTTE5MSA2MGgxdjFoLTF6Ii8+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTI5OSA2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjQyIDE4aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjMzhjOGY4IiBkPSJNMTAwIDQ3aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjMzhjOGY4IiBkPSJNMjc5IDU1aDF2M2gtMXpNMjc4IDU2aDN2MWgtM3oiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjA1IDQyaDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMTIwIDQyaDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjY5IDI2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMzQgMTJoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNiOGUwZjgiIGQ9Ik0xNTcgNTFoMXYzaC0xek0xNTYgNTJoM3YxaC0zeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0xMzkgMzJoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yMjAgMjdoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik03MCA1OGgxdjFoLTF6Ii8+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTUxIDRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0yNTYgMTVoMXYzaC0xek0yNTUgMTZoM3YxaC0zeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0yMjUgNTFoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yMTcgMzRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yOTUgMjRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0zMDEgMTZoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0xNyA1NmgxdjNoLTF6TTE2IDU3aDN2MWgtM3oiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMzEyIDQ0aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMTY5IDM2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjZjBmOGY4IiBkPSJNMTEwIDQyaDF2MWgtMXoiLz48L3N2Zz4=") repeat left top / 640px 128px,
+    var(--night);
+  border-bottom: 4px solid var(--deep);
+}
+.topbar__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--coin);
+  text-shadow: 4px 4px 0 var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ice);
+  text-decoration: none;
+}
+.topbar__brand:hover { color: var(--coin); }
+.topbar__brand .rj { margin: -8px 0; }
+
+.arcade {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 24px;
+  width: 100%;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 20px var(--gutter) 24px;
+}
+.rail { width: 160px; }
+.rail[hidden] { display: none; }
+.cabinet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  grid-column: 2;
+}
+.stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 640px;
+  height: 480px;
+  max-width: 100%;
+  background: var(--ink);
+  /* arcade-monitor bezel */
+  box-shadow:
+    0 0 0 4px var(--ink),
+    0 0 0 12px var(--arcade),
+    0 0 0 16px var(--ink),
+    12px 16px 0 12px var(--ink);
+  margin: 16px 0 0;
+}
+.stage__box {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  background: var(--ink);
+}
+.stage__box iframe {
+  display: block;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--ink);
+  transform-origin: 0 0;
+}
+.stage.is-zoomed .stage__box iframe { width: auto; height: auto; }
+.stage__msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--night);
+}
+.stage__msg[hidden] { display: none; }
+.stage__msg .state { padding: 0; }
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 40px;
+}
+.btn--fullscreen { min-width: 232px; }
+.cabinet__desc { margin-top: 24px; max-width: 60ch; color: var(--ice); text-align: center; }
+.cabinet__desc[hidden] { display: none; }
+
+/* fullscreen: the stage fills the screen, letterboxed in ink */
+.stage:fullscreen { width: 100vw !important; height: 100vh !important; max-width: none; margin: 0; box-shadow: none; }
+.stage:-webkit-full-screen { width: 100vw !important; height: 100vh !important; max-width: none; margin: 0; box-shadow: none; }
+.stage.is-pseudo-fs {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none;
+  margin: 0;
+  box-shadow: none;
+}
+html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
+.stage__exit {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 3;
+  min-height: 40px;
+  padding: 8px 16px;
+}
+.stage__exit[hidden] { display: none; }
+.stage.is-idle .stage__exit { visibility: hidden; }
+
+/* ==========================================================================
+   Ad slots
+   ========================================================================== */
+.ad-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+.ad-slot.is-collapsed { display: none !important; }
+.ad-slot__label {
+  align-self: flex-start;
+  font-size: 8px;
+  line-height: 12px;
+  color: #7890b8;
+  margin-bottom: 4px;
+}
+.ad-slot__unit { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.ad-slot--160x600 .ad-slot__unit { width: 160px; min-height: 600px; }
+.ad-slot--728x90 .ad-slot__unit { width: 728px; max-width: 100%; min-height: 90px; }
+.ad-slot--300x250 .ad-slot__unit { width: 300px; min-height: 250px; }
+.ad-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  color: #6880b0;
+  font-size: 8px;
+  line-height: 12px;
+  /* 1-pixel dither, framed by a hard 4px edge */
+  background:
+    conic-gradient(var(--deep) 25%, transparent 0 50%, var(--deep) 0 75%, transparent 0) 0 0 / 8px 8px,
+    var(--night);
+  box-shadow: inset 0 0 0 4px var(--deep);
+}
+.ad-placeholder strong { font-size: 16px; line-height: 24px; color: #8098c8; font-weight: normal; }
+.ad-band { padding: 0 var(--gutter) 32px; }
+.ad-band:has(.ad-slot.is-collapsed) { display: none; }
+.library + .ad-band { padding-top: 0; }
+
+/* ==========================================================================
+   Sound toggle
+   ========================================================================== */
+.sound-toggle { min-height: 44px; padding: 8px 16px; gap: 10px; }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 1199px) {
+  .rail { display: none; }
+  .topbar__brand > span:last-child { display: none; }
+  .arcade { grid-template-columns: minmax(0, 1fr); }
+  .cabinet { grid-column: 1; }
+}
+@media (max-width: 800px) {
+  :root { --gutter: 16px; }
+  .marquee__inner { min-height: 152px; gap: 12px; }
+  .brand__words { padding-bottom: 28px; }
+  .logo__big { font-size: 32px; line-height: 40px; }
+  .logo__small { font-size: 16px; line-height: 24px; }
+  .marquee__tag { display: none; }
+  .toolbar__end { margin-left: 0; }
+  .topbar { flex-wrap: wrap; gap: 16px; }
+  .topbar__brand span:not(.rj) { display: none; }
+  .ad-band { display: none; }
+  .bubble--big { font-size: 16px; line-height: 24px; }
+}
+@media (max-width: 520px) {
+  .brand__rj svg { width: 82px; height: 92px; }
+  .shelf { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 32px 24px; }
+}
+
+/* Respect "reduce motion": everything holds still */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .rj .rj-alt { visibility: hidden !important; }
+}
+
+/* ==========================================================================
+   One-file arcade: views, RJ cards, owner page
+   ========================================================================== */
+.view { flex: 1; display: flex; flex-direction: column; }
+.marquee__tools { display: flex; gap: 20px; flex-wrap: wrap; justify-content: flex-end; }
+
+/* A game with no picture gets an RJ card */
+.poster { position: absolute; inset: 0; display: block; overflow: hidden;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjQiIHdpZHRoPSIzMjAiIGhlaWdodD0iNjQiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTEyNCAzOWgxdjNoLTF6TTEyMyA0MGgzdjFoLTN6Ii8+PHBhdGggZmlsbD0iIzM4YzhmOCIgZD0iTTE5MSA2MGgxdjFoLTF6Ii8+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTI5OSA2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjQyIDE4aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjMzhjOGY4IiBkPSJNMTAwIDQ3aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjMzhjOGY4IiBkPSJNMjc5IDU1aDF2M2gtMXpNMjc4IDU2aDN2MWgtM3oiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjA1IDQyaDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMTIwIDQyaDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMjY5IDI2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMzQgMTJoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNiOGUwZjgiIGQ9Ik0xNTcgNTFoMXYzaC0xek0xNTYgNTJoM3YxaC0zeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0xMzkgMzJoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yMjAgMjdoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik03MCA1OGgxdjFoLTF6Ii8+PHBhdGggZmlsbD0iI2I4ZTBmOCIgZD0iTTUxIDRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0yNTYgMTVoMXYzaC0xek0yNTUgMTZoM3YxaC0zeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0yMjUgNTFoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yMTcgMzRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiMzOGM4ZjgiIGQ9Ik0yOTUgMjRoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0zMDEgMTZoMXYxaC0xeiIvPjxwYXRoIGZpbGw9IiNmMGY4ZjgiIGQ9Ik0xNyA1NmgxdjNoLTF6TTE2IDU3aDN2MWgtM3oiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMzEyIDQ0aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjYjhlMGY4IiBkPSJNMTY5IDM2aDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjZjBmOGY4IiBkPSJNMTEwIDQyaDF2MWgtMXoiLz48L3N2Zz4=") repeat 0 0 / 320px 64px, var(--night); }
+.poster--1 { background-color: #081830; }
+.poster--2 { background-color: #100828; }
+.poster::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNjQiIHdpZHRoPSIzMjAiIGhlaWdodD0iNjQiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+PHBhdGggZmlsbD0iIzE4Mzg3OCIgZD0iTTAgMTRoMTZ2NTBoLTE2ek02IDExaDR2M2gtNHpNNyA4aDJ2M2gtMnpNMTYgMjRoMTZ2NDBoLTE2ek0yMiAyMWg0djNoLTR6TTMyIDEyaDE4djUyaC0xOHpNMzkgOWg0djNoLTR6TTQwIDZoMnYzaC0yek01MCAxNWgyNHY0OWgtMjR6TTYwIDEyaDR2M2gtNHpNNjEgOWgydjNoLTJ6TTc0IDE0aDI0djUwaC0yNHpNODQgMTFoNHYzaC00ek05OCAxNWgxNHY0OWgtMTR6TTExMiAxOGgxOHY0NmgtMTh6TTExMyAxNmgxNnYyaC0xNnpNMTMwIDI0aDE2djQwaC0xNnpNMTM2IDIxaDR2M2gtNHpNMTM3IDE4aDJ2M2gtMnpNMTQ2IDI2aDE4djM4aC0xOHpNMTUzIDIzaDR2M2gtNHpNMTY0IDE2aDI0djQ4aC0yNHpNMTc0IDEzaDR2M2gtNHpNMTc1IDEwaDJ2M2gtMnpNMTg4IDIyaDI0djQyaC0yNHpNMjEyIDI4aDE4djM2aC0xOHpNMjE5IDI1aDR2M2gtNHpNMjIwIDIyaDJ2M2gtMnpNMjMwIDE3aDIwdjQ3aC0yMHpNMjM4IDE0aDR2M2gtNHpNMjM5IDExaDJ2M2gtMnpNMjUwIDE2aDIwdjQ4aC0yMHpNMjU4IDEzaDR2M2gtNHpNMjcwIDEzaDE0djUxaC0xNHpNMjc1IDEwaDR2M2gtNHpNMjg0IDEwaDI0djU0aC0yNHpNMjk0IDdoNHYzaC00ek0zMDggMjFoMTJ2NDNoLTEyek0zMTIgMThoNHYzaC00ek0zMTMgMTVoMnYzaC0yeiIvPjxwYXRoIGZpbGw9IiMyMDQ4YTgiIGQ9Ik01IDE3aDF2MmgtMXpNMiAyMWgxdjJoLTF6TTUgMjFoMXYyaC0xek0xMSAyMWgxdjJoLTF6TTUgMjVoMXYyaC0xek04IDI5aDF2MmgtMXpNMiAzM2gxdjJoLTF6TTUgMzNoMXYyaC0xek0xMSAzM2gxdjJoLTF6TTUgNDFoMXYyaC0xek0xMSA0MWgxdjJoLTF6TTIgNDVoMXYyaC0xek04IDUzaDF2MmgtMXpNMTEgNTNoMXYyaC0xek01IDU3aDF2MmgtMXpNMTggMjdoMXYyaC0xek0yNyAyN2gxdjJoLTF6TTIxIDMxaDF2MmgtMXpNMjcgNDNoMXYyaC0xek0yNyA1MWgxdjJoLTF6TTIxIDU1aDF2MmgtMXpNMjQgNTVoMXYyaC0xek0yNyA1NWgxdjJoLTF6TTIxIDU5aDF2MmgtMXpNMjQgNTloMXYyaC0xek0zNyAxNWgxdjJoLTF6TTQzIDE5aDF2MmgtMXpNNDYgMTloMXYyaC0xek0zNCAyM2gxdjJoLTF6TTQwIDIzaDF2MmgtMXpNNDYgMjNoMXYyaC0xek0zNyAyN2gxdjJoLTF6TTM0IDMxaDF2MmgtMXpNNDYgMzloMXYyaC0xek00MCA0M2gxdjJoLTF6TTQ2IDQzaDF2MmgtMXpNNDYgNDdoMXYyaC0xek0zNCA1MWgxdjJoLTF6TTM3IDU1aDF2MmgtMXpNMzcgNTloMXYyaC0xek01MiAyMmgxdjJoLTF6TTY3IDIyaDF2MmgtMXpNNjcgMjZoMXYyaC0xek03MCAyNmgxdjJoLTF6TTU4IDMwaDF2MmgtMXpNNTUgMzRoMXYyaC0xek01NSAzOGgxdjJoLTF6TTU4IDM4aDF2MmgtMXpNNTUgNDJoMXYyaC0xek03MCA0MmgxdjJoLTF6TTU4IDQ2aDF2MmgtMXpNNzAgNDZoMXYyaC0xek02NCA1MGgxdjJoLTF6TTY3IDUwaDF2MmgtMXpNNTIgNTRoMXYyaC0xek01NSA1OGgxdjJoLTF6TTYxIDU4aDF2MmgtMXpNNzAgNThoMXYyaC0xek03OSAxN2gxdjJoLTF6TTg4IDE3aDF2MmgtMXpNNzkgMjFoMXYyaC0xek05MSAyNWgxdjJoLTF6TTc2IDI5aDF2MmgtMXpNNzkgMjloMXYyaC0xek04NSAyOWgxdjJoLTF6TTg4IDMzaDF2MmgtMXpNOTQgMzNoMXYyaC0xek03OSA0OWgxdjJoLTF6TTgyIDQ5aDF2MmgtMXpNODggNDloMXYyaC0xek05MSA0OWgxdjJoLTF6TTk0IDQ5aDF2MmgtMXpNODUgNTNoMXYyaC0xek05NCA1M2gxdjJoLTF6TTgyIDU3aDF2MmgtMXpNMTA5IDE4aDF2MmgtMXpNMTAwIDMwaDF2MmgtMXpNMTA2IDMwaDF2MmgtMXpNMTAwIDM0aDF2MmgtMXpNMTA5IDM0aDF2MmgtMXpNMTAwIDUwaDF2MmgtMXpNMTA5IDUwaDF2MmgtMXpNMTAwIDU0aDF2MmgtMXpNMTA5IDU0aDF2MmgtMXpNMTAzIDU4aDF2MmgtMXpNMTA2IDU4aDF2MmgtMXpNMTI2IDIxaDF2MmgtMXpNMTIzIDI1aDF2MmgtMXpNMTI2IDI5aDF2MmgtMXpNMTE0IDMzaDF2MmgtMXpNMTI2IDMzaDF2MmgtMXpNMTIzIDQxaDF2MmgtMXpNMTI2IDQxaDF2MmgtMXpNMTE0IDQ1aDF2MmgtMXpNMTIzIDQ1aDF2MmgtMXpNMTIwIDQ5aDF2MmgtMXpNMTE3IDUzaDF2MmgtMXpNMTIzIDU3aDF2MmgtMXpNMTI2IDU3aDF2MmgtMXpNMTQxIDI3aDF2MmgtMXpNMTM1IDMxaDF2MmgtMXpNMTM4IDMxaDF2MmgtMXpNMTMyIDM1aDF2MmgtMXpNMTQxIDM1aDF2MmgtMXpNMTM1IDM5aDF2MmgtMXpNMTQxIDM5aDF2MmgtMXpNMTMyIDQ3aDF2MmgtMXpNMTQxIDQ3aDF2MmgtMXpNMTMyIDU5aDF2MmgtMXpNMTU3IDMzaDF2MmgtMXpNMTYwIDMzaDF2MmgtMXpNMTQ4IDM3aDF2MmgtMXpNMTU0IDM3aDF2MmgtMXpNMTYwIDQxaDF2MmgtMXpNMTQ4IDQ5aDF2MmgtMXpNMTU3IDQ5aDF2MmgtMXpNMTUxIDUzaDF2MmgtMXpNMTc4IDE5aDF2MmgtMXpNMTgxIDE5aDF2MmgtMXpNMTY2IDI3aDF2MmgtMXpNMTcyIDI3aDF2MmgtMXpNMTgxIDI3aDF2MmgtMXpNMTc4IDMxaDF2MmgtMXpNMTg0IDMxaDF2MmgtMXpNMTY5IDM1aDF2MmgtMXpNMTc4IDM1aDF2MmgtMXpNMTcyIDM5aDF2MmgtMXpNMTgxIDM5aDF2MmgtMXpNMTg0IDM5aDF2MmgtMXpNMTc1IDQzaDF2MmgtMXpNMTY2IDQ3aDF2MmgtMXpNMTc1IDQ3aDF2MmgtMXpNMTY5IDU1aDF2MmgtMXpNMTcyIDU1aDF2MmgtMXpNMTg0IDU1aDF2MmgtMXpNMTcyIDU5aDF2MmgtMXpNMTk2IDI1aDF2MmgtMXpNMTkzIDI5aDF2MmgtMXpNMTk5IDI5aDF2MmgtMXpNMTkwIDM3aDF2MmgtMXpNMTkzIDM3aDF2MmgtMXpNMTk2IDM3aDF2MmgtMXpNMjA1IDM3aDF2MmgtMXpNMTk2IDQxaDF2MmgtMXpNMTk5IDQxaDF2MmgtMXpNMjAyIDQxaDF2MmgtMXpNMjA4IDQxaDF2MmgtMXpNMTkwIDQ1aDF2MmgtMXpNMTk5IDQ5aDF2MmgtMXpNMjA4IDQ5aDF2MmgtMXpNMTk5IDUzaDF2MmgtMXpNMjA1IDUzaDF2MmgtMXpNMjAyIDU3aDF2MmgtMXpNMjA1IDU3aDF2MmgtMXpNMjE3IDM1aDF2MmgtMXpNMjIwIDM1aDF2MmgtMXpNMjI2IDM1aDF2MmgtMXpNMjI2IDM5aDF2MmgtMXpNMjE3IDQzaDF2MmgtMXpNMjIwIDQzaDF2MmgtMXpNMjI2IDQzaDF2MmgtMXpNMjE3IDUxaDF2MmgtMXpNMjI2IDUxaDF2MmgtMXpNMjIwIDU1aDF2MmgtMXpNMjIzIDU5aDF2MmgtMXpNMjM1IDIwaDF2MmgtMXpNMjM4IDIwaDF2MmgtMXpNMjQ3IDIwaDF2MmgtMXpNMjMyIDI0aDF2MmgtMXpNMjM4IDI4aDF2MmgtMXpNMjQ3IDI4aDF2MmgtMXpNMjM1IDMyaDF2MmgtMXpNMjQxIDMyaDF2MmgtMXpNMjM1IDM2aDF2MmgtMXpNMjM1IDQwaDF2MmgtMXpNMjQ0IDQwaDF2MmgtMXpNMjQ3IDQwaDF2MmgtMXpNMjQxIDQ0aDF2MmgtMXpNMjM1IDQ4aDF2MmgtMXpNMjM4IDQ4aDF2MmgtMXpNMjQxIDQ4aDF2MmgtMXpNMjQ0IDQ4aDF2MmgtMXpNMjM1IDU2aDF2MmgtMXpNMjM4IDU2aDF2MmgtMXpNMjQxIDU2aDF2MmgtMXpNMjU4IDE5aDF2MmgtMXpNMjY0IDE5aDF2MmgtMXpNMjY3IDIzaDF2MmgtMXpNMjY3IDI3aDF2MmgtMXpNMjUyIDMxaDF2MmgtMXpNMjU1IDMxaDF2MmgtMXpNMjUyIDM1aDF2MmgtMXpNMjYxIDM5aDF2MmgtMXpNMjY3IDM5aDF2MmgtMXpNMjUyIDQ3aDF2MmgtMXpNMjU4IDQ3aDF2MmgtMXpNMjUyIDUxaDF2MmgtMXpNMjU1IDUxaDF2MmgtMXpNMjU4IDU1aDF2MmgtMXpNMjU1IDU5aDF2MmgtMXpNMjYxIDU5aDF2MmgtMXpNMjY0IDU5aDF2MmgtMXpNMjc1IDE2aDF2MmgtMXpNMjc4IDE2aDF2MmgtMXpNMjc1IDIwaDF2MmgtMXpNMjcyIDMyaDF2MmgtMXpNMjc1IDMyaDF2MmgtMXpNMjcyIDM2aDF2MmgtMXpNMjc1IDM2aDF2MmgtMXpNMjgxIDM2aDF2MmgtMXpNMjc4IDQwaDF2MmgtMXpNMjcyIDQ0aDF2MmgtMXpNMjc1IDQ0aDF2MmgtMXpNMjgxIDQ0aDF2MmgtMXpNMjgxIDQ4aDF2MmgtMXpNMjcyIDUyaDF2MmgtMXpNMjgxIDUyaDF2MmgtMXpNMjcyIDU2aDF2MmgtMXpNMjc4IDU2aDF2MmgtMXpNMjg5IDEzaDF2MmgtMXpNMjk1IDEzaDF2MmgtMXpNMjk4IDEzaDF2MmgtMXpNMjg5IDE3aDF2MmgtMXpNMjkyIDE3aDF2MmgtMXpNMzAxIDE3aDF2MmgtMXpNMjg2IDIxaDF2MmgtMXpNMjk1IDIxaDF2MmgtMXpNMjk4IDIxaDF2MmgtMXpNMjg5IDI1aDF2MmgtMXpNMjkyIDI1aDF2MmgtMXpNMjg5IDMzaDF2MmgtMXpNMjk1IDMzaDF2MmgtMXpNMjk4IDMzaDF2MmgtMXpNMjk4IDM3aDF2MmgtMXpNMzAxIDM3aDF2MmgtMXpNMjkyIDQxaDF2MmgtMXpNMzA0IDQxaDF2MmgtMXpNMjk1IDQ1aDF2MmgtMXpNMjg2IDQ5aDF2MmgtMXpNMjg5IDQ5aDF2MmgtMXpNMzAxIDQ5aDF2MmgtMXpNMjk4IDUzaDF2MmgtMXpNMzA0IDUzaDF2MmgtMXpNMjk1IDU3aDF2MmgtMXpNMjk4IDU3aDF2MmgtMXpNMzE2IDI0aDF2MmgtMXpNMzE2IDI4aDF2MmgtMXpNMzEzIDMyaDF2MmgtMXpNMzEwIDQ4aDF2MmgtMXpNMzEwIDUyaDF2MmgtMXpNMzEzIDU2aDF2MmgtMXoiLz48cGF0aCBmaWxsPSIjMDgxMDI4IiBkPSJNMCAzMGgxMHYzNGgtMTB6TTMgMjdoNHYzaC00ek00IDI0aDJ2M2gtMnpNMTAgNDNoMTJ2MjFoLTEyek0xNCA0MGg0djNoLTR6TTIyIDQ2aDEydjE4aC0xMnpNMjYgNDNoNHYzaC00ek0zNiAzOWgxMHYyNWgtMTB6TTM3IDM3aDh2MmgtOHpNNDYgMzhoMTR2MjZoLTE0ek00NyAzNmgxMnYyaC0xMnpNNjAgNDRoMTB2MjBoLTEwek02MyA0MWg0djNoLTR6TTY0IDM4aDJ2M2gtMnpNNzAgMzJoMjJ2MzJoLTIyek05MiA0NGgxMHYyMGgtMTB6TTk1IDQxaDR2M2gtNHpNOTYgMzhoMnYzaC0yek0xMDQgNDVoMjJ2MTloLTIyek0xMTMgNDJoNHYzaC00ek0xMjYgNDZoMjZ2MThoLTI2ek0xMjcgNDRoMjR2MmgtMjR6TTE1NCA0M2gxOHYyMWgtMTh6TTE3MiAzM2gxOHYzMWgtMTh6TTE3OSAzMGg0djNoLTR6TTE4MCAyN2gydjNoLTJ6TTE5MiA0NGgxMnYyMGgtMTJ6TTE5NiA0MWg0djNoLTR6TTE5NyAzOGgydjNoLTJ6TTIwNCAzMWgyMnYzM2gtMjJ6TTIxMyAyOGg0djNoLTR6TTIxNCAyNWgydjNoLTJ6TTIyNiAyOGgyNnYzNmgtMjZ6TTIzNyAyNWg0djNoLTR6TTIzOCAyMmgydjNoLTJ6TTI1MiA0MGgxNHYyNGgtMTR6TTI1NyAzN2g0djNoLTR6TTI2NiAzNGgxNnYzMGgtMTZ6TTI3MiAzMWg0djNoLTR6TTI4MiAzMWgyNnYzM2gtMjZ6TTI5MyAyOGg0djNoLTR6TTI5NCAyNWgydjNoLTJ6TTMxMCAzNmgxMHYyOGgtMTB6TTMxMSAzNGg4djJoLTh6Ii8+PHBhdGggZmlsbD0iI2Y4YzgzOCIgZD0iTTUgMzdoMnYyaC0yek0yIDQxaDJ2MmgtMnpNMiA1M2gydjJoLTJ6TTI3IDQ5aDJ2MmgtMnpNNDggNDFoMnYyaC0yek01NCA1N2gydjJoLTJ6TTY1IDU1aDJ2MmgtMnpNNzggMzVoMnYyaC0yek03OCAzOWgydjJoLTJ6TTgxIDM5aDJ2MmgtMnpNNzIgNDNoMnYyaC0yek03NSA0M2gydjJoLTJ6TTc4IDQzaDJ2MmgtMnpNODEgNDdoMnYyaC0yek03MiA1NWgydjJoLTJ6TTgxIDU1aDJ2MmgtMnpNMTEyIDUyaDJ2MmgtMnpNMTE1IDUyaDJ2MmgtMnpNMTE4IDUyaDJ2MmgtMnpNMTA2IDU2aDJ2MmgtMnpNMTA5IDU2aDJ2MmgtMnpNMTMxIDUzaDJ2MmgtMnpNMTQzIDUzaDJ2MmgtMnpNMTQzIDU3aDJ2MmgtMnpNMTU5IDQ2aDJ2MmgtMnpNMTYyIDUwaDJ2MmgtMnpNMTY1IDUwaDJ2MmgtMnpNMTYyIDU0aDJ2MmgtMnpNMTgwIDM2aDJ2MmgtMnpNMTc3IDQwaDJ2MmgtMnpNMTc3IDQ0aDJ2MmgtMnpNMTc3IDQ4aDJ2MmgtMnpNMTgzIDQ4aDJ2MmgtMnpNMjAwIDQ3aDJ2MmgtMnpNMjA2IDM0aDJ2MmgtMnpNMjIxIDM0aDJ2MmgtMnpNMjEyIDQyaDJ2MmgtMnpNMjMxIDMxaDJ2MmgtMnpNMjM0IDMxaDJ2MmgtMnpNMjMxIDM5aDJ2MmgtMnpNMjQzIDM5aDJ2MmgtMnpNMjM3IDQ3aDJ2MmgtMnpNMjMxIDU5aDJ2MmgtMnpNMjQ5IDU5aDJ2MmgtMnpNMjYwIDQzaDJ2MmgtMnpNMjU0IDQ3aDJ2MmgtMnpNMjYwIDQ3aDJ2MmgtMnpNMjU0IDUxaDJ2MmgtMnpNMjYzIDU5aDJ2MmgtMnpNMjc3IDQ1aDJ2MmgtMnpNMjY4IDQ5aDJ2MmgtMnpNMjY4IDU3aDJ2MmgtMnpNMjc0IDU3aDJ2MmgtMnpNMzA1IDQ2aDJ2MmgtMnpNMjg0IDUwaDJ2MmgtMnpNMjg3IDU4aDJ2MmgtMnpNMjk2IDU4aDJ2MmgtMnpNMzEyIDM5aDJ2MmgtMnpNMzEyIDQ3aDJ2MmgtMnoiLz48cGF0aCBmaWxsPSIjMzhjOGY4IiBkPSJNMiAzM2gxdjJoLTF6TTUgNDVoMXYyaC0xek01NyA1M2gxdjJoLTF6TTg3IDUxaDF2MmgtMXpNMTI5IDUxaDIwdjJoLTIwek0xNTYgNDZoMXYyaC0xek0xNzcgNTJoMXYyaC0xek0xODYgNTJoMXYyaC0xek0yMTIgMzhoMXYyaC0xek0yMDkgNDJoMXYyaC0xek0yMDkgNTRoMXYyaC0xek0yMjEgNTRoMXYyaC0xek0yMDkgNThoMXYyaC0xek0yNDAgMzFoMXYyaC0xek0yMzEgNTVoMXYyaC0xek0yNzEgNDFoMXYyaC0xek0yODcgMzRoMXYyaC0xek0yOTkgNDZoMXYyaC0xek0zMTIgNTloMXYyaC0xeiIvPjxwYXRoIGZpbGw9IiNlMDcwMjgiIGQ9Ik0xMjggNTBoMjJ2NGgtMjJ6Ii8+PC9zdmc+") repeat-x left bottom / 320px 64px; }
+.poster__title {
+  position: absolute; left: 12px; right: 12px; top: 10px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere;
+  color: var(--moon);
+  text-shadow: 2px 0 var(--ink), -2px 0 var(--ink), 0 2px var(--ink), 0 -2px var(--ink), 4px 4px var(--ink);
+}
+.cart__label .poster__rj { position: absolute; left: 4px; bottom: 0; width: 82px; height: 92px; object-fit: contain; image-rendering: pixelated; }
+
+/* ---- owner page ---- */
+.owner { flex: 1; width: 100%; max-width: 1080px; margin: 0 auto; padding: 32px var(--gutter) 64px; display: grid; gap: 48px; align-content: start; }
+.owner-hello { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; }
+.owner-hello .bubble { margin-bottom: 56px; }
+.owner-card { --bg: var(--deep); --hi: var(--dusk); --lo: var(--ink); --lift: 8px; padding: 28px 28px 32px; margin-right: 12px; }
+.owner-card h2 { font-size: 24px; line-height: 32px; margin-bottom: 16px; color: var(--coin); }
+.owner-card p { color: var(--ice); max-width: 64ch; }
+.owner-card p + p { margin-top: 12px; }
+.owner code { font-family: inherit; color: var(--coin); }
+.owner a:not(.btn) { color: var(--electric); }
+.owner .field { display: block; margin-top: 20px; color: var(--ice); max-width: 640px; }
+.owner input[type=text], .owner input[type=password], .owner textarea {
+  display: block; width: 100%; margin-top: 6px; padding: 10px 12px; border: 0;
+  background: var(--night); color: var(--moon); box-shadow: inset 0 0 0 4px var(--ink);
+}
+.owner textarea { min-height: 88px; resize: vertical; font-size: 16px; line-height: 24px; }
+.owner input:focus, .owner textarea:focus { outline: 4px solid var(--coin); outline-offset: 2px; }
+.owner details { margin-top: 24px; color: var(--ice); }
+.owner summary { cursor: pointer; color: var(--electric); }
+.owner-row { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 24px; align-items: center; }
+.owner-msg { margin-top: 20px; color: var(--moon); }
+.owner-msg:empty { display: none; }
+.owner-msg.is-bad { color: var(--coin); }
+.owner-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 24px; counter-reset: s; }
+.owner-steps > li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; color: var(--ice); }
+.owner-steps > li::before { counter-increment: s; content: counter(s); display: grid; place-items: center; width: 40px; height: 40px;
+  background: var(--coin); color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.owner-steps ul { margin: 8px 0 0; padding-left: 24px; }
+.owner-top { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; color: var(--ice); }
+.owner-picked { margin-top: 24px; color: var(--moon); }
+.owner-preview { display: grid; grid-template-columns: minmax(0, 480px) minmax(0, 1fr); gap: 28px; margin-top: 24px; align-items: start; }
+.owner-preview__frame { position: relative; aspect-ratio: 4 / 3; background: var(--ink); box-shadow: 0 0 0 4px var(--ink); }
+.owner-preview__frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.owner-preview__frame p { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; }
+.owner-preview__side { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+.owner-pic { width: 200px; height: 150px; object-fit: cover; background: var(--night); box-shadow: 0 0 0 4px var(--ink); }
+.owner-pic.is-rj, .owner-game > img.is-rj { object-fit: contain; object-position: left bottom; image-rendering: pixelated; }
+.owner-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; }
+.owner-game { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 24px; padding-bottom: 28px; border-bottom: 4px solid var(--dusk); }
+.owner-game:last-child { border-bottom: 0; padding-bottom: 0; }
+.owner-game > img { width: 160px; height: 120px; object-fit: cover; background: var(--night); box-shadow: 0 0 0 4px var(--ink); }
+.owner-game .field { margin-top: 0; margin-bottom: 16px; }
+.owner-game .owner-row { margin-top: 4px; gap: 16px; }
+.owner-ads .field textarea { font-size: 16px; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+.btn--small { min-height: 40px; padding: 8px 14px; gap: 8px; }
+.btn--danger { --bg: #801828; --hi: #b02838; --lo: #400818; }
+.btn--danger:hover { --bg: #a02030; --hi: #d03838; color: var(--moon); }
+@media (max-width: 760px) { .owner-preview, .owner-game { grid-template-columns: 1fr; } }
+
+</style>
+</head>
+<body>
+
+<!-- ============================== HOME ============================== -->
+<div class="view" id="view-home">
+  <header class="marquee">
+    <span class="twinkle" style="left:22%;top:20px" aria-hidden="true"></span>
+    <span class="twinkle" style="left:58%;top:44px" aria-hidden="true"></span>
+    <span class="twinkle" style="left:83%;top:28px" aria-hidden="true"></span>
+    <div class="marquee__city" aria-hidden="true"></div>
+    <div class="marquee__inner">
+      <a class="brand" href="#/" aria-label="RJ's Gamekade home">
+        <span class="brand__rj" data-rj="idle" data-rj-scale="3" data-rj-live></span>
+        <span class="brand__words">
+          <span class="logo" aria-hidden="true"><span class="logo__small">RJ's</span><span class="logo__big">Gamekade</span></span>
+          <span class="marquee__tag">Free games that play right in your browser.</span>
+        </span>
+      </a>
+      <div class="marquee__tools">
+        <a class="btn px btn--quiet" href="#/owner" id="owner-link" hidden>Manage games</a>
+        <button class="btn px btn--quiet sound-toggle" type="button" data-sound-toggle aria-pressed="false">
+          <span data-icon="sound-off"></span><span data-sound-label>Sound off</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="library" aria-labelledby="library-title">
+    <div class="toolbar" id="toolbar">
+      <h1 class="library__title" id="library-title">Pick a game<span class="library__count" id="game-count" aria-live="polite"></span></h1>
+      <label class="search px" id="search-box" hidden>
+        <span data-icon="search"></span>
+        <span class="visually-hidden">Search games</span>
+        <input type="search" id="search" placeholder="Search games" autocomplete="off" spellcheck="false" enterkeyhint="search">
+        <button class="search__clear" type="button" id="search-clear" aria-label="Clear search"><span data-icon="close"></span></button>
+      </label>
+      <div class="toolbar__end">
+        <button class="btn px" type="button" id="random-game" hidden><span data-icon="dice"></span>Random game</button>
+      </div>
+    </div>
+    <ul class="shelf" id="shelf" hidden></ul>
+    <div class="state" id="state" role="status">
+      <div class="state__rj loading-rj" data-rj="skate" data-rj-live></div>
+      <div class="state__copy"><p class="bubble px">Loading games…</p></div>
+    </div>
+  </main>
+
+  <div class="ad-band"><div class="ad-slot" data-ad-slot="home-bottom"></div></div>
+</div>
+
+<!-- ============================== PLAY ============================== -->
+<div class="view" id="view-play" hidden>
+  <header class="topbar">
+    <a class="btn px btn--quiet" href="#/"><span data-icon="back"></span>All games</a>
+    <h1 class="topbar__title" id="game-title">Loading game…</h1>
+    <a class="topbar__brand" href="#/" aria-label="RJ's Gamekade home"><span data-rj="head" data-rj-scale="2" data-rj-label=""></span><span>RJ's Gamekade</span></a>
+    <button class="btn px btn--quiet sound-toggle" type="button" data-sound-toggle aria-pressed="false">
+      <span data-icon="sound-off"></span><span data-sound-label>Sound off</span>
+    </button>
+  </header>
+  <main class="arcade">
+    <aside class="rail rail--left"><div class="ad-slot" data-ad-slot="play-left"></div></aside>
+    <section class="cabinet" id="cabinet" aria-labelledby="game-title">
+      <div class="stage" id="stage">
+        <div class="stage__box" id="stage-box"></div>
+        <button class="btn px stage__exit" type="button" id="exit-fs" hidden><span data-icon="fullscreen-exit"></span>Exit fullscreen</button>
+        <div class="stage__msg" id="stage-msg">
+          <div class="state">
+            <div class="state__rj loading-rj" data-rj="skate" data-rj-live></div>
+            <div class="state__copy"><p class="bubble px">Loading game…</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="controls" id="controls">
+        <button class="btn px btn--fullscreen" type="button" id="fs-btn" title="Play fullscreen. Press Esc to exit." hidden>
+          <span data-icon="fullscreen" data-icon-scale="3"></span><span data-fs-label>Fullscreen</span>
+        </button>
+      </div>
+      <p class="cabinet__desc" id="game-desc" hidden></p>
+    </section>
+    <aside class="rail rail--right"><div class="ad-slot" data-ad-slot="play-right"></div></aside>
+  </main>
+  <div class="ad-band"><div class="ad-slot" data-ad-slot="play-bottom"></div></div>
+</div>
+
+<!-- ============================== OWNER ============================= -->
+<div class="view" id="view-owner" hidden>
+  <header class="topbar">
+    <a class="btn px btn--quiet" href="#/"><span data-icon="back"></span>Back to the arcade</a>
+    <h1 class="topbar__title">Arcade owner</h1>
+    <a class="topbar__brand" href="#/" aria-label="RJ's Gamekade home"><span data-rj="head" data-rj-scale="2" data-rj-label=""></span><span>RJ's Gamekade</span></a>
+  </header>
+  <main class="owner" id="owner"></main>
+</div>
+
+<footer class="footer"><p>RJ's Gamekade. No tracking, no accounts, just games.</p></footer>
+
+<script>
+/*
+ * RJ's Gamekade — pixel art
+ * --------------------------------------------------------------
+ * RJ the Squirrel and every icon on the site are drawn here as tiny
+ * pixel grids and turned into crisp SVG at runtime. The same file is
+ * used by the build script to draw placeholder thumbnails, so the art
+ * always matches.
+ *
+ * Works in the browser (window.PixelArt) and in Node (require()).
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.PixelArt = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  // Every color is a real SNES 15-bit color (each channel a multiple of 8).
+  var PALETTE = {
+    k: '#080820', // ink / outline
+    o: '#e07028', // fur
+    d: '#a04818', // fur shade
+    h: '#f8a048', // fur light
+    c: '#f8e0b0', // cream
+    w: '#f8f8f8', // white
+    n: '#602030', // nose
+    y: '#f8c838', // beanie / coin yellow
+    Y: '#c89020', // beanie shade
+    r: '#d03838', // flannel
+    R: '#801828', // flannel dark
+    t: '#e8f0f8', // tee
+    g: '#a8b8d0', // tee shade
+    j: '#3858b8', // jeans
+    J: '#203078', // jeans dark
+    s: '#f0f0f0', // sneaker
+    S: '#9098a8', // sneaker shade
+    e: '#38c8f8'  // electric (tear)
+  };
+
+  // ---- RJ the Squirrel ------------------------------------------------
+  // Run-length encoded rows: "4.2k3o" = 4 empty, 2 ink, 3 fur. Rows are
+  // separated by "|". All body layers share one 41x46 canvas.
+  var RJ_W = 41, RJ_H = 46;
+  var RJ_LAYERS = {
+    tail0: "41.|41.|41.|41.|41.|5.4k32.|4.kh2od2k30.|3.kh5odk29.|2.kh6od2k28.|.kh9odk27.|.kh10odk26.|kh12odk25.|.kh3od7odk25.|.kh4o2d6odk24.|.kh12odk24.|.kh12odk24.|2.2khd8odk25.|3.kho2d6odk25.|2.kh4od5odk25.|2.kh10odk25.|2.kh10odk25.|3.kh8odk26.|3.kh8odk26.|3.khd6odk27.|3.kho2d5odk26.|3.kh7odk27.|3.kh7odk27.|4.kh7odk26.|4.kh7odk26.|4.khd6odk26.|5.khd6odk25.|5.khod5od2k24.|6.kh8odk23.|7.2kh6odk23.|8.kh7odk22.|9.2kh4odk23.|11.2kh2odk23.|13.4k24.|41.|41.|41.|41.|41.|41.|41.|41.",
+    tail1: "41.|41.|41.|41.|7.2k32.|5.2khd2k30.|2.3kh4odk29.|.kh7odk29.|.kh8odk28.|.kh9odk27.|.kh10odk26.|kh12odk25.|kh4od7odk25.|.2kh3o2d6odk24.|3.kh10odk24.|3.kh10odk24.|3.khd8odk25.|3.kho2d6odk25.|2.kh4od5odk25.|2.kh10odk25.|2.kh10odk25.|3.kh8odk26.|3.kh8odk26.|3.khd6odk27.|3.kho2d5odk26.|3.kh7odk27.|3.kh7odk27.|4.kh7odk26.|4.kh7odk26.|4.khd6odk26.|5.khd6odk25.|5.khod5od2k24.|6.kh8odk23.|7.2kh6odk23.|8.kh7odk22.|9.2kh4odk23.|11.2kh2odk23.|13.4k24.|41.|41.|41.|41.|41.|41.|41.|41.",
+    tailSad: "41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|5.4k32.|4.kh2odk31.|3.kh4odk30.|2.kh5odk30.|2.kh5odk30.|2.kh5odk30.|.khd5odk30.|.kho2d3odk30.|.kh6odk30.|.kh6odk30.|.khod5odk29.|.kh2od4odk29.|.kh3od3odk29.|.kh4od3od4k25.|.kh12od2k23.|2.kh13odk22.|3.kh12odk22.|4.kh11odk22.|5.kh10odk22.|6.kh7od2k23.|7.9k25.|41.|41.|41.|41.|41.|41.|41.",
+    idle: "14.k14.k11.|13.kdk12.kdk10.|14.khk10.k2ok10.|14.kohk9.khok10.|14.k2ohk7.kohok10.|14.k2oco7k2ohok10.|15.ko2k7y2k2ok10.|15.2k11ykok10.|15.k13y2k10.|13.2k15yk10.|12.k18yk9.|11.k19yk9.|11.ky18Yk9.|11.ky18Yk9.|11.k6y4k2o3k3ok10.|11.k6y2w2k2o2wk3o3k8.|12.k4yo2w2k2o2wk6o2k6.|13.2k11o6conhk5.|14.k10o8c2nk5.|15.k5h4o8cok6.|15.k5h4o7ckok6.|15.k5h5o8k7.|16.3k7ok2R2wRk8.|15.11kR5k9.|14.k4rkrg4tR2rk11.|14.k4rkrg4tR3rk10.|14.k4rkrg4tR3rk10.|14.k4RkR5t4Rk10.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rRk9.|14.k4RkR5t5Rk9.|14.k4rkr5tR3rRk9.|14.k4ok7t3rRk9.|14.kd3ok7t3rRk9.|15.4k3j2J5j2k10.|16.kJ4j2k5jk11.|16.kJj2cj2kJ4jk11.|15.2kJ4j2kJ4j2k10.|14.k5srs2k5srsk9.|14.k4sr2s2k4sr2sk9.|14.k7S2k7Sk9.|15.7k2.7k10.|41.|41.|41.",
+    blink: "41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|18.4o2.3o14.|18.4o2.3o14.|18.2k4.2k15.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.",
+    wave: "14.k14.k11.|13.kdk12.kdk10.|14.khk10.k2ok10.|14.kohk9.khok10.|14.k2ohk7.kohok10.|14.k2oco7k2ohok10.|15.ko2k7y2k2ok10.|15.2k11ykok10.|15.k13y2k3.k.k.k2.|13.2k15yk2.kokokok.|12.k18yk.kododok.|11.k19yk.k5ok.|11.ky18Yk.k5ok.|11.ky18Yk.k2d3ok.|11.k6yo2w4o2w3ok3.5k2.|11.k6y2w2k2o2wk3o4k2rk4.|12.k4yo2w2k2o2wk5ok3rRk3.|13.2k11o6ck3rRk3.|14.k10o6ckR3rk4.|15.k5h4o5ckrR2rk5.|15.k5h4o5ckrR2rk5.|15.k5h5o4k2rRrk6.|16.3k7ok2Rk2rRk7.|15.11kR2k3rRk7.|14.k4rkrg4tRkR3rk8.|14.k4rkrg4tRr4k9.|14.k4rkrg4tR3rk10.|14.k4RkR5t4Rk10.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rRk9.|14.k4RkR5t5Rk9.|14.k4rkr5tR3rRk9.|14.k4ok7t3rRk9.|14.k4ok7t3rRk9.|15.4k3j2J5j2k10.|16.kJ4j2k5jk11.|16.kJj2cj2kJ4jk11.|15.2kJ4j2kJ4j2k10.|14.k5srs2k5srsk9.|14.k4sr2s2k4sr2sk9.|14.k7S2k7Sk9.|15.7k2.7k10.|41.|41.|41.",
+    thumbs: "14.k14.k11.|13.kdk12.kdk10.|14.khk10.k2ok10.|14.kohk9.khok10.|14.k2ohk7.kohok10.|14.k2oco7k2ohok10.|15.ko2k7y2k2ok10.|15.2k11ykok10.|15.k13y2k10.|13.2k15yk10.|12.k18yk9.|11.k19yk9.|11.ky18Yk9.|11.ky18Yk9.|11.k6y4k8ok10.|11.k6y2w2k3ok4o3k8.|12.k4yo2w2k2okok6o2k6.|13.2k11o6conh3k3.|14.k10o8c2nkhok2.|15.k5h4o8co2k2ok2.|15.k5h4o7cko2k2ok2.|15.k5h5o8k.k2ok2.|16.3k7ok2R2wRk.k4ok.|15.11kR8kd3ok.|14.k4rkrg4tRr3krR2rd3ok.|14.k4rkrg4tRkR3rR2rd2odk.|14.k4rkrg4tRrk3rR3r3k2.|14.k4RkR5t3Rk2rR3k5.|14.k4rkr5tR3r3k8.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rRk9.|14.k4RkR5t5Rk9.|14.k4rkr5tR3rRk9.|14.k4ok7t3rRk9.|14.k4ok7t3rRk9.|15.4k3j2J5j2k10.|16.kJ4j2k5jk11.|16.kJj2cj2kJ4jk11.|15.2kJ4j2kJ4j2k10.|14.k5srs2k5srsk9.|14.k4sr2s2k4sr2sk9.|14.k7S2k7Sk9.|15.7k2.7k10.|41.|41.|41.",
+    sad: "41.|41.|41.|41.|41.|19.7k15.|17.2k7y2k13.|16.k11yk12.|15.k13yk11.|13.2k15yk10.|12.k18yk9.|10.2k19y3k7.|9.koky18Ykodk6.|10.2ky7Yk3Yk6Y3k7.|11.k6y2k5o2k3ok10.|11.k6y4w2o3w3o3k8.|12.k4yow2kw2owkw6o2k6.|13.2k11o6conhk5.|14.k4oe5o8c2nk5.|15.k3heh4o8cok6.|15.k5h4o8cok6.|15.k5h5o2c3kcok7.|16.3k7o3k2w2k8.|15.11k3R2k10.|14.k4rkrg4tR2rk11.|14.k4rkrg4tR3rk10.|14.k4rkrg4tR3rk10.|14.k4RkR5t4Rk10.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rRk9.|14.k4RkR5t5Rk9.|14.k4rkr5tR3rRk9.|14.k4ok7t3rRk9.|14.kd3ok7t3rRk9.|15.4k3j2J5j2k10.|16.kJ4j2k5jk11.|16.kJj2cj2kJ4jk11.|15.2kJ4j2kJ4j2k10.|14.k5srs2k5srsk9.|14.k4sr2s2k4sr2sk9.|14.k7S2k7Sk9.|15.7k2.7k10.|41.|41.|41.",
+    skate: "14.k14.k11.|13.kdk12.kdk10.|14.khk10.k2ok10.|14.kohk9.khok10.|14.k2ohk7.kohok10.|14.k2oco7k2ohok10.|15.ko2k7y2k2ok10.|15.2k11ykok10.|15.k13y2k10.|13.2k15yk10.|12.k18yk9.|11.k19yk9.|11.ky18Yk9.|11.ky18Yk9.|11.k6yo2w4o2w3ok10.|11.k6y2w2k2o2wk3o3k8.|12.k4yo2w2k2o2wk6o2k6.|13.2k11o6conhk5.|14.k10o8c2nk5.|15.k5h4o8cok6.|15.k5h4o7ckok6.|15.k5h5o8k7.|16.3k7ok2R2wRk8.|15.11kR5k9.|14.k4rkrg4tR2rk11.|14.k4rkrg4tR3rk10.|14.k4rkrg4tR3rk10.|14.k4RkR5t4Rk10.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rk10.|14.k4rkr5tR3rRk9.|14.k4RkR5t5Rk9.|14.k4rkr5tR3rRk9.|14.k4ok7t3rRk9.|14.kd3ok7t3rRk9.|15.4k3j2J5j2k10.|16.kJ4j2k5jk11.|16.kJj2cj2kJ4jk11.|15.2kJ4j2kJ4j2k10.|14.k5srs2k5srsk9.|14.k4sr2s2k4sr2sk9.|14.k7S2k7Sk9.|15.7k2.7k10.|41.|41.|41.",
+    board0: "41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|10.k.k2.k2.k2.k2.k2.k2.k4.k5.|9.kyky2ky2ky2ky2ky2ky2ky4kyk4.|10.k2y20Y2yk5.|11.3k2s14k2s3k6.|13.ksSk12.ksSk8.|14.2k14.2k9.",
+    board1: "41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|41.|10.k2.k2.k2.k2.k2.k2.k2.k3.k5.|9.ky2ky2ky2ky2ky2ky2ky2ky3kyk4.|10.k2y20Y2yk5.|11.3k2s14k2s3k6.|13.ksSk12.ksSk8.|14.2k14.2k9.",
+    head: "3.k14.k6.|2.kdk12.kdk5.|3.khk10.k2ok5.|3.kohk9.khok5.|3.k2ohk7.kohok5.|3.k2oco7k2ohok5.|4.ko2k7y2k2ok5.|4.2k11ykok5.|4.k13y2k5.|2.2k15yk5.|.k18yk4.|k19yk4.|ky18Yk4.|ky18Yk4.|k6y4k2o3k3ok5.|k6y2w2k2o2wk3o3k3.|.k4yo2w2k2o2wk6o2k.|2.2k11o6conhk|3.k10o8c2nk|4.k5h4o8cok.|4.k5h4o7ckok.|4.k5h5o8k2.|5.3k7ok2R2wRk3.|8.7k.5k4.|25."
+  };
+
+  var POSES = {
+    idle:   { label: 'RJ the Squirrel', layers: [['tail0', 'rj-tail-a'], ['tail1', 'rj-tail-b rj-alt'], ['idle'], ['blink', 'rj-blink rj-alt']] },
+    wave:   { label: 'RJ the Squirrel waving hello', layers: [['tail0'], ['wave']] },
+    thumbs: { label: 'RJ the Squirrel giving a thumbs-up', layers: [['tail0'], ['thumbs']] },
+    sad:    { label: 'RJ the Squirrel looking sad', layers: [['tailSad'], ['sad']] },
+    skate:  { label: 'RJ the Squirrel on a skateboard', layers: [['board0', 'rj-wheel-a'], ['board1', 'rj-wheel-b rj-alt'], ['tail0', 'rj-bob'], ['skate', 'rj-bob']] },
+    head:   { label: 'RJ the Squirrel', layers: [['head']], w: 25, h: 25 }
+  };
+
+  // ---- Icons (single color, drawn with currentColor) -------------------
+  var ICONS = {
+    fullscreen:  ['####..####', '####..####', '##......##', '##......##', '..........', '..........', '##......##', '##......##', '####..####', '####..####'],
+    'fullscreen-exit': ['..##..##..', '..##..##..', '####..####', '####..####', '..........', '..........', '####..####', '####..####', '..##..##..', '..##..##..'],
+    back:        ['...##.....', '..###.....', '.#########', '##########', '##########', '.#########', '..###.....', '...##.....'],
+    search:      ['..#####....', '.##...##...', '##.....##..', '##.....##..', '##.....##..', '.##...##...', '..######...', '......###..', '.......###.', '........###', '.........##'],
+    'sound-on':  ['....##....', '...###..#.', '######...#', '######.#.#', '######.#.#', '######...#', '...###..#.', '....##....'],
+    'sound-off': ['....##....', '...###....', '######.#.#', '######..#.', '######..#.', '######.#.#', '...###....', '....##....'],
+    play:        ['##......', '####....', '######..', '########', '########', '######..', '####....', '##......'],
+    dice:        ['.########.', '##......##', '#.##..##.#', '#.##..##.#', '#...##...#', '#...##...#', '#.##..##.#', '#.##..##.#', '##......##', '.########.'],
+    close:       ['##....##', '###..###', '.######.', '..####..', '..####..', '.######.', '###..###', '##....##'],
+    reload:      ['..####.#.', '.##..###.', '##...###.', '##.......', '##.......', '##.....##', '.##...##.', '..#####..']
+  };
+
+  // ---- helpers ----------------------------------------------------------
+  var cache = {};
+  function decode(str) {
+    if (cache[str]) return cache[str];
+    var rows = str.split('|').map(function (row) {
+      var out = '', re = /(\d*)(\D)/g, m;
+      while ((m = re.exec(row))) out += new Array((m[1] ? +m[1] : 1) + 1).join(m[2]);
+      return out;
+    });
+    cache[str] = rows;
+    return rows;
+  }
+
+  /** Turn pixel rows into one <path> per color. */
+  function paths(rows, colorOf, dx, dy) {
+    dx = dx || 0; dy = dy || 0;
+    var byColor = {}, order = [];
+    for (var y = 0; y < rows.length; y++) {
+      var row = rows[y], x = 0;
+      while (x < row.length) {
+        var ch = row.charAt(x);
+        if (ch === '.' || ch === ' ') { x++; continue; }
+        var x2 = x;
+        while (x2 < row.length && row.charAt(x2) === ch) x2++;
+        if (!byColor[ch]) { byColor[ch] = []; order.push(ch); }
+        byColor[ch].push('M' + (x + dx) + ' ' + (y + dy) + 'h' + (x2 - x) + 'v1h-' + (x2 - x) + 'z');
+        x = x2;
+      }
+    }
+    return order.map(function (ch) {
+      return '<path fill="' + colorOf(ch) + '" d="' + byColor[ch].join('') + '"/>';
+    }).join('');
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+  }
+  function paletteColor(ch) { return PALETTE[ch] || '#ff00ff'; }
+
+  /** Raw SVG markup (no <svg> wrapper) for a pose — used to compose bigger pictures. */
+  function rjMarkup(pose, opts) {
+    opts = opts || {};
+    var def = POSES[pose] || POSES.idle;
+    var dx = opts.x || 0, dy = opts.y || 0;
+    return def.layers.map(function (layer) {
+      var cls = layer[1] || '';
+      if (opts.still && cls.indexOf('rj-alt') !== -1) return '';
+      var body = paths(decode(RJ_LAYERS[layer[0]]), paletteColor, dx, dy);
+      return cls && !opts.still ? '<g class="' + cls + '">' + body + '</g>' : body;
+    }).join('');
+  }
+
+  /**
+   * RJ as a complete <svg>.
+   *   pose:  idle | wave | thumbs | sad | skate | head
+   *   opts.scale   pixel size in CSS px (default 3)
+   *   opts.label   accessible name (defaults to a description of the pose)
+   *   opts.still   true = no animation frames (for static images)
+   */
+  function rj(pose, opts) {
+    opts = opts || {};
+    var def = POSES[pose] || POSES.idle;
+    var w = def.w || RJ_W, h = def.h || RJ_H, scale = opts.scale || 3;
+    var label = opts.label === '' ? '' : (opts.label || def.label);
+    var a11y = label ? ' role="img" aria-label="' + esc(label) + '"' : ' aria-hidden="true" focusable="false"';
+    return '<svg xmlns="http://www.w3.org/2000/svg" class="rj rj--' + pose + (opts.className ? ' ' + opts.className : '') +
+      '" viewBox="0 0 ' + w + ' ' + h + '" width="' + (w * scale) + '" height="' + (h * scale) +
+      '" shape-rendering="crispEdges"' + a11y + '>' + rjMarkup(pose, { still: opts.still }) + '</svg>';
+  }
+
+  /** A pixel icon as <svg>, filled with currentColor so CSS can recolor it. */
+  function icon(name, opts) {
+    opts = opts || {};
+    var rows = ICONS[name];
+    if (!rows) return '';
+    var w = rows[0].length, h = rows.length, scale = opts.scale || 2;
+    return '<svg xmlns="http://www.w3.org/2000/svg" class="px-icon px-icon--' + name + '" viewBox="0 0 ' + w + ' ' + h +
+      '" width="' + (w * scale) + '" height="' + (h * scale) + '" shape-rendering="crispEdges" aria-hidden="true" focusable="false">' +
+      paths(rows, function () { return 'currentColor'; }) + '</svg>';
+  }
+
+  return {
+    PALETTE: PALETTE,
+    RJ_SIZE: { w: RJ_W, h: RJ_H },
+    poses: Object.keys(POSES),
+    decode: decode,
+    paths: paths,
+    rj: rj,
+    rjMarkup: rjMarkup,
+    icon: icon,
+    iconNames: Object.keys(ICONS)
+  };
+});
+
+</script>
+<script>
+/* RJ's Gamekade — the arcade (home shelf, play view, ads, page switching) */
+(function () {
+  'use strict';
+  var PA = window.PixelArt;
+  var $ = function (id) { return document.getElementById(id); };
+  var OWNER_KEY = 'gamekade-owner';
+
+  // ---- helpers ------------------------------------------------------------------
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function paint(root) {
+    root = root || document;
+    root.querySelectorAll('[data-icon]').forEach(function (el) {
+      var name = el.getAttribute('data-icon');
+      if (el.getAttribute('data-icon-drawn') === name) return;
+      el.innerHTML = PA.icon(name, { scale: +(el.getAttribute('data-icon-scale') || 2) });
+      el.setAttribute('data-icon-drawn', name);
+    });
+    root.querySelectorAll('[data-rj]').forEach(function (el) {
+      var pose = el.getAttribute('data-rj');
+      if (el.getAttribute('data-rj-drawn') === pose) return;
+      el.innerHTML = PA.rj(pose, {
+        scale: +(el.getAttribute('data-rj-scale') || 3),
+        label: el.hasAttribute('data-rj-label') ? el.getAttribute('data-rj-label') : undefined,
+        className: el.hasAttribute('data-rj-live') ? 'rj--live' : ''
+      });
+      el.setAttribute('data-rj-drawn', pose);
+    });
+  }
+
+  function hashNum(s) {
+    var h = 0x811c9dc5;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return h >>> 0;
+  }
+
+  var SMALL = { a: 1, an: 1, and: 1, as: 1, at: 1, by: 1, for: 1, in: 1, of: 1, on: 1, or: 1, the: 1, to: 1, vs: 1 };
+  function titleFromName(name) {
+    var words = String(name).replace(/\.[a-z0-9]+$/i, '').replace(/[_\-.+]+/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([A-Za-z])(\d)/g, '$1 $2')
+      .replace(/\s+/g, ' ').trim().split(' ');
+    return words.map(function (w, i) {
+      if (/^\d+d$/i.test(w)) return w.toUpperCase();
+      if (/[A-Z]/.test(w.slice(1))) return w;
+      if (i > 0 && SMALL[w.toLowerCase()]) return w.toLowerCase();
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(' ') || 'New Game';
+  }
+  function slugify(name) {
+    return String(name).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'game';
+  }
+
+  var RJ_CARD = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(PA.rj('thumbs', { scale: 2, still: true, label: '' }));
+  function poster(title) {
+    return '<span class="poster poster--' + (hashNum(String(title)) % 3) + '"><span class="poster__title">' + esc(title) +
+      '</span><img class="poster__rj" src="' + RJ_CARD + '" alt=""></span>';
+  }
+
+  function hasOwnerKey() {
+    try { return !!(JSON.parse(localStorage.getItem(OWNER_KEY) || '{}') || {}).token; } catch (e) { return false; }
+  }
+  function syncOwnerLink() { $('owner-link').hidden = !hasOwnerKey(); }
+
+  // ---- sound (off unless a player turns it on; forgotten when the tab closes) ----
+  var soundOn = false, audio = null;
+  try { soundOn = sessionStorage.getItem('gamekade-sound') === 'on'; } catch (e) { /* blocked */ }
+  function blip(kind) {
+    if (!soundOn) return;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      audio = audio || new AC();
+      if (audio.state === 'suspended') audio.resume();
+      var t = audio.currentTime + 0.01, notes = kind === 'start' ? [523, 659, 784, 1047] : [784, 1175];
+      var osc = audio.createOscillator(), gain = audio.createGain();
+      osc.type = 'square';
+      notes.forEach(function (f, i) { osc.frequency.setValueAtTime(f, t + i * 0.045); });
+      gain.gain.setValueAtTime(0.05, t);
+      gain.gain.setValueAtTime(0, t + notes.length * 0.045);
+      osc.connect(gain); gain.connect(audio.destination);
+      osc.start(t); osc.stop(t + notes.length * 0.045 + 0.02);
+    } catch (e) { /* stay quiet */ }
+  }
+  function syncSound() {
+    document.querySelectorAll('[data-sound-toggle]').forEach(function (btn) {
+      btn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+      btn.title = soundOn ? 'Turn button sounds off' : 'Turn button sounds on';
+      btn.querySelector('[data-icon]').setAttribute('data-icon', soundOn ? 'sound-on' : 'sound-off');
+      btn.querySelector('[data-sound-label]').textContent = soundOn ? 'Sound on' : 'Sound off';
+    });
+    paint();
+  }
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest || !e.target.closest('[data-sound-toggle]')) return;
+    soundOn = !soundOn;
+    try { sessionStorage.setItem('gamekade-sound', soundOn ? 'on' : 'off'); } catch (err) { /* ignore */ }
+    syncSound();
+    blip('start');
+  });
+  function go(hash) {
+    if (soundOn) { blip(); setTimeout(function () { location.hash = hash; }, 140); }
+    else location.hash = hash;
+  }
+
+  // ---- data ---------------------------------------------------------------------
+  var openedFromFile = location.protocol === 'file:';
+  function fetchJSON(name) {
+    return fetch(name + '?t=' + Date.now(), { cache: 'no-store' }).then(function (res) {
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(name + ' answered ' + res.status);
+      return res.json();
+    });
+  }
+  function loadGames() {
+    return fetchJSON('games.json').then(function (data) {
+      var list = (data && data.games) || [];
+      return list.filter(function (g) { return g && g.id && g.path && g.title; });
+    });
+  }
+  function loadHint() {
+    return openedFromFile
+      ? 'This copy was opened straight from your computer, where games can’t load. Put index.html on GitHub Pages (see README.md) and open the live address.'
+      : 'Reload the page to try again.';
+  }
+
+  // ==============================================================================
+  // HOME
+  // ==============================================================================
+  var Home = (function () {
+    var shelf = $('shelf'), state = $('state'), count = $('game-count'), toolbar = $('toolbar');
+    var searchBox = $('search-box'), search = $('search'), clearBtn = $('search-clear'), randomBtn = $('random-game');
+    var games = [], cards = [], lastKey = '';
+
+    function norm(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+    function showState(html) { state.innerHTML = html; state.hidden = false; paint(state); }
+    function hideState() { state.hidden = true; state.innerHTML = ''; }
+
+    function cardHTML(g) {
+      var label = g.thumbnail
+        ? '<img src="' + esc(g.thumbnail) + '" alt="" width="320" height="240" loading="lazy" decoding="async">'
+        : poster(g.title);
+      return '<li><a class="cart px" href="#/game/' + encodeURIComponent(g.id) + '"' +
+        (g.description ? ' title="' + esc(g.description) + '"' : '') + '>' +
+        '<span class="cart__label">' + label + '<span class="cart__play" aria-hidden="true"><span data-icon="play"></span>Play</span></span>' +
+        '<span class="cart__name">' + esc(g.title) + '</span></a></li>';
+    }
+    function setCount(shown) {
+      var total = games.length, word = total === 1 ? ' game' : ' games';
+      count.textContent = shown === total ? total + word : shown + ' of ' + total + word;
+    }
+    function visible() { return cards.filter(function (c) { return !c.el.hidden; }); }
+
+    function applySearch() {
+      var words = norm(search.value).trim().split(/\s+/).filter(Boolean), shown = 0;
+      searchBox.classList.toggle('has-text', search.value.length > 0);
+      cards.forEach(function (c) {
+        var hit = words.every(function (w) { return c.key.indexOf(w) !== -1; });
+        c.el.hidden = !hit;
+        if (hit) shown++;
+      });
+      setCount(shown);
+      if (!shown) {
+        shelf.hidden = true;
+        showState('<div class="state__rj" data-rj="sad" data-rj-scale="3"></div>' +
+          '<div class="state__copy"><p class="bubble px">No games match “' + esc(search.value.trim()) + '”.</p>' +
+          '<div class="state__actions"><button class="btn px" type="button" data-clear-search>Clear search</button></div></div>');
+      } else { shelf.hidden = false; hideState(); }
+    }
+    function clearSearch() { search.value = ''; applySearch(); search.focus(); }
+
+    function render(list) {
+      var key = JSON.stringify(list);
+      if (key === lastKey) return;
+      lastKey = key;
+      games = list.slice().sort(function (a, b) { return a.title.localeCompare(b.title, 'en', { numeric: true }); });
+      if (!games.length) {
+        shelf.hidden = true; toolbar.hidden = true; count.textContent = '';
+        showState('<div class="state__rj" data-rj="wave" data-rj-scale="4" data-rj-live></div>' +
+          '<div class="state__copy"><p class="bubble bubble--big px">The arcade is warming up! Check back soon.</p></div>');
+        return;
+      }
+      toolbar.hidden = false;
+      shelf.innerHTML = games.map(cardHTML).join('');
+      cards = Array.prototype.map.call(shelf.children, function (li, i) { return { game: games[i], el: li, key: norm(games[i].title) }; });
+      paint(shelf);
+      searchBox.hidden = false;
+      randomBtn.hidden = games.length < 2;
+      hideState();
+      shelf.hidden = false;
+      if (search.value) applySearch(); else setCount(games.length);
+    }
+
+    function showError() {
+      lastKey = '';
+      shelf.hidden = true;
+      showState('<div class="state__rj" data-rj="sad" data-rj-scale="3"></div>' +
+        '<div class="state__copy"><p class="bubble px">The game list didn’t load.</p><p class="state__hint">' + esc(loadHint()) + '</p>' +
+        '<div class="state__actions"><button class="btn px" type="button" onclick="location.reload()"><span data-icon="reload"></span>Try again</button></div></div>');
+    }
+
+    shelf.addEventListener('error', function (e) {          // broken picture: show RJ's card instead
+      var img = e.target;
+      if (!img || img.tagName !== 'IMG' || img.classList.contains('poster__rj')) return;
+      var name = img.closest('a').querySelector('.cart__name').textContent;
+      img.outerHTML = poster(name);
+    }, true);
+    shelf.addEventListener('click', function (e) {
+      var a = e.target.closest('a.cart');
+      if (!a || !soundOn || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      go(a.getAttribute('href'));
+    });
+    state.addEventListener('click', function (e) { if (e.target.closest('[data-clear-search]')) clearSearch(); });
+    search.addEventListener('input', applySearch);
+    search.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && search.value) { e.preventDefault(); clearSearch(); }
+      if (e.key === 'Enter') { var first = visible()[0]; if (first) { e.preventDefault(); go(first.el.querySelector('a').getAttribute('href')); } }
+    });
+    clearBtn.addEventListener('click', clearSearch);
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || searchBox.hidden || current !== 'home') return;
+      var t = document.activeElement;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      e.preventDefault();
+      search.focus();
+    });
+    randomBtn.addEventListener('click', function () {
+      var pool = visible();
+      if (!pool.length) pool = cards;
+      if (pool.length) go(pool[Math.floor(Math.random() * pool.length)].el.querySelector('a').getAttribute('href'));
+    });
+
+    return { enter: function () { loadGames().then(render).catch(showError); } };
+  })();
+
+  // ==============================================================================
+  // PLAY
+  // ==============================================================================
+  var Play = (function () {
+    var stage = $('stage'), box = $('stage-box'), msg = $('stage-msg'), cabinet = $('cabinet'), controls = $('controls');
+    var fsBtn = $('fs-btn'), exitBtn = $('exit-fs'), titleEl = $('game-title'), descEl = $('game-desc');
+    var LOADING = msg.innerHTML, MIN_W = 320, MIN_H = 240;
+    var KEYS = { ' ': 1, Spacebar: 1, ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1, PageUp: 1, PageDown: 1 };
+    var game = null, frame = null, zoom = null, pseudoFs = false, frameReady = false, problem = null;
+    var idleTimer = 0, fitTimer = 0, loadTimer = 0, queued = false, ticket = 0;
+
+    function isFullscreen() { return pseudoFs || (document.fullscreenElement || document.webkitFullscreenElement) === stage; }
+
+    function available() {
+      if (isFullscreen()) return { w: stage.clientWidth, h: stage.clientHeight };
+      var w = cabinet.clientWidth - 40;
+      var top = stage.getBoundingClientRect().top + window.scrollY;
+      var h = window.innerHeight - top - 16 - (controls.offsetHeight + 40 + 24);
+      return { w: Math.max(MIN_W, w), h: Math.max(MIN_H, h) };
+    }
+    function layout() {
+      queued = false;
+      if (!game || !stage.getClientRects().length) return;
+      var av = available();
+      var ratio = zoom ? zoom.w / zoom.h : game.aspect || Math.min(16 / 9, Math.max(4 / 3, av.w / av.h));
+      var w = av.w, h = Math.round(av.w / ratio);
+      if (h > av.h) { h = av.h; w = Math.round(av.h * ratio); }
+      w = Math.max(1, Math.floor(w)); h = Math.max(1, Math.floor(h));
+      if (isFullscreen()) { stage.style.width = ''; stage.style.height = ''; }
+      else { stage.style.width = w + 'px'; stage.style.height = h + 'px'; }
+      box.style.width = w + 'px'; box.style.height = h + 'px';
+      if (!frame) return;
+      if (zoom) {
+        frame.style.width = zoom.w + 'px'; frame.style.height = zoom.h + 'px';
+        frame.style.transform = 'scale(' + Math.min(w / zoom.w, h / zoom.h).toFixed(4) + ')';
+        stage.classList.add('is-zoomed');
+      } else {
+        frame.style.width = ''; frame.style.height = ''; frame.style.transform = '';
+        stage.classList.remove('is-zoomed');
+        if (frameReady) { clearTimeout(fitTimer); fitTimer = setTimeout(autoFit, 350); }
+      }
+    }
+    function requestLayout() { if (!queued) { queued = true; requestAnimationFrame(layout); } }
+
+    // fixed-size games: detect them and scale the whole picture
+    function gameDoc() { try { return frame && frame.contentDocument && frame.contentDocument.documentElement ? frame.contentDocument : null; } catch (e) { return null; } }
+    function measure(doc) {
+      var de = doc.documentElement, b = doc.body;
+      return { vw: de.clientWidth, vh: de.clientHeight, sw: Math.max(de.scrollWidth, b ? b.scrollWidth : 0), sh: Math.max(de.scrollHeight, b ? b.scrollHeight : 0) };
+    }
+    function largestCanvas(doc) {
+      var best = null, area = 0;
+      Array.prototype.forEach.call(doc.querySelectorAll('canvas'), function (c) {
+        var r = c.getBoundingClientRect();
+        if (r.width * r.height > area) { area = r.width * r.height; best = r; }
+      });
+      return area > 0 ? best : null;
+    }
+    function zoomTo(w, h) {
+      zoom = { w: Math.min(2560, Math.ceil(w)), h: Math.min(1600, Math.ceil(h)) };
+      layout();
+      setTimeout(function () {
+        var doc = gameDoc();
+        if (!doc || !zoom) return;
+        var m = measure(doc);
+        if (m.sw > zoom.w + 1 || m.sh > zoom.h + 1) { zoom = { w: Math.min(2560, Math.max(zoom.w, m.sw)), h: Math.min(1600, Math.max(zoom.h, m.sh)) }; layout(); }
+      }, 150);
+    }
+    function autoFit() {
+      if (zoom || !game || game.fit === 'resize') return;
+      var doc = gameDoc();
+      if (!doc) return;
+      var m = measure(doc), c = largestCanvas(doc);
+      var fills = c && Math.abs(c.width - m.vw) <= Math.max(24, m.vw * 0.05) && Math.abs(c.height - m.vh) <= Math.max(24, m.vh * 0.05);
+      var overflow = m.sw > m.vw + 2 || m.sh > m.vh + 2;
+      if (fills) {
+        if (overflow && m.sw - m.vw <= 40 && m.sh - m.vh <= 40) {
+          doc.documentElement.style.overflow = 'hidden';
+          if (doc.body) doc.body.style.overflow = 'hidden';
+        }
+        return;
+      }
+      if (overflow && m.sw <= m.vw * 2 && m.sh <= m.vh * 2) { zoomTo(m.sw, m.sh); return; }
+      if (!overflow && c && c.width >= 160 && c.height >= 120 && Math.min(m.vw / c.width, m.vh / c.height) >= 1.1) zoomTo(c.width, c.height);
+    }
+
+    // keyboard: the game gets the keys, the page never scrolls
+    function focusGame() {
+      if (!frame) return;
+      try { frame.focus({ preventScroll: true }); } catch (e) { frame.focus(); }
+      try { if (frame.contentWindow) frame.contentWindow.focus(); } catch (e) { /* cross-origin */ }
+    }
+    function editable(el) { return !!el && !!el.tagName && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)); }
+    function guardKeys() {
+      var win;
+      try { win = frame.contentWindow; if (!win || !win.document) return; } catch (e) { return; }
+      if (win.__gamekadeGuard) return;
+      win.__gamekadeGuard = true;
+      if (game.blockPageScroll !== false) {
+        win.addEventListener('keydown', function (e) {
+          if (!KEYS[e.key] || e.defaultPrevented || editable(e.target)) return;
+          if ((e.key === ' ' || e.key === 'Spacebar') && e.target && e.target.closest && e.target.closest('button, a, [role="button"]')) return;
+          e.preventDefault();
+        });
+      }
+      win.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pseudoFs) exitFullscreen(); });
+      win.addEventListener('mousemove', wake, { passive: true });
+      win.addEventListener('pointerdown', wake, { passive: true });
+    }
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && pseudoFs) { exitFullscreen(); return; }
+      if (!frame || !KEYS[e.key] || current !== 'play') return;
+      var a = document.activeElement;
+      if (a && a !== document.body && a !== stage && a !== box && a !== document.documentElement) return;
+      e.preventDefault();
+      focusGame();
+    });
+    stage.addEventListener('mousedown', function (e) { if (e.target === stage || e.target === box) { e.preventDefault(); focusGame(); } });
+
+    // fullscreen (with a full-window fallback for browsers without it)
+    function apiOK() {
+      var on = document.fullscreenEnabled !== undefined ? document.fullscreenEnabled : document.webkitFullscreenEnabled;
+      return !!(stage.requestFullscreen || stage.webkitRequestFullscreen) && on !== false;
+    }
+    function enterFullscreen() {
+      if (!apiOK()) { setPseudo(true); return; }
+      try {
+        var p = stage.requestFullscreen ? stage.requestFullscreen({ navigationUI: 'hide' }) : stage.webkitRequestFullscreen();
+        if (p && p.catch) p.catch(function () { setPseudo(true); });
+      } catch (e) { setPseudo(true); }
+    }
+    function exitFullscreen() {
+      if (pseudoFs) { setPseudo(false); return; }
+      var exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+        try { var p = exit.call(document); if (p && p.catch) p.catch(function () {}); } catch (e) { /* already out */ }
+      }
+    }
+    function setPseudo(on) {
+      pseudoFs = on;
+      stage.classList.toggle('is-pseudo-fs', on);
+      document.documentElement.classList.toggle('has-pseudo-fs', on);
+      onFsChange();
+    }
+    function onFsChange() {
+      var on = isFullscreen();
+      exitBtn.hidden = !on;
+      fsBtn.querySelector('[data-fs-label]').textContent = on ? 'Exit fullscreen' : 'Fullscreen';
+      wake();
+      requestLayout();
+      setTimeout(function () { layout(); focusGame(); }, 60);
+    }
+    function wake() {
+      stage.classList.remove('is-idle');
+      clearTimeout(idleTimer);
+      if (isFullscreen()) idleTimer = setTimeout(function () { stage.classList.add('is-idle'); }, 2600);
+    }
+    fsBtn.addEventListener('click', function () { blip(); if (isFullscreen()) exitFullscreen(); else enterFullscreen(); });
+    exitBtn.addEventListener('click', exitFullscreen);
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+    document.addEventListener('mousemove', wake, { passive: true });
+
+    function showProblem(title, bubble, hint) {
+      document.title = title + " | RJ's Gamekade";
+      titleEl.textContent = title;
+      stage.hidden = true;
+      controls.hidden = true;
+      problem = document.createElement('div');
+      problem.className = 'state';
+      problem.innerHTML = '<div class="state__rj" data-rj="sad" data-rj-scale="4"></div>' +
+        '<div class="state__copy"><p class="bubble bubble--big px">' + esc(bubble) + '</p>' +
+        (hint ? '<p class="state__hint">' + esc(hint) + '</p>' : '') +
+        '<div class="state__actions"><a class="btn px" href="#/"><span data-icon="back"></span>Back to all games</a></div></div>';
+      cabinet.insertBefore(problem, cabinet.firstChild);
+      paint(problem);
+    }
+
+    function reset() {
+      ticket++;
+      clearTimeout(fitTimer); clearTimeout(loadTimer);
+      if (isFullscreen()) exitFullscreen();
+      if (frame) { try { frame.src = 'about:blank'; } catch (e) { /* ignore */ } frame.remove(); }
+      frame = null; game = null; zoom = null; frameReady = false;
+      if (problem) { problem.remove(); problem = null; }
+      stage.hidden = false; controls.hidden = false; fsBtn.hidden = true; descEl.hidden = true;
+      msg.innerHTML = LOADING; msg.hidden = false; paint(msg);
+      titleEl.textContent = 'Loading game…';
+    }
+
+    function start(g) {
+      game = Object.assign({}, g);
+      if (typeof game.aspect === 'string') { var p = game.aspect.split(/[:/x]/); game.aspect = p.length === 2 ? +p[0] / +p[1] : +game.aspect; }
+      if (!(game.aspect > 0.3 && game.aspect < 5)) game.aspect = 0;
+      if (game.width > 0 && game.height > 0 && game.fit !== 'resize') zoom = { w: +game.width, h: +game.height };
+      document.title = game.title + " | RJ's Gamekade";
+      titleEl.textContent = game.title;
+      if (game.description) { descEl.textContent = game.description; descEl.hidden = false; }
+      frame = document.createElement('iframe');
+      frame.title = game.title;
+      frame.setAttribute('allow', 'fullscreen; autoplay; gamepad; clipboard-write');
+      frame.setAttribute('allowfullscreen', '');
+      frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-modals allow-popups allow-orientation-lock');
+      frame.addEventListener('load', function () {
+        if (!frame || frame.getAttribute('src') === 'about:blank') return;
+        frameReady = true;
+        msg.hidden = true;
+        guardKeys(); focusGame();
+        setTimeout(autoFit, 300); setTimeout(autoFit, 1500);
+      });
+      box.appendChild(frame);
+      frame.src = game.path;
+      fsBtn.hidden = false;
+      layout();
+      loadTimer = setTimeout(function () { msg.hidden = true; }, 15000);
+    }
+
+    function open(id) {
+      reset();
+      var mine = ticket;
+      loadGames().then(function (list) {
+        if (mine !== ticket) return;
+        var g = list.filter(function (x) { return x.id === id; })[0];
+        if (!g) showProblem('Game not found', 'We couldn’t find that game.', 'It may have been renamed or taken off the shelf. Every game in the arcade is on the home page.');
+        else start(g);
+      }).catch(function () {
+        if (mine === ticket) showProblem('Game list didn’t load', 'The arcade couldn’t open its game list.', loadHint());
+      });
+    }
+
+    window.addEventListener('resize', requestLayout);
+    window.addEventListener('gamekade:layout', requestLayout);
+    if (window.ResizeObserver) new ResizeObserver(requestLayout).observe(cabinet);
+    return { open: open, close: reset };
+  })();
+
+  // ==============================================================================
+  // ADS (the code lives in ads.json, saved from the owner page)
+  // ==============================================================================
+  var Ads = (function () {
+    var SIZES = { 'play-left': '160x600', 'play-right': '160x600', 'play-bottom': '728x90', 'home-bottom': '728x90' };
+    var params = new URLSearchParams(location.search), host = location.hostname;
+    var isLocal = openedFromFile || host === 'localhost' || host === '[::1]' || host === '' ||
+      /\.(localhost|test)$/.test(host) || /^(10|127)\.|^192\.168\.|^172\.(1[6-9]|2\d|3[01])\./.test(host);
+    var cfg = null, loading = false, headDone = false, timer = 0;
+
+    function settings() {
+      var off = params.get('ads') === 'off' || (cfg && cfg.enabled === false);
+      return { off: off, preview: !off && (params.get('ads') === 'preview' || isLocal), wait: +(cfg && cfg.waitMs) || 6000 };
+    }
+    function collapse(slot, yes) {
+      slot.classList.toggle('is-collapsed', yes);
+      var rail = slot.closest('.rail');
+      if (rail) rail.hidden = yes;
+      window.dispatchEvent(new Event('gamekade:layout'));
+    }
+    function runCode(target, html) {
+      var tpl = document.createElement('template');
+      tpl.innerHTML = html;
+      var nodes = Array.prototype.slice.call(tpl.content.childNodes);
+      function revive(old) {
+        var s = document.createElement('script');
+        Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+        if (!old.src) s.text = old.textContent;
+        return s;
+      }
+      (function next() {
+        var node = nodes.shift();
+        if (!node) return;
+        if (node.nodeType === 1 && node.tagName === 'SCRIPT') {
+          var s = revive(node);
+          if (s.src && !s.hasAttribute('async')) { s.onload = s.onerror = next; target.appendChild(s); return; }
+          target.appendChild(s); next(); return;
+        }
+        if (node.nodeType === 1) Array.prototype.forEach.call(node.querySelectorAll('script'), function (o) { o.replaceWith(revive(o)); });
+        target.appendChild(node);
+        next();
+      })();
+    }
+    function filled(unit) {
+      var ins = unit.querySelector('ins[data-ad-status]');
+      if (ins) return ins.getAttribute('data-ad-status') === 'filled';
+      var media = unit.querySelectorAll('iframe, img, video, canvas, object, embed');
+      for (var i = 0; i < media.length; i++) if (media[i].offsetWidth >= 40 && media[i].offsetHeight >= 30) return true;
+      return false;
+    }
+    function placeholder(size, note) {
+      return '<div class="ad-placeholder" aria-hidden="true"><strong>Ad space</strong><span>' + size.replace('x', ' × ') + '</span><span>' + note + '</span></div>';
+    }
+    function load(slot) {
+      var name = slot.getAttribute('data-ad-slot'), s = settings();
+      if (!slot.__ad) {
+        var conf = (cfg.slots && cfg.slots[name]) || {};
+        var size = conf.size || SIZES[name] || '300x250';
+        slot.classList.add('ad-slot--' + size);
+        slot.setAttribute('aria-label', 'Advertisement');
+        slot.innerHTML = '<span class="ad-slot__label">Advertisement</span><div class="ad-slot__unit"></div>';
+        slot.__ad = { size: size, code: String(conf.code || '').trim(), unit: slot.lastChild, loaded: false };
+      }
+      var a = slot.__ad;
+      if (s.off) { collapse(slot, true); return; }
+      if (!a.code) {
+        if (s.preview) { if (!a.unit.firstChild) a.unit.innerHTML = placeholder(a.size, 'Add ad code on the owner page'); collapse(slot, false); }
+        else collapse(slot, true);
+        return;
+      }
+      if (a.loaded || !slot.getClientRects().length) return;
+      a.loaded = true;
+      if (!headDone && cfg.headCode && String(cfg.headCode).trim()) { headDone = true; runCode(document.head, String(cfg.headCode)); }
+      runCode(a.unit, a.code);
+      setTimeout(function () {
+        if (filled(a.unit)) return;
+        if (s.preview) { a.unit.insertAdjacentHTML('beforeend', placeholder(a.size, 'No ad showed up yet')); return; }
+        collapse(slot, true);
+        if (window.MutationObserver) {
+          var mo = new MutationObserver(function () { if (filled(a.unit)) { mo.disconnect(); collapse(slot, false); } });
+          mo.observe(a.unit, { childList: true, subtree: true, attributes: true });
+          setTimeout(function () { mo.disconnect(); }, 30000);
+        }
+      }, s.wait);
+    }
+    function run() {
+      if (!cfg) {
+        if (loading) return;
+        loading = true;
+        fetchJSON('ads.json').catch(function () { return null; }).then(function (d) { cfg = d || {}; run(); });
+        return;
+      }
+      document.querySelectorAll('[data-ad-slot]').forEach(load);
+    }
+    window.addEventListener('resize', function () { clearTimeout(timer); timer = setTimeout(run, 250); });
+    return { run: run };
+  })();
+
+  // ==============================================================================
+  // PAGE SWITCHING:  #/  home    #/game/<id>  play    #/owner  owner page
+  // ==============================================================================
+  var views = { home: $('view-home'), play: $('view-play'), owner: $('view-owner') };
+  var current = null;
+  function route() {
+    var h = location.hash.replace(/^#\/?/, '');
+    var m = /^game\/(.+)$/.exec(h);
+    var next = m ? 'play' : h === 'owner' ? 'owner' : 'home';
+    if (current === 'play') Play.close();
+    Object.keys(views).forEach(function (k) { views[k].hidden = k !== next; });
+    if (current !== next) window.scrollTo(0, 0);
+    current = next;
+    if (next === 'home') { document.title = "RJ's Gamekade"; Home.enter(); }
+    else if (next === 'play') Play.open(decodeURIComponent(m[1]));
+    else {
+      document.title = "Arcade owner | RJ's Gamekade";
+      if (window.GamekadeOwner) window.GamekadeOwner.enter();
+    }
+    Ads.run();
+    syncOwnerLink();
+  }
+
+  window.Gamekade = {
+    esc: esc, paint: paint, blip: blip, titleFromName: titleFromName, slugify: slugify,
+    RJ_CARD: RJ_CARD, poster: poster, fetchJSON: fetchJSON, ownerChanged: syncOwnerLink, OWNER_KEY: OWNER_KEY,
+    start: function () {
+      var legacy = new URLSearchParams(location.search).get('game');      // old play.html?game=… links
+      if (legacy && !location.hash) location.replace('#/game/' + encodeURIComponent(legacy));
+      window.addEventListener('hashchange', route);
+      syncSound();
+      route();
+    }
+  };
+})();
+
+</script>
+<script>
+/*
+ * RJ's Gamekade — owner page  (your-site/#/owner)
+ * Saves games straight into your arcade's GitHub repository, so they go
+ * live for everyone. Your owner key stays in this browser only.
+ */
+(function () {
+  'use strict';
+  var G = window.Gamekade, esc = G.esc;
+  var root = document.getElementById('owner');
+  var API = 'https://api.github.com';
+  var S = readSettings(), games = [], busy = false, pending = null, previewURL = null, rendered = '';
+
+  function $(id) { return document.getElementById(id); }
+  function readSettings() { try { return JSON.parse(localStorage.getItem(G.OWNER_KEY) || '{}') || {}; } catch (e) { return {}; } }
+  function saveSettings() {
+    try { if (S.token) localStorage.setItem(G.OWNER_KEY, JSON.stringify(S)); else localStorage.removeItem(G.OWNER_KEY); } catch (e) { /* private mode */ }
+    G.ownerChanged();
+  }
+  function detect() {
+    var m = /^([^.]+)\.github\.io$/i.exec(location.hostname);
+    if (!m) return {};
+    var first = location.pathname.split('/').filter(Boolean)[0] || '';
+    if (/\.html?$/i.test(first)) first = '';
+    return { owner: m[1], repo: first || m[1] + '.github.io' };
+  }
+  function say(el, text, bad) { if (!el) return; el.textContent = text || ''; el.classList.toggle('is-bad', !!bad); }
+  function encodePath(p) { return p.split('/').map(encodeURIComponent).join('/'); }
+  function decodePath(p) { return String(p).split('?')[0].split('/').map(function (s) { try { return decodeURIComponent(s); } catch (e) { return s; } }).join('/'); }
+
+  // ---- GitHub --------------------------------------------------------------------
+  function friendly(status, data) {
+    var m = (data && data.message) || '';
+    if (status === 401) return 'GitHub didn’t accept that owner key. It may be mistyped or expired. Make a new one and try again.';
+    if (status === 403 && /rate limit/i.test(m)) return 'GitHub says too many changes were made in a short time. Wait a few minutes, then try again.';
+    if (status === 403) return 'This key isn’t allowed to change the arcade. Give it “Contents: Read and write” for ' + S.owner + '/' + S.repo + '.';
+    if (status === 404) return 'GitHub couldn’t find ' + S.owner + '/' + S.repo + ', or this key can’t see it. Check the arcade details and the key’s repository access.';
+    if (status === 409 || status === 422) return 'GitHub was busy saving another change to the same file. Try again in a moment.';
+    if (status === 413) return 'That file is too big to upload this way. Keep games under about 50 MB.';
+    return 'GitHub answered: ' + (m || 'error ' + status);
+  }
+  async function api(method, path, body) {
+    var headers = { Accept: 'application/vnd.github+json', Authorization: 'Bearer ' + S.token, 'X-GitHub-Api-Version': '2022-11-28' };
+    if (body) headers['Content-Type'] = 'application/json';
+    var res;
+    try { res = await fetch(API + path, { method: method, headers: headers, body: body ? JSON.stringify(body) : undefined, cache: 'no-store' }); }
+    catch (e) { var offline = new Error('Couldn’t reach GitHub. Check the internet connection and try again.'); offline.status = 0; throw offline; }
+    var data = null;
+    try { data = await res.json(); } catch (e) { /* empty */ }
+    if (!res.ok) { var err = new Error(friendly(res.status, data)); err.status = res.status; throw err; }
+    return data;
+  }
+  function repoURL() { return '/repos/' + encodeURIComponent(S.owner) + '/' + encodeURIComponent(S.repo); }
+  function contentsURL(p) {
+    var base = String(S.folder || '').replace(/^\/+|\/+$/g, '');
+    return repoURL() + '/contents/' + encodePath(base ? base + '/' + p : p);
+  }
+  async function getFile(p) {
+    try { return await api('GET', contentsURL(p) + '?ref=' + encodeURIComponent(S.branch)); }
+    catch (e) { if (e.status === 404) return null; throw e; }
+  }
+  async function putFile(p, base64, message) {
+    for (var attempt = 0; ; attempt++) {
+      var cur = await getFile(p), body = { message: message, content: base64, branch: S.branch };
+      if (cur && cur.sha && !Array.isArray(cur)) body.sha = cur.sha;
+      try { return await api('PUT', contentsURL(p), body); }
+      catch (e) { if ((e.status === 409 || e.status === 422) && attempt < 2) continue; throw e; }
+    }
+  }
+  async function deletePath(p, message) {
+    var cur = await getFile(p);
+    if (!cur) return;
+    if (Array.isArray(cur)) { for (var i = 0; i < cur.length; i++) await deletePath(p + '/' + cur[i].name, message); return; }
+    await api('DELETE', contentsURL(p), { message: message, sha: cur.sha, branch: S.branch });
+  }
+
+  // ---- bytes -----------------------------------------------------------------------
+  function bytesToB64(bytes) {
+    var s = '';
+    for (var i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  function textToB64(t) { return bytesToB64(new TextEncoder().encode(t)); }
+  function b64ToText(b) {
+    var bin = atob(String(b || '').replace(/\s/g, '')), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function fileToB64(file) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload = function () { resolve(String(r.result).split(',')[1] || ''); };
+      r.onerror = function () { reject(new Error('Couldn’t read ' + file.name + '.')); };
+      r.readAsDataURL(file);
+    });
+  }
+
+  // ---- the game list (games.json) ---------------------------------------------------
+  async function readList() {
+    var f = await getFile('games.json'), data = null;
+    if (f && !Array.isArray(f)) { try { data = JSON.parse(b64ToText(f.content)); } catch (e) { data = null; } }
+    if (!data || !Array.isArray(data.games)) data = { games: [] };
+    return data;
+  }
+  async function changeList(change, message) {
+    var data = await readList();
+    change(data.games);
+    data.games.sort(function (a, b) { return a.title.localeCompare(b.title, 'en', { numeric: true }); });
+    data.count = data.games.length;
+    data.updated = new Date().toISOString();
+    await putFile('games.json', textToB64(JSON.stringify(data, null, 2) + '\n'), message);
+    games = data.games;
+  }
+
+  // ---- card pictures ---------------------------------------------------------------
+  function toCard(source, w, h) {
+    var c = document.createElement('canvas');
+    c.width = 400; c.height = 300;
+    var g = c.getContext('2d');
+    g.fillStyle = '#081028'; g.fillRect(0, 0, 400, 300);
+    var s = Math.max(400 / w, 300 / h), sw = 400 / s, sh = 300 / s;
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(source, (w - sw) / 2, (h - sh) / 2, sw, sh, 0, 0, 400, 300);
+    return c.toDataURL('image/jpeg', 0.86);
+  }
+  function pictureFromFile(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () { try { resolve(toCard(img, img.naturalWidth, img.naturalHeight)); } catch (e) { reject(e); } URL.revokeObjectURL(url); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('That picture couldn’t be opened. Try a PNG or JPG.')); };
+      img.src = url;
+    });
+  }
+  function snapshot(frame) {
+    var doc = null;
+    try { doc = frame.contentDocument; } catch (e) { /* not ready */ }
+    if (!doc) throw new Error('The preview isn’t ready yet. Wait a moment and try again.');
+    var best = null, area = 0;
+    doc.querySelectorAll('canvas').forEach(function (c) {
+      var r = c.getBoundingClientRect();
+      if (r.width * r.height > area && c.width && c.height) { area = r.width * r.height; best = c; }
+    });
+    if (!best) throw new Error('This game doesn’t draw on a canvas, so a picture can’t be taken from it. Choose a picture file, or keep RJ’s card.');
+    try { return toCard(best, best.width, best.height); }
+    catch (e) { throw new Error('The browser won’t let this game’s picture be copied (it uses images from another website). Choose a picture file instead.'); }
+  }
+  // Keeps WebGL games' last frame readable so "Take picture" works on them too (preview only).
+  var KEEP_FRAME = '<script>(function(){var g=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(t,o){if(/webgl/i.test(String(t))){o=Object.assign({},o||{},{preserveDrawingBuffer:true});}return g.call(this,t,o);};})();<\/script>';
+  function withKeepFrame(html) {
+    var m = /<head[^>]*>/i.exec(html);
+    return m ? html.replace(m[0], m[0] + KEEP_FRAME) : KEEP_FRAME + html;
+  }
+
+  // ---- busy wrapper ------------------------------------------------------------------
+  async function work(msgEl, job) {
+    if (busy) return;
+    busy = true;
+    root.querySelectorAll('button, input, textarea').forEach(function (b) { b.dataset.wasDisabled = b.disabled ? '1' : ''; b.disabled = true; });
+    try { await job(); }
+    catch (e) {
+      say(msgEl, e.message, true);
+      if (e.status === 401) { S.token = ''; saveSettings(); }
+    } finally {
+      busy = false;
+      root.querySelectorAll('button, input, textarea').forEach(function (b) { b.disabled = b.dataset.wasDisabled === '1'; });
+    }
+  }
+
+  // ==================================================================================
+  // LOCKED: setup guide + key
+  // ==================================================================================
+  function renderLocked() {
+    var d = detect(), owner = S.owner || d.owner || '', repo = S.repo || d.repo || '';
+    rendered = 'locked';
+    root.innerHTML =
+      '<div class="owner-hello"><div data-rj="wave" data-rj-scale="3"></div>' +
+      '<p class="bubble px">This is where you add games to the arcade. Unlock it with your owner key.</p></div>' +
+      '<section class="owner-card px">' +
+        '<h2>Unlock with your owner key</h2>' +
+        '<p>The key lets this page save games into your arcade on GitHub. It’s kept only in this browser, on this computer.</p>' +
+        '<label class="field">Owner key<input type="password" id="o-token" autocomplete="off" spellcheck="false" placeholder="github_pat_…"></label>' +
+        '<details' + (owner && repo ? '' : ' open') + '><summary>Arcade details</summary>' +
+          '<label class="field">Your GitHub name<input type="text" id="o-owner" value="' + esc(owner) + '" spellcheck="false"></label>' +
+          '<label class="field">Repository name<input type="text" id="o-repo" value="' + esc(repo) + '" spellcheck="false"></label>' +
+          '<label class="field">Branch (leave empty for the usual one)<input type="text" id="o-branch" value="' + esc(S.branch || '') + '" spellcheck="false"></label>' +
+          '<label class="field">Folder inside the repository (leave empty if index.html is at the top)<input type="text" id="o-folder" value="' + esc(S.folder || '') + '" spellcheck="false"></label>' +
+        '</details>' +
+        '<div class="owner-row"><button class="btn btn--coin px" type="button" id="o-unlock">Unlock</button></div>' +
+        '<p class="owner-msg" id="o-msg" role="status"></p>' +
+      '</section>' +
+      '<section class="owner-card px">' +
+        '<h2>First time? Set up once</h2>' +
+        '<ol class="owner-steps">' +
+          '<li><div><strong>Put the arcade on GitHub Pages.</strong> Make a free account at <a href="https://github.com/signup" target="_blank" rel="noopener">github.com</a>, create a <em>public</em> repository, upload this <code>index.html</code> to it, then turn on <strong>Settings › Pages › Deploy from a branch</strong>. The README has every click.</div></li>' +
+          '<li><div><strong>Make an owner key.</strong> Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub’s new-key page</a>:' +
+            '<ul><li>Name it “Gamekade” and pick an expiration date.</li>' +
+            '<li>Under <strong>Repository access</strong>, choose <strong>Only select repositories</strong> and pick your arcade.</li>' +
+            '<li>Under <strong>Permissions</strong>, set <strong>Contents</strong> to <strong>Read and write</strong>.</li>' +
+            '<li>Click <strong>Generate token</strong> and copy it.</li></ul></div></li>' +
+          '<li><div><strong>Paste the key above and click Unlock.</strong> Keep the key secret, like a password. If it ever leaks, delete it on GitHub and make a new one.</div></li>' +
+        '</ol>' +
+      '</section>';
+    G.paint(root);
+    $('o-unlock').addEventListener('click', unlock);
+    $('o-token').addEventListener('keydown', function (e) { if (e.key === 'Enter') unlock(); });
+  }
+
+  function unlock() {
+    var msg = $('o-msg');
+    var next = {
+      token: $('o-token').value.trim(), owner: $('o-owner').value.trim(), repo: $('o-repo').value.trim(),
+      branch: $('o-branch').value.trim(), folder: $('o-folder').value.trim()
+    };
+    if (!next.token) { say(msg, 'Paste your owner key first.', true); return; }
+    if (!next.owner || !next.repo) { say(msg, 'Fill in your GitHub name and repository name under “Arcade details”.', true); return; }
+    work(msg, async function () {
+      say(msg, 'Checking with GitHub…');
+      S = next;
+      var info;
+      try { info = await api('GET', repoURL()); }
+      catch (e) { S = { owner: next.owner, repo: next.repo, branch: next.branch, folder: next.folder }; throw e; }
+      if (info.permissions && info.permissions.push === false) {
+        S = { owner: next.owner, repo: next.repo };
+        throw new Error('This key can see the arcade but isn’t allowed to change it. Give it “Contents: Read and write”.');
+      }
+      if (!S.branch) S.branch = info.default_branch || 'main';
+      saveSettings();
+      busy = false;
+      await renderUnlocked();
+    });
+  }
+
+  // ==================================================================================
+  // UNLOCKED: add, manage, ads
+  // ==================================================================================
+  var AD_SLOTS = [
+    ['play-left', 'Left of the game (160 × 600, wide screens)'],
+    ['play-right', 'Right of the game (160 × 600, wide screens)'],
+    ['play-bottom', 'Under the game (728 × 90)'],
+    ['home-bottom', 'Bottom of the home page (728 × 90)']
+  ];
+
+  async function renderUnlocked() {
+    rendered = 'unlocked';
+    pending = null;
+    root.innerHTML =
+      '<div class="owner-top"><p>Saving to <code>' + esc(S.owner + '/' + S.repo) + '</code></p>' +
+        '<button class="btn px btn--quiet btn--small" type="button" id="o-lock">Lock this computer</button></div>' +
+
+      '<section class="owner-card px" id="o-add-card">' +
+        '<h2>Add a game</h2>' +
+        '<p>Pick your game’s HTML file. If your game has its own pictures or sounds in a folder, pick the whole folder instead (it needs an index.html inside).</p>' +
+        '<div class="owner-row">' +
+          '<button class="btn px" type="button" id="o-pick-file"><span data-icon="play"></span>Choose a game file</button>' +
+          '<button class="btn px btn--quiet" type="button" id="o-pick-folder">Choose a game folder</button>' +
+          '<input type="file" id="o-file" accept=".html,.htm,text/html" hidden>' +
+          '<input type="file" id="o-folder-in" webkitdirectory multiple hidden>' +
+        '</div>' +
+        '<div id="o-new" hidden>' +
+          '<p class="owner-picked" id="o-picked"></p>' +
+          '<label class="field">Name<input type="text" id="o-title" maxlength="80"></label>' +
+          '<label class="field">Short description (optional)<input type="text" id="o-desc" maxlength="300"></label>' +
+          '<div class="owner-preview">' +
+            '<div class="owner-preview__frame" id="o-preview"></div>' +
+            '<div class="owner-preview__side">' +
+              '<p>Card picture</p>' +
+              '<img class="owner-pic is-rj" id="o-pic" alt="Card picture">' +
+              '<button class="btn px btn--small" type="button" id="o-snap">Take picture from the game</button>' +
+              '<button class="btn px btn--small btn--quiet" type="button" id="o-pick-pic">Choose a picture file</button>' +
+              '<button class="btn px btn--small btn--quiet" type="button" id="o-use-rj">Use RJ’s card</button>' +
+              '<input type="file" id="o-pic-in" accept="image/*" hidden>' +
+            '</div>' +
+          '</div>' +
+          '<div class="owner-row"><button class="btn btn--coin px" type="button" id="o-add">Add to the arcade</button>' +
+            '<button class="btn px btn--quiet" type="button" id="o-cancel">Cancel</button></div>' +
+        '</div>' +
+        '<p class="owner-msg" id="o-add-msg" role="status"></p>' +
+      '</section>' +
+
+      '<section class="owner-card px">' +
+        '<h2>Your games</h2>' +
+        '<ul class="owner-list" id="o-list"><li>Loading your games…</li></ul>' +
+        '<input type="file" id="o-swap-pic" accept="image/*" hidden>' +
+        '<input type="file" id="o-swap-file" accept=".html,.htm,text/html" hidden>' +
+      '</section>' +
+
+      '<section class="owner-card owner-ads px">' +
+        '<h2>Ads</h2>' +
+        '<p>Paste the code your ad provider gives you. Empty slots stay hidden on the live site. Most players are kids, so turn on your provider’s child-directed (COPPA) settings.</p>' +
+        '<label class="field">One-time site code (goes on every page)<textarea id="o-ad-head" spellcheck="false"></textarea></label>' +
+        AD_SLOTS.map(function (s) { return '<label class="field">' + esc(s[1]) + '<textarea data-ad="' + s[0] + '" spellcheck="false"></textarea></label>'; }).join('') +
+        '<div class="owner-row"><button class="btn px" type="button" id="o-ads-save">Save ads</button></div>' +
+        '<p class="owner-msg" id="o-ads-msg" role="status"></p>' +
+      '</section>';
+    G.paint(root);
+    wire();
+    try {
+      var data = await readList();
+      games = data.games;
+      renderList();
+      var ads = await getFile('ads.json');
+      if (ads && !Array.isArray(ads)) {
+        var cfg = JSON.parse(b64ToText(ads.content) || '{}');
+        $('o-ad-head').value = cfg.headCode || '';
+        root.querySelectorAll('[data-ad]').forEach(function (t) { var s = cfg.slots && cfg.slots[t.getAttribute('data-ad')]; t.value = (s && s.code) || ''; });
+      }
+    } catch (e) {
+      $('o-list').innerHTML = '<li class="owner-msg is-bad">' + esc(e.message) + '</li>';
+      if (e.status === 401) { S.token = ''; saveSettings(); }
+    }
+  }
+
+  function renderList() {
+    var ul = $('o-list');
+    if (!games.length) { ul.innerHTML = '<li>No games yet. Add your first one above.</li>'; return; }
+    ul.innerHTML = games.map(function (g) {
+      return '<li class="owner-game" data-id="' + esc(g.id) + '">' +
+        '<img alt="" src="' + esc(g.thumbnail || G.RJ_CARD) + '"' + (g.thumbnail ? '' : ' class="is-rj"') + '>' +
+        '<div>' +
+          '<label class="field">Name<input type="text" data-k="title" maxlength="80" value="' + esc(g.title) + '"></label>' +
+          '<label class="field">Short description (optional)<input type="text" data-k="description" maxlength="300" value="' + esc(g.description || '') + '"></label>' +
+          '<div class="owner-row">' +
+            '<button class="btn px btn--small" type="button" data-act="save">Save changes</button>' +
+            '<button class="btn px btn--small btn--quiet" type="button" data-act="pic">New picture</button>' +
+            (g.kind === 'folder' ? '' : '<button class="btn px btn--small btn--quiet" type="button" data-act="replace">Replace game file</button>') +
+            '<a class="btn px btn--small btn--quiet" href="#/game/' + encodeURIComponent(g.id) + '">Play</a>' +
+            '<button class="btn px btn--small btn--danger" type="button" data-act="remove">Remove</button>' +
+          '</div>' +
+          '<p class="owner-msg" data-msg role="status"></p>' +
+        '</div></li>';
+    }).join('');
+  }
+
+  function showNew(label, title) {
+    $('o-new').hidden = false;
+    $('o-picked').textContent = 'Picked: ' + label;
+    $('o-title').value = title;
+    $('o-desc').value = '';
+    setPicture(null);
+    say($('o-add-msg'), '');
+  }
+  function setPicture(dataURL) {
+    pending.picture = dataURL;
+    var img = $('o-pic');
+    img.src = dataURL || G.RJ_CARD;
+    img.classList.toggle('is-rj', !dataURL);
+  }
+  function clearNew() {
+    pending = null;
+    if (previewURL) { URL.revokeObjectURL(previewURL); previewURL = null; }
+    $('o-preview').innerHTML = '';
+    $('o-new').hidden = true;
+  }
+
+  async function pickedFile(file) {
+    if (!/\.html?$/i.test(file.name)) { say($('o-add-msg'), 'Pick a game’s .html file.', true); return; }
+    pending = { kind: 'file', file: file, picture: null };
+    showNew(file.name + ' (' + Math.max(1, Math.round(file.size / 1024)) + ' KB)', G.titleFromName(file.name));
+    if (previewURL) URL.revokeObjectURL(previewURL);
+    previewURL = URL.createObjectURL(new Blob([withKeepFrame(await file.text())], { type: 'text/html' }));
+    $('o-preview').innerHTML = '';
+    var f = document.createElement('iframe');
+    f.title = 'Game preview';
+    f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-pointer-lock');
+    f.src = previewURL;
+    $('o-preview').appendChild(f);
+    $('o-snap').hidden = false;
+  }
+
+  function pickedFolder(list) {
+    var files = Array.prototype.filter.call(list, function (f) { return !/(^|\/)\./.test(f.webkitRelativePath); });
+    var top = files.length ? files[0].webkitRelativePath.split('/')[0] : '';
+    var hasIndex = files.some(function (f) { return f.webkitRelativePath.toLowerCase() === (top + '/index.html').toLowerCase(); });
+    if (!hasIndex) { say($('o-add-msg'), 'That folder needs an index.html inside it: the page that starts the game.', true); return; }
+    if (files.length > 300) { say($('o-add-msg'), 'That folder has ' + files.length + ' files. Up to 300 can be uploaded at a time.', true); return; }
+    pending = { kind: 'folder', files: files, top: top, picture: null };
+    showNew('the folder “' + top + '” (' + files.length + ' files)', G.titleFromName(top));
+    $('o-preview').innerHTML = '<p>A preview isn’t available for folders. Choose a picture file, or keep RJ’s card.</p>';
+    $('o-snap').hidden = true;
+  }
+
+  function addGame() {
+    var msg = $('o-add-msg');
+    var title = $('o-title').value.trim(), description = $('o-desc').value.trim();
+    if (!pending) return;
+    if (!title) { say(msg, 'Give the game a name first.', true); return; }
+    work(msg, async function () {
+      var job = pending;
+      var latest = (await readList()).games, ids = latest.map(function (g) { return g.id; });
+      var base = G.slugify(title), id = base, n = 2;
+      while (ids.indexOf(id) !== -1) id = base + '-' + n++;
+      var path = job.kind === 'file' ? 'games/' + id + '.html' : 'games/' + id + '/index.html';
+      if (job.kind === 'file') {
+        say(msg, 'Uploading ' + title + '…');
+        await putFile(path, await fileToB64(job.file), 'Add game: ' + title);
+      } else {
+        for (var i = 0; i < job.files.length; i++) {
+          var f = job.files[i], rel = f.webkitRelativePath.slice(job.top.length + 1);
+          say(msg, 'Uploading file ' + (i + 1) + ' of ' + job.files.length + '…');
+          await putFile('games/' + id + '/' + rel, await fileToB64(f), 'Add game: ' + title + ' (' + rel + ')');
+        }
+      }
+      var thumb = null;
+      if (job.picture) {
+        say(msg, 'Uploading the card picture…');
+        await putFile('games/' + id + '.jpg', job.picture.split(',')[1], 'Card picture: ' + title);
+        thumb = 'games/' + id + '.jpg?v=' + Date.now().toString(36);
+      }
+      say(msg, 'Updating the game list…');
+      await changeList(function (list) {
+        var entry = { id: id, title: title, path: encodePath(path), kind: job.kind, added: new Date().toISOString() };
+        if (description) entry.description = description;
+        if (thumb) entry.thumbnail = thumb;
+        list.push(entry);
+      }, 'List game: ' + title);
+      clearNew();
+      renderList();
+      say(msg, 'Added! “' + title + '” will show in the arcade in about a minute, once GitHub finishes publishing.');
+    });
+  }
+
+  function wire() {
+    $('o-lock').addEventListener('click', function () {
+      S = { owner: S.owner, repo: S.repo, branch: S.branch, folder: S.folder };
+      saveSettings();
+      try { localStorage.removeItem(G.OWNER_KEY); } catch (e) { /* ignore */ }
+      renderLocked();
+    });
+    $('o-pick-file').addEventListener('click', function () { $('o-file').click(); });
+    $('o-pick-folder').addEventListener('click', function () { $('o-folder-in').click(); });
+    $('o-file').addEventListener('change', function (e) { if (e.target.files[0]) pickedFile(e.target.files[0]); e.target.value = ''; });
+    $('o-folder-in').addEventListener('change', function (e) { if (e.target.files.length) pickedFolder(e.target.files); e.target.value = ''; });
+    $('o-snap').addEventListener('click', function () {
+      try { setPicture(snapshot($('o-preview').querySelector('iframe'))); say($('o-add-msg'), 'Picture taken. Play a bit and take another if you like.'); }
+      catch (e) { say($('o-add-msg'), e.message, true); }
+    });
+    $('o-pick-pic').addEventListener('click', function () { $('o-pic-in').click(); });
+    $('o-pic-in').addEventListener('change', async function (e) {
+      var f = e.target.files[0]; e.target.value = '';
+      if (!f) return;
+      try { setPicture(await pictureFromFile(f)); } catch (err) { say($('o-add-msg'), err.message, true); }
+    });
+    $('o-use-rj').addEventListener('click', function () { setPicture(null); });
+    $('o-add').addEventListener('click', addGame);
+    $('o-cancel').addEventListener('click', function () { clearNew(); say($('o-add-msg'), ''); });
+
+    // manage list
+    var target = null;
+    $('o-list').addEventListener('error', function (e) {
+      if (e.target.tagName === 'IMG' && !e.target.classList.contains('is-rj')) { e.target.src = G.RJ_CARD; e.target.classList.add('is-rj'); }
+    }, true);
+    $('o-list').addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      var li = btn.closest('li'), id = li.getAttribute('data-id'), msg = li.querySelector('[data-msg]');
+      var game = games.filter(function (g) { return g.id === id; })[0];
+      if (!game) return;
+      var act = btn.getAttribute('data-act');
+      if (act === 'save') {
+        var title = li.querySelector('[data-k=title]').value.trim(), desc = li.querySelector('[data-k=description]').value.trim();
+        if (!title) { say(msg, 'A game needs a name.', true); return; }
+        work(msg, async function () {
+          say(msg, 'Saving…');
+          await changeList(function (list) { list.forEach(function (g) { if (g.id === id) { g.title = title; if (desc) g.description = desc; else delete g.description; } }); }, 'Rename game: ' + title);
+          renderList();
+          say(document.querySelector('.owner-game[data-id="' + id + '"] [data-msg]'), 'Saved. The arcade updates in about a minute.');
+        });
+      } else if (act === 'pic') {
+        target = { id: id, msg: msg }; $('o-swap-pic').click();
+      } else if (act === 'replace') {
+        target = { id: id, msg: msg }; $('o-swap-file').click();
+      } else if (act === 'remove') {
+        if (!window.confirm('Remove “' + game.title + '” from the arcade? Its files will be deleted.')) return;
+        work(msg, async function () {
+          say(msg, 'Removing…');
+          var p = decodePath(game.path);
+          await deletePath(game.kind === 'folder' ? p.replace(/\/[^/]*$/, '') : p, 'Remove game: ' + game.title);
+          if (game.thumbnail && /^games\//.test(game.thumbnail)) await deletePath(decodePath(game.thumbnail), 'Remove card picture: ' + game.title);
+          await changeList(function (list) { for (var i = list.length - 1; i >= 0; i--) if (list[i].id === id) list.splice(i, 1); }, 'Unlist game: ' + game.title);
+          renderList();
+          say($('o-add-msg'), '“' + game.title + '” was removed. It leaves the arcade in about a minute.');
+        });
+      }
+    });
+    $('o-swap-pic').addEventListener('change', function (e) {
+      var f = e.target.files[0]; e.target.value = '';
+      if (!f || !target) return;
+      var t = target;
+      work(t.msg, async function () {
+        say(t.msg, 'Uploading the picture…');
+        var pic = await pictureFromFile(f);
+        await putFile('games/' + t.id + '.jpg', pic.split(',')[1], 'New card picture');
+        await changeList(function (list) { list.forEach(function (g) { if (g.id === t.id) g.thumbnail = 'games/' + t.id + '.jpg?v=' + Date.now().toString(36); }); }, 'New card picture');
+        renderList();
+        var li = document.querySelector('.owner-game[data-id="' + t.id + '"]');
+        if (li) { li.querySelector('img').src = pic; li.querySelector('img').classList.remove('is-rj'); say(li.querySelector('[data-msg]'), 'New picture saved.'); }
+      });
+    });
+    $('o-swap-file').addEventListener('change', function (e) {
+      var f = e.target.files[0]; e.target.value = '';
+      if (!f || !target) return;
+      var t = target, game = games.filter(function (g) { return g.id === t.id; })[0];
+      if (!game) return;
+      work(t.msg, async function () {
+        say(t.msg, 'Uploading the new version…');
+        await putFile(decodePath(game.path), await fileToB64(f), 'Update game: ' + game.title);
+        say(t.msg, 'Updated. Players get the new version in about a minute.');
+      });
+    });
+
+    // ads
+    $('o-ads-save').addEventListener('click', function () {
+      var msg = $('o-ads-msg');
+      work(msg, async function () {
+        var cfg = { enabled: true, headCode: $('o-ad-head').value.trim(), slots: {} };
+        root.querySelectorAll('[data-ad]').forEach(function (t) { cfg.slots[t.getAttribute('data-ad')] = { code: t.value.trim() }; });
+        say(msg, 'Saving…');
+        await putFile('ads.json', textToB64(JSON.stringify(cfg, null, 2) + '\n'), 'Update ads');
+        say(msg, 'Ads saved. They show on the live site in about a minute (reload the page to see them).');
+      });
+    });
+  }
+
+  window.GamekadeOwner = {
+    enter: function () {
+      if (busy) return;
+      S = readSettings();
+      if (S.token) { if (rendered !== 'unlocked') renderUnlocked(); else readList().then(function (d) { games = d.games; renderList(); }).catch(function () {}); }
+      else if (rendered !== 'locked') renderLocked();
+    }
+  };
+})();
+
+</script>
+<script>window.Gamekade.start();</script>
+</body>
+</html>
