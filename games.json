@@ -1,6 +1,14 @@
 {
   "games": [
     {
+      "id": "8bit-chess",
+      "title": "8bit Chess",
+      "path": "games/8bit-chess.html",
+      "kind": "file",
+      "added": "2026-10-16T20:48:55.757Z",
+      "thumbnail": "games/8bit-chess.jpg?v=mvbfx8o0"
+    },
+    {
       "id": "grave-rush",
       "title": "Grave Rush",
       "path": "games/grave-rush.html",
@@ -17,6 +25,6 @@
       "thumbnail": "games/knightmares.jpg?v=mvbekxqr"
     }
   ],
-  "count": 2,
-  "updated": "2026-10-16T20:11:27.014Z"
+  "count": 3,
+  "updated": "2026-10-16T20:48:55.757Z"
 }
