@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ACE'S ARCADE - 8-Bit Card Casino</title>
+<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}body{display:flex;align-items:center;justify-content:center}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;touch-action:none;display:block;background:#000;user-select:none;-webkit-user-select:none}</style>
+</head><body><canvas id="cv"></canvas>
+<script>
+'use strict';
+/* ACE'S ARCADE — 8-bit casino card games. Single file, no dependencies (PeerJS loads on demand for online rooms). */
+const W=384,H=216;
+const rnd=n=>Math.floor(Math.random()*n);
+const pick=a=>a[rnd(a.length)];
+const range=n=>Array.from({length:n},(_,i)=>i);
+const sum=a=>a.reduce((x,y)=>x+y,0);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);const t=a[i];a[i]=a[j];a[j]=t}return a}
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+const K={bk:'#000000',wh:'#fcfcfc',fe:'#0a6a34',fe2:'#0d7a3c',fe3:'#085a2c',w1:'#6c3200',w2:'#a05a14',w3:'#d08a3c',
+ rd:'#d82800',rl:'#fc7460',rk:'#881400',yl:'#fcb800',yl2:'#fce0a8',yk:'#a87000',bl:'#0058f8',bl2:'#6888fc',bk2:'#0000bc',
+ gy:'#bcbcbc',gm:'#7c7c7c',gd:'#444444',gn:'#00a800',gn2:'#80d010',pk:'#f878f8',or:'#f87858'};
+
+/* ---------- canvas ---------- */
+const cv=document.getElementById('cv');cv.width=W;cv.height=H;
+const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;
+let g=ctx;
+function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.imageSmoothingEnabled=false;return c}
+function drawTo(c,fn){const p=g;g=c.getContext('2d');fn();g=p;return c}
+function R(x,y,w,h,c){g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function pbox(x,y,w,h,fill,bd){R(x+1,y,w-2,h,bd);R(x,y+1,w,h-2,bd);if(fill){R(x+2,y+1,w-4,h-2,fill);R(x+1,y+2,w-2,h-4,fill)}}
+function frame(x,y,w,h,c,t=1){R(x,y,w,t,c);R(x,y+h-t,w,t,c);R(x,y,t,h,c);R(x+w-t,y,t,h,c)}
+
+/* ---------- 5x7 pixel font ---------- */
+const FD={};
+(function(){const s={
+A:'.###./#...#/#...#/#####/#...#/#...#/#...#',B:'####./#...#/#...#/####./#...#/#...#/####.',C:'.###./#...#/#..../#..../#..../#...#/.###.',
+D:'####./#...#/#...#/#...#/#...#/#...#/####.',E:'#####/#..../#..../####./#..../#..../#####',F:'#####/#..../#..../####./#..../#..../#....',
+G:'.###./#...#/#..../#.###/#...#/#...#/.###.',H:'#...#/#...#/#...#/#####/#...#/#...#/#...#',I:'.###./..#../..#../..#../..#../..#../.###.',
+J:'..###/...#./...#./...#./...#./#..#./.##..',K:'#...#/#..#./#.#../##.../#.#../#..#./#...#',L:'#..../#..../#..../#..../#..../#..../#####',
+M:'#...#/##.##/#.#.#/#.#.#/#...#/#...#/#...#',N:'#...#/##..#/#.#.#/#..##/#...#/#...#/#...#',O:'.###./#...#/#...#/#...#/#...#/#...#/.###.',
+P:'####./#...#/#...#/####./#..../#..../#....',Q:'.###./#...#/#...#/#...#/#.#.#/#..#./.##.#',R:'####./#...#/#...#/####./#.#../#..#./#...#',
+S:'.####/#..../#..../.###./....#/....#/####.',T:'#####/..#../..#../..#../..#../..#../..#..',U:'#...#/#...#/#...#/#...#/#...#/#...#/.###.',
+V:'#...#/#...#/#...#/#...#/#...#/.#.#./..#..',W:'#...#/#...#/#...#/#.#.#/#.#.#/##.##/#...#',X:'#...#/#...#/.#.#./..#../.#.#./#...#/#...#',
+Y:'#...#/#...#/.#.#./..#../..#../..#../..#..',Z:'#####/....#/...#./..#../.#.../#..../#####',
+'0':'.###./#...#/#..##/#.#.#/##..#/#...#/.###.','1':'..#../.##../..#../..#../..#../..#../.###.','2':'.###./#...#/....#/...#./..#../.#.../#####',
+'3':'#####/...#./..#../...#./....#/#...#/.###.','4':'...#./..##./.#.#./#..#./#####/...#./...#.','5':'#####/#..../####./....#/....#/#...#/.###.',
+'6':'..##./.#.../#..../####./#...#/#...#/.###.','7':'#####/....#/...#./..#../.#.../.#.../.#...','8':'.###./#...#/#...#/.###./#...#/#...#/.###.',
+'9':'.###./#...#/#...#/.####/....#/...#./.##..',' ':'...../...../...../...../...../...../.....','.':'...../...../...../...../...../.##../.##..',
+',':'...../...../...../...../..##./...#./..#..',':':'...../.##../.##../...../.##../.##../.....','!':'..#../..#../..#../..#../..#../...../..#..',
+'?':'.###./#...#/....#/...#./..#../...../..#..','-':'...../...../...../#####/...../...../.....','+':'...../..#../..#../#####/..#../..#../.....',
+'=':'...../...../#####/...../#####/...../.....','/':'....#/....#/...#./..#../.#.../#..../#....','(':'...#./..#../.#.../.#.../.#.../..#../...#.',
+')':'.#.../..#../...#./...#./...#./..#../.#...','<':'...#./..#../.#.../#..../.#.../..#../...#.','>':'.#.../..#../...#./....#/...#./..#../.#...',
+'*':'..#../#.#.#/.###./#####/.###./#.#.#/..#..','%':'##..#/##.#./...#./..#../.#.../.#.##/#..##','$':'..#../.####/#.#../.###./..#.#/####./..#..',
+'#':'.#.#./.#.#./#####/.#.#./#####/.#.#./.#.#.',"'":'..#../..#../.#.../...../...../...../.....','"':'.#.#./.#.#./...../...../...../...../.....',
+'_':'...../...../...../...../...../...../#####','&':'.##../#..#./#.#../.#.../#.#.#/#..#./.##.#','|':'..#../..#../..#../..#../..#../..#../..#..',
+'^':'..#../.#.#./#...#/...../...../...../.....','[':'.###./.#.../.#.../.#.../.#.../.#.../.###.',']':'.###./...#./...#./...#./...#./...#./.###.',
+';':'...../.##../.##../...../.##../..#../.#...'};
+for(const k in s)FD[k]=s[k].split('/')})();
+const tcache=new Map();
+function tsprite(s,col,sc){const key=sc+col+s;let c=tcache.get(key);if(c)return c;if(tcache.size>2500)tcache.clear();
+ c=mk(Math.max(1,s.length*6-1)*sc,7*sc);const x=c.getContext('2d');x.fillStyle=col;
+ for(let i=0;i<s.length;i++){const gl=FD[s[i]]||FD['?'];for(let r=0;r<7;r++){const row=gl[r];for(let q=0;q<5;q++)if(row[q]==='#')x.fillRect((i*6+q)*sc,r*sc,sc,sc)}}
+ tcache.set(key,c);return c}
+function tw(s,sc=1){return Math.max(1,String(s).length*6-1)*sc}
+function T(s,x,y,col,o){o=o||{};col=col||K.wh;s=String(s).toUpperCase();const sc=o.sc||1;const w=tw(s,sc);
+ if(o.al==='c')x-=w>>1;else if(o.al==='r')x-=w;x=Math.round(x);y=Math.round(y);
+ if(o.sh)g.drawImage(tsprite(s,o.sh,sc),x+sc,y+sc);g.drawImage(tsprite(s,col,sc),x,y)}
+function wrap(s,n){const out=[];let line='';for(const w of String(s).split(' ')){if((line+' '+w).trim().length>n){out.push(line);line=w}else line=(line+' '+w).trim()}if(line)out.push(line);return out}
+
+/* ---------- cards ---------- */
+const rk=c=>c%13,su=c=>(c/13)|0,isRed=c=>su(c)===1||su(c)===2;
+const RL=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const SN=['SPADES','HEARTS','DIAMONDS','CLUBS'];
+const SUITS7=[['...#...','..###..','.#####.','#######','#######','...#...','..###..'],
+ ['.##.##.','#######','#######','#######','.#####.','..###..','...#...'],
+ ['...#...','..###..','.#####.','#######','.#####.','..###..','...#...'],
+ ['..###..','..###..','#######','#######','..###..','...#...','..###..']];
+const SUITS5=[['..#..','.###.','#####','#####','..#..'],['.#.#.','#####','#####','.###.','..#..'],['..#..','.###.','#####','.###.','..#..'],['.###.','.###.','#####','..#..','.###.']];
+const scache={};
+function sprRows(rows,col,sc){sc=sc||1;const k=rows.join('')+col+sc;if(scache[k])return scache[k];const h=rows.length,w=rows[0].length;const c=mk(w*sc,h*sc);const x=c.getContext('2d');x.fillStyle=col;
+ for(let r=0;r<h;r++)for(let q=0;q<w;q++)if(rows[r][q]==='#')x.fillRect(q*sc,r*sc,sc,sc);scache[k]=c;return c}
+function suitSpr(s,size,col,sc){return sprRows(size===5?SUITS5[s]:SUITS7[s],col,sc||1)}
+function suitCol(c){return isRed(c)?K.rd:K.bk}
+const CW=26,CH=36,SW=18,SH=25;
+const ccache={};
+function faceSpr(c,small){const key=(small?'s':'n')+c;if(ccache[key])return ccache[key];
+ const w=small?SW:CW,h=small?SH:CH;const cnv=mk(w,h);
+ drawTo(cnv,()=>{R(1,0,w-2,h,K.bk);R(0,1,w,h-2,K.bk);R(2,1,w-4,h-2,K.wh);R(1,2,w-2,h-4,K.wh);
+  const col=suitCol(c),r=rk(c),lab=RL[r];T(lab,2,3,col);g.drawImage(suitSpr(su(c),5,col),2,11);
+  if(!small){
+   if(r>=9&&r<=11){R(6,15,14,17,K.yl2);frame(6,15,14,17,col);T(lab,8,19,col,{sc:2});
+   }else if(r===12){g.drawImage(suitSpr(su(c),7,col,2),6,17)}
+   else g.drawImage(suitSpr(su(c),7,col),w/2-3.5|0,19);
+   if(r<9||r===12){const l2=lab;T(l2,w-3-tw(l2),h-10,col)}else T(lab,w-3-tw(lab),h-10,col);
+  }else g.drawImage(suitSpr(su(c),7,col),9,15)});
+ ccache[key]=cnv;return cnv}
+function backSpr(small){const key='b'+(small?1:0);if(ccache[key])return ccache[key];const w=small?SW:CW,h=small?SH:CH;const cnv=mk(w,h);
+ drawTo(cnv,()=>{R(1,0,w-2,h,K.bk);R(0,1,w,h-2,K.bk);R(2,1,w-4,h-2,K.wh);R(1,2,w-2,h-4,K.wh);R(3,3,w-6,h-6,K.rk);
+  for(let y=3;y<h-3;y++)for(let x=3;x<w-3;x++)if((x+y)%4===0||(x-y+100)%4===0)R(x,y,1,1,K.rl)});ccache[key]=cnv;return cnv}
+// c<0 => back. o:{small,sel,dim,hl}
+function card(c,x,y,o){o=o||{};const small=o.small;const w=small?SW:CW,h=small?SH:CH;if(o.sel)y-=5;
+ const spr=c<0||o.back?backSpr(small):faceSpr(c,small);g.drawImage(spr,Math.round(x),Math.round(y));
+ if(o.dim){g.globalAlpha=.45;R(x+1,y+1,w-2,h-2,K.bk);g.globalAlpha=1}
+ if(o.hl)frame(x-1,y-1,w+2,h+2,o.hl===true?K.yl:o.hl,1);
+ if(o.sel)frame(x-1,y-1,w+2,h+2,K.yl,1)}
+function emptySlot(x,y,w,h,label,col){w=w||CW;h=h||CH;frame(x,y,w,h,col||K.fe2,1);R(x+1,y+1,1,1,col||K.fe2);if(label)T(label,x+w/2,y+h/2-3,col||K.fe2,{al:'c'})}
+
+/* hand evaluation (poker) */
+function* combos(a,k,s=0,cur=[]){if(cur.length===k){yield cur.slice();return}for(let i=s;i<=a.length-(k-cur.length);i++){cur.push(a[i]);yield* combos(a,k,i+1,cur);cur.pop()}}
+function ev5(cs){const r=cs.map(rk).sort((a,b)=>b-a);const flush=cs.length===5&&cs.every(c=>su(c)===su(cs[0]));
+ const cnt={};r.forEach(x=>cnt[x]=(cnt[x]||0)+1);const gr=Object.keys(cnt).map(Number).sort((a,b)=>cnt[b]-cnt[a]||b-a);const cn=gr.map(x=>cnt[x]);
+ let sh=-1;const u=[...new Set(r)];
+ if(cs.length===5&&u.length===5){if(r[0]-r[4]===4)sh=r[0];else if(r[0]===12&&r[1]===3&&r[4]===0)sh=3}
+ let cat,ks;
+ if(sh>=0&&flush){cat=8;ks=[sh]}else if(cn[0]===4){cat=7;ks=gr}else if(cn[0]===3&&cn[1]===2){cat=6;ks=gr}else if(flush){cat=5;ks=r}
+ else if(sh>=0){cat=4;ks=[sh]}else if(cn[0]===3){cat=3;ks=gr}else if(cn[0]===2&&cn[1]===2){cat=2;ks=gr}else if(cn[0]===2){cat=1;ks=gr}else{cat=0;ks=r}
+ let v=cat;for(let i=0;i<5;i++)v=v*13+(ks[i]||0);return v}
+const catOf=v=>Math.floor(v/371293);
+const CATN=['HIGH CARD','PAIR','TWO PAIR','TRIPS','STRAIGHT','FLUSH','FULL HOUSE','QUADS','STRAIGHT FLUSH'];
+function best5(cs){if(cs.length<=5)return ev5(cs);let b=-1;for(const c of combos(cs,5)){const v=ev5(c);if(v>b)b=v}return b}
+function handName(cs){const v=best5(cs);const c=catOf(v);if(c===8&&Math.floor(v/28561)%13===12)return 'ROYAL FLUSH';return CATN[c]}
+function ev2(cs){const a=rk(cs[0]),b=rk(cs[1]);return a===b?169+a*13:Math.max(a,b)*13+Math.min(a,b)}
+
+/* ---------- input / buttons ---------- */
+const mouse={x:-1,y:-1,down:false};
+let buttons=[];
+function hitIn(b,x,y){return x>=b.x&&x<b.x+b.w&&y>=b.y&&y<b.y+b.h}
+function Hit(x,y,w,h,fn){buttons.push({x,y,w,h,fn})}
+const BST={red:[K.rd,K.rl,K.rk],green:[K.gn,K.gn2,'#005800'],yellow:[K.yl,K.yl2,K.yk],blue:[K.bl,K.bl2,K.bk2],gray:[K.gm,K.gy,K.gd],white:[K.gy,K.wh,K.gm],purple:['#6844fc','#9878f8','#4428bc']};
+function Btn(label,x,y,w,h,fn,o){o=o||{};const hov=!o.dis&&mouse.x>=x&&mouse.x<x+w&&mouse.y>=y&&mouse.y<y+h;
+ const st=BST[o.dis?'gray':(o.st||'red')];const press=hov&&mouse.down?1:0;
+ pbox(x,y,w,h,st[0],K.bk);if(!press){R(x+2,y+1,w-4,1,st[1]);R(x+1,y+2,1,h-4,st[1]);R(x+2,y+h-2,w-4,1,st[2]);R(x+w-2,y+2,1,h-4,st[2])}
+ if(hov&&!press){R(x+2,y+2,w-4,h-4,st[1]);}
+ const tc=o.dis?K.gd:(o.st==='yellow'||o.st==='white'||o.st==='green')?K.bk:K.wh;
+ const sc=o.sc||1;T(label,x+w/2,y+(h-7*sc)/2+press,tc,{al:'c',sc});
+ if(o.blink&&((now/400)|0)%2===0)frame(x-1,y-1,w+2,h+2,K.yl);
+ if(!o.dis)buttons.push({x,y,w,h,fn:()=>{sfx('click');fn()}})}
+let now=0;
+
+/* ---------- sound ---------- */
+let AC=null;const snd={sfx:true,mus:true};
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,d,type,v,when,f2){const a=AC;if(!a||a.state!=='running')return;const o=a.createOscillator(),gn=a.createGain();o.type=type||'square';const t=a.currentTime+(when||0);
+ o.frequency.setValueAtTime(f,t);if(f2)o.frequency.linearRampToValueAtTime(f2,t+d);gn.gain.setValueAtTime(v||.05,t);gn.gain.linearRampToValueAtTime(.0001,t+d);o.connect(gn);gn.connect(a.destination);o.start(t);o.stop(t+d+.02)}
+function noise(d,v,when){const a=AC;if(!a||a.state!=='running')return;const n=Math.floor(a.sampleRate*d),b=a.createBuffer(1,n,a.sampleRate),ch=b.getChannelData(0);for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*(1-i/n);
+ const s=a.createBufferSource(),gn=a.createGain();s.buffer=b;gn.gain.value=v||.05;s.connect(gn);gn.connect(a.destination);s.start(a.currentTime+(when||0))}
+const SFX={click(){tone(880,.04)},card(){noise(.06,.06)},chip(){tone(1200,.03,'square',.04);tone(1700,.04,'square',.04,.04)},
+ win(){[523,659,784,1047].forEach((f,i)=>tone(f,.11,'square',.05,i*.09))},lose(){[330,262,196].forEach((f,i)=>tone(f,.15,'triangle',.08,i*.13))},
+ turn(){tone(1050,.05,'square',.03)},err(){tone(120,.12,'sawtooth',.05)},flip(){noise(.04,.05);tone(500,.04,'square',.02)},deal(){noise(.05,.05);noise(.05,.04,.08)}};
+function sfx(n){if(snd.sfx&&AC&&SFX[n])try{SFX[n]()}catch(e){}}
+const CHD=[[261.6,329.6,392],[220,261.6,329.6],[174.6,220,261.6],[196,246.9,293.7]],BSS=[65.4,55,43.65,49],PAT=[0,1,2,1,0,2,1,2];
+let mstep=0;
+setInterval(()=>{if(!snd.mus||!AC||AC.state!=='running')return;const s=mstep++;const bar=(s>>3)&3,i=s&7;
+ if(i%2===0)tone(BSS[bar]*(i===4?1.5:1),.22,'triangle',.08);
+ if(s%32>=8||true)tone(CHD[bar][PAT[i]]*(i>5?2:1),.12,'square',.014)},155);
+/* ---------- transports ---------- */
+const PFX='acesarcade-';
+function randCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=a[rnd(a.length)];return s}
+function loadPeer(cb){if(window.Peer)return cb(true);
+ const urls=['https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js','https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js','https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js'];let i=0;
+ const next=()=>{if(i>=urls.length)return cb(false);const s=document.createElement('script');s.src=urls[i++];s.onload=()=>window.Peer?cb(true):next();s.onerror=next;document.head.appendChild(s)};next()}
+const TP={name:'online',
+ host(code,h){const peer=new Peer(PFX+code,{debug:0});const conns={};
+  peer.on('open',()=>h.open());
+  peer.on('connection',conn=>{conn.on('open',()=>{conns[conn.peer]=conn;h.join(conn.peer)});conn.on('data',d=>h.data(conn.peer,d));
+   conn.on('close',()=>{delete conns[conn.peer];h.leave(conn.peer)});conn.on('error',()=>{})});
+  peer.on('error',e=>h.error(e.type||String(e)));
+  return{send(cid,d){const c=conns[cid];if(c&&c.open)try{c.send(d)}catch(e){}},close(){try{peer.destroy()}catch(e){}}}},
+ join(code,h){const peer=new Peer({debug:0});let conn=null,opened=false;
+  peer.on('open',()=>{conn=peer.connect(PFX+code,{reliable:true,serialization:'json'});conn.on('open',()=>{opened=true;h.open()});conn.on('data',d=>h.data(d));conn.on('close',()=>h.close());conn.on('error',()=>h.close())});
+  peer.on('error',e=>h.error(e.type||String(e)));
+  setTimeout(()=>{if(!opened)h.error('peer-unavailable')},12000);
+  return{send(d){if(conn&&conn.open)try{conn.send(d)}catch(e){}},close(){try{peer.destroy()}catch(e){}}}}};
+const TB={name:'this browser',
+ host(code,h){const ch=new BroadcastChannel('aces-'+code);
+  ch.onmessage=e=>{const m=e.data;if(!m||m.to!=='host')return;if(m.t==='hello'){ch.postMessage({to:m.from,from:'host',t:'ack'});h.join(m.from)}else if(m.t==='d')h.data(m.from,m.d);else if(m.t==='bye')h.leave(m.from)};
+  setTimeout(()=>h.open(),0);
+  return{send(cid,d){ch.postMessage({to:cid,from:'host',t:'d',d})},close(){ch.postMessage({to:'*',from:'host',t:'end'});ch.close()}}},
+ join(code,h){const ch=new BroadcastChannel('aces-'+code);const id='c'+Math.random().toString(36).slice(2,9);let ok=false;
+  ch.onmessage=e=>{const m=e.data;if(!m||(m.to!==id&&m.to!=='*'))return;if(m.t==='ack'){ok=true;h.open()}else if(m.t==='d')h.data(m.d);else if(m.t==='end')h.close()};
+  ch.postMessage({to:'host',from:id,t:'hello'});setTimeout(()=>{if(!ok){h.error('peer-unavailable');ch.close()}},1500);
+  return{send(d){ch.postMessage({to:'host',from:id,t:'d',d})},close(){try{ch.postMessage({to:'host',from:id,t:'bye'});ch.close()}catch(e){}}}}};
+let TRANSPORT=null;
+function getTransport(cb){if(TRANSPORT)return cb(TRANSPORT);
+ loadPeer(ok=>{if(ok)TRANSPORT=TP;else if(typeof BroadcastChannel!=='undefined')TRANSPORT=TB;cb(TRANSPORT)})}
+
+/* ---------- room / game session ---------- */
+const GAMES={};
+const RM={screen:'title',role:'none',game:null,opts:{},nbots:2,S:null,me:0,slots:[],code:'',link:null,status:'',notice:'',started:false,lobby:null,pt:null,transport:null,joinCode:''};
+const UI={};
+function nameFor(S,seat,me){return seat===me?'YOU':(S.names[seat]||'P'+(seat+1))}
+function mkNames(slots){let h=0,b=0;return slots.map(s=>s.k==='b'?'BOT'+(++b):'P'+(++h))}
+function gameOpts(G){const o={};(G.opts||[]).forEach(d=>o[d.key]=(RM.opts[G.id]&&RM.opts[G.id][d.key]!==undefined)?RM.opts[G.id][d.key]:d.def);return o}
+
+function startGame(){const G=GAMES[RM.game];const slots=RM.slots.slice();
+ while(slots.length<G.min)slots.push({k:'b'});while(slots.length>G.max)slots.pop();
+ const S=G.init(slots.length,gameOpts(G));S.g=G.id;S.n=slots.length;S.bot=slots.map(s=>s.k==='b');S.names=mkNames(slots);S.auto=false;
+ RM.S=S;RM.me=0;RM.started=true;RM.screen='play';Object.keys(UI).forEach(k=>delete UI[k]);
+ // seat map: slot index == seat
+ changed(true)}
+function changed(first){const S=RM.S;if(!S)return;
+ if(RM.role==='host')RM.slots.forEach((s,i)=>{if(s.k==='h'&&s.cid)RM.link.send(s.cid,{k:'state',S,you:i})});
+ const G=GAMES[S.g];if(!first&&RM.prevPhase!==S.phase&&(S.phase==='result'||S.phase==='over')&&G.mine){const m=G.mine(S,RM.me);sfx(m>0?'win':m<0?'lose':'turn')}
+ RM.prevPhase=S.phase;pump()}
+function pump(){clearTimeout(RM.pt);const S=RM.S;if(!S||RM.role==='client')return;const G=GAMES[S.g];const t=G.turn(S);if(t==null)return;
+ if(t>=0&&S.bot[t]){RM.pt=setTimeout(()=>{if(RM.S!==S)return;const a=G.bot(S,t);sfx('card');if(!a||G.act(S,t,a)===false){console.warn('bot stuck',S.g,t,JSON.stringify(a));S.bot[t]=true;if(G.fallback){G.fallback(S,t);changed()}return}changed()},(G.delay||650)+rnd(350))}
+ else if(t===-3||(t===-2&&S.auto&&G.auto)){RM.pt=setTimeout(()=>{if(RM.S!==S)return;sfx('card');G.auto(S);changed()},t===-3?(G.autoDelay||1000):(G.autoFast||650))}}
+function hostAct(seat,a){const S=RM.S;if(!S)return;const G=GAMES[S.g];if(G.act(S,seat,a)===false){if(seat===RM.me)sfx('err');return}changed()}
+function act(a){if(RM.role==='client'){if(RM.link)RM.link.send({k:'act',a})}else hostAct(RM.me,a)}
+
+function playSolo(){RM.role='solo';RM.slots=[{k:'h',cid:null}];for(let i=0;i<RM.nbots;i++)RM.slots.push({k:'b'});startGame()}
+function openRoom(){RM.role='host';RM.slots=[{k:'h',cid:null}];for(let i=0;i<Math.max(0,GAMES[RM.game].min-1);i++)RM.slots.push({k:'b'});RM.code='';RM.status='CONNECTING...';RM.screen='lobby';RM.started=false;
+ getTransport(T=>{if(RM.role!=='host')return;if(!T){RM.status='NO NETWORK - CANNOT HOST';return}RM.transport=T;tryHost(0)})}
+function tryHost(n){const code=randCode();let link=null;
+ link=RM.transport.host(code,{open(){RM.code=code;RM.status=''},error(e){if(e==='unavailable-id'&&n<6){try{link.close()}catch(x){}tryHost(n+1)}else RM.status='ERROR: '+e},
+  join(cid){},data(cid,d){hostData(cid,d)},leave(cid){hostLeave(cid)}});RM.link=link}
+function lobbySend(){if(RM.role!=='host')return;const names=mkNames(RM.slots);
+ RM.slots.forEach((s,i)=>{if(s.k==='h'&&s.cid)RM.link.send(s.cid,{k:'lobby',game:RM.game,names,you:i,max:GAMES[RM.game].max,code:RM.code})})}
+function hostData(cid,d){if(!d)return;const G=GAMES[RM.game];
+ if(d.k==='join'){if(RM.started){RM.link.send(cid,{k:'err',m:'GAME IN PROGRESS'});return}
+  if(RM.slots.some(s=>s.cid===cid))return;
+  if(RM.slots.length>=G.max){const bi=RM.slots.map(s=>s.k).lastIndexOf('b');if(bi<0){RM.link.send(cid,{k:'err',m:'ROOM IS FULL'});return}RM.slots.splice(bi,1)}
+  RM.slots.push({k:'h',cid});lobbySend()}
+ else if(d.k==='act'){const seat=RM.slots.findIndex(s=>s.cid===cid);if(seat>=0&&RM.started)hostAct(seat,d.a)}
+ else if(d.k==='leave')hostLeave(cid)}
+function hostLeave(cid){const i=RM.slots.findIndex(s=>s.cid===cid);if(i<0)return;
+ if(RM.started&&RM.S){RM.slots[i]={k:'b'};RM.S.bot[i]=true;RM.S.names[i]=RM.S.names[i]+'*';changed()}else{RM.slots.splice(i,1);lobbySend()}}
+function joinRoom(code){RM.role='client';RM.status='CONNECTING...';RM.code=code;RM.screen='joining';
+ getTransport(T=>{if(RM.role!=='client')return;if(!T){RM.status='NO NETWORK';return}
+  RM.link=T.join(code,{open(){RM.status='JOINED ROOM';RM.link.send({k:'join'})},data(d){clientData(d)},
+   close(){if(RM.role==='client')leaveRoom('HOST LEFT THE ROOM')},error(e){if(RM.role==='client'){RM.status=e==='peer-unavailable'?'ROOM NOT FOUND':'ERROR: '+e;RM.err=true}}})})}
+function clientData(d){if(!d)return;
+ if(d.k==='lobby'){RM.lobby=d;RM.game=d.game;RM.screen='lobby';RM.started=false;RM.S=null;RM.code=d.code||RM.code}
+ else if(d.k==='state'){const first=!RM.S;RM.S=d.S;RM.me=d.you;if(RM.screen!=='play'){RM.screen='play';Object.keys(UI).forEach(k=>delete UI[k])}RM.game=d.S.g;
+  const G=GAMES[d.S.g];if(RM.prevPhase!==d.S.phase&&(d.S.phase==='result'||d.S.phase==='over')&&G.mine){const m=G.mine(d.S,RM.me);sfx(m>0?'win':m<0?'lose':'turn')}RM.prevPhase=d.S.phase;sfx('card')}
+ else if(d.k==='err'){RM.status=d.m;RM.err=true}
+ else if(d.k==='end')leaveRoom('HOST CLOSED THE ROOM')}
+function leaveRoom(notice){clearTimeout(RM.pt);
+ try{if(RM.role==='host'&&RM.link){RM.slots.forEach(s=>{if(s.cid)RM.link.send(s.cid,{k:'end'})});setTimeout(()=>{try{RM.link.close()}catch(e){}},200)}
+  else if(RM.role==='client'&&RM.link){RM.link.send({k:'leave'});const l=RM.link;setTimeout(()=>{try{l.close()}catch(e){}},200)}}catch(e){}
+ RM.role='none';RM.S=null;RM.link=null;RM.started=false;RM.lobby=null;RM.code='';RM.status='';RM.err=false;RM.screen='menu';RM.notice=notice||''}
+function toLobby(){if(RM.role!=='host')return;clearTimeout(RM.pt);RM.started=false;RM.S=null;RM.screen='lobby';
+ RM.slots.forEach(s=>{if(s.k==='h'&&s.cid)RM.link.send(s.cid,{k:'toLobby'})});lobbySend()}
+/* ---------- backgrounds ---------- */
+const bgc={};
+function feltBg(kind){if(bgc[kind])return bgc[kind];const c=mk(W,H);
+ drawTo(c,()=>{R(0,0,W,H,K.w1);for(let y=0;y<H;y+=3)R(0,y,W,1,y%9===0?K.w2:'#5a2a00');R(0,0,W,1,K.w3);R(0,H-1,W,1,'#3a1a00');
+  R(5,5,W-10,H-10,K.bk);R(6,6,W-12,H-12,'#2a1400');pbox(7,7,W-14,H-14,K.fe,K.bk);R(8,8,W-16,H-16,K.fe);
+  for(let y=8;y<H-8;y+=2)for(let x=8+((y>>1)&1)*2;x<W-8;x+=4)R(x,y,1,1,K.fe2);
+  const L='#58b878';
+  if(kind==='title'||kind==='menu'){
+   frame(12,25,W-24,H-34,L,2);R(12,25,2,2,K.fe);R(W-14,25,2,2,K.fe);
+   R(150,23,84,6,K.fe);T("DON'T PASS BAR",192,22,L,{al:'c'});
+   R(150,H-17,84,8,K.fe);T('PASS LINE',192,H-18,L,{al:'c'});
+   if(kind==='title'){const nums=['4','5','SIX','8','NINE','10'];nums.forEach((n,i)=>{const bx=14+i*62;frame(bx,8,58,12,L,1);T(n,bx+29,11,L,{al:'c'})})}
+  }else{
+   frame(12,12,W-24,H-24,L,1);R(12,12,2,2,K.fe);R(W-14,12,2,2,K.fe);R(12,H-14,2,2,K.fe);R(W-14,H-14,2,2,K.fe)}});
+ bgc[kind]=c;return c}
+const dcache={};
+function diceSpr(n){if(dcache[n])return dcache[n];const c=mk(16,16);
+ drawTo(c,()=>{pbox(0,0,15,15,K.wh,K.bk);R(2,13,12,2,K.gy);const P={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}[n];
+  P.forEach(p=>{R(3+(p%3)*3,3+((p/3)|0)*3,2,2,n===1?K.rd:K.bk)})});dcache[n]=c;return c}
+let busC=null,fishC=null;
+function busSpr(){if(busC)return busC;busC=mk(28,14);drawTo(busC,()=>{R(1,1,26,9,K.bk);R(2,2,24,7,K.yl);for(let i=0;i<5;i++)R(4+i*4,3,3,3,'#9cd0fc');R(22,3,3,5,'#9cd0fc');R(2,7,24,1,K.bk);R(0,10,28,1,K.bk);R(4,9,6,5,K.bk);R(18,9,6,5,K.bk);R(6,11,2,2,K.gy);R(20,11,2,2,K.gy)});return busC}
+function fishSpr(){if(fishC)return fishC;fishC=mk(16,7);drawTo(fishC,()=>{const rows=['.....oooo.......','...oooooooo...o.','.oooooooooooooo.','oowkoooooooooooo','.oooooooooooooo.','...oooooooo...o.','.....oooo.......'];
+  rows.forEach((r,y)=>{for(let x=0;x<16;x++){const ch=r[x];if(ch==='o')R(x,y,1,1,K.or);else if(ch==='w')R(x,y,1,1,K.wh);else if(ch==='k')R(x,y,1,1,K.bk)}})});return fishC}
+function chipSpr(col,size){size=size||9;const key='chip'+col+size;if(scache[key])return scache[key];const c=mk(size,size);
+ drawTo(c,()=>{const rows=['..#####..','.#######.','#########','#########','#########','#########','#########','.#######.','..#####..'];
+  rows.forEach((r,y)=>{for(let x=0;x<9;x++)if(r[x]==='#')R(x,y,1,1,K.bk)});rows.forEach((r,y)=>{for(let x=0;x<9;x++)if(r[x]==='#'&&x>0&&x<8&&y>0&&y<8)R(x,y,1,1,col)});
+  R(4,1,1,1,K.wh);R(4,7,1,1,K.wh);R(1,4,1,1,K.wh);R(7,4,1,1,K.wh);R(3,3,3,3,K.wh);R(4,4,1,1,col)});scache[key]=c;return c}
+function chipCol(v){return v>=500?'#a850f8':v>=100?'#444444':v>=50?K.bl:v>=25?K.gn:v>=10?K.rd:K.yl}
+function money(n){return '$'+n}
+
+/* ---------- layout helpers shared by games ---------- */
+function posOf(S,me,seat){const n=S.n,v=((seat-me)%n+n)%n;if(n===1)return'b';if(n===2)return v?'t':'b';if(n===3)return['b','l','r'][v];return['b','l','t','r'][v]}
+function fanPos(pos,n,o){o=o||{};const cw=o.cw||CW;let step=o.step||(pos==='b'?15:pos==='t'?11:9);const maxw=o.maxw||(pos==='b'||pos==='t'?260:104);
+ if(n>1&&(n-1)*step+cw>maxw)step=Math.floor((maxw-cw)/(n-1));const tot=(n-1)*step+cw;let x0,y0;
+ if(pos==='b'){x0=192-tot/2;y0=o.y||150}else if(pos==='t'){x0=192-tot/2;y0=o.y||22}else if(pos==='l'){x0=o.x||10;y0=o.y||74}else{x0=374-tot;y0=o.y||74}
+ return Array.from({length:n},(_,i)=>[Math.round(x0+i*step),y0])}
+function labelXY(pos){return pos==='b'?[192,140,'c']:pos==='t'?[192,12,'c']:pos==='l'?[10,62,'l']:[374,62,'r']}
+function seatLabel(S,me,seat,extra,o){o=o||{};const pos=posOf(S,me,seat);const[x,y,al]=labelXY(pos);const turn=GAMES[S.g].turn(S)===seat;
+ let col=o.col||(turn?K.yl:K.wh);if(o.dim)col=K.gm;const txt=(turn?'>':'')+nameFor(S,seat,me)+(extra?' '+extra:'');
+ T(txt,x,y,col,{al,sh:K.bk})}
+function msgBar(text,y,max){if(!text)return;y=y||124;const ls=wrap(text,58);ls.slice(0,max||2).forEach((l,i)=>T(l,192,y+i*9,K.yl,{al:'c',sh:K.bk}))}
+function whoTurn(S,me){return GAMES[S.g].turn(S)}
+function myTurn(S,me){return GAMES[S.g].turn(S)===me}
+function panel(x,y,w,h,title){pbox(x,y,w,h,'#06381a',K.wh);if(title){R(x+4,y-3,tw(title)+6,8,'#06381a');T(title,x+7,y-3,K.yl)}}
+function chipTxt(x,y,amt,al){const s=money(amt);const w=tw(s)+11;const x0=al==='c'?x-w/2:al==='r'?x-w:x;g.drawImage(chipSpr(chipCol(amt)),Math.round(x0),y-1);T(s,x0+11,y,K.wh,{sh:K.bk})}
+
+/* ---------- title ---------- */
+function drawTitle(){g.drawImage(feltBg('title'),0,0);R(14,30,W-28,H-44,K.fe);
+ const t=now/1000;T("ACE'S",192,44,K.yl,{al:'c',sc:5,sh:K.rk});T('ARCADE',192,84,K.wh,{al:'c',sc:4,sh:K.rd});
+ T('8-BIT CARD CASINO',192,120,K.gn2,{al:'c',sc:1});
+ const d1=1+((t*3)|0)%6,d2=1+((t*3+2)|0)%6;g.drawImage(diceSpr(d1),150,138);g.drawImage(diceSpr(d2),218,141);
+ [0,1,2,3].forEach(s=>g.drawImage(suitSpr(s,7,s===1||s===2?K.rd:K.wh,2),166+s*18,140));
+ if(((now/500)|0)%2===0)T('CLICK TO START',192,170,K.wh,{al:'c',sc:1,sh:K.bk});
+ T('12 GAMES - SOLO, BOTS OR MULTIPLAYER',192,184,K.gy,{al:'c'});
+ Hit(0,0,W,H,()=>{ac();sfx('win');RM.screen='menu'})}
+
+/* ---------- menu ---------- */
+const ORDER=['solitaire','war','draw','holdem','stud','paigow','golf','euchre','gofish','memory','blackjack','bus'];
+function icon(id,x,y){const sm=true,cx=x+40,o={small:true};
+ const fan=(cs,x0,y0,st)=>cs.forEach((c,i)=>card(c,x0+i*st,y0,o));
+ switch(id){
+ case'solitaire':card(-1,x+16,y+5,o);card(-1,x+24,y+9,o);card(12,x+32,y+13,o);card(24,x+46,y+3,o);card(37,x+52,y+8,o);break;
+ case'war':card(12,x+14,y+5,o);card(24,x+46,y+5,o);T('VS',cx,y+13,K.yl,{al:'c',sh:K.bk});break;
+ case'draw':fan([12,25,38,50,0],x+14,y+4,10);break;
+ case'holdem':card(12,x+10,y+5,o);card(25,x+19,y+5,o);fan([-1,-1,-1],x+42,y+5,10);break;
+ case'stud':fan([-1,-1,12,24,38,50,9],x+8,y+4,9);break;
+ case'paigow':fan([12,11,10],x+8,y+5,9);fan([25,24],x+50,y+5,9);T('+',x+43,y+13,K.yl);break;
+ case'golf':fan([11,24,-1],x+8,y+5,10);R(x+54,y+4,1,22,K.wh);R(x+55,y+4,8,5,K.rd);R(x+50,y+26,10,2,K.gn2);break;
+ case'euchre':fan([9,48,22],x+18,y+5,14);break;
+ case'gofish':g.drawImage(fishSpr(),x+8,y+12);fan([18,31],x+36,y+4,13);break;
+ case'memory':card(18,x+10,y+5,o);card(-1,x+30,y+5,o);card(31,x+50,y+5,o);break;
+ case'blackjack':card(12,x+14,y+5,o);card(24,x+24,y+5,o);T('21',x+56,y+13,K.yl,{al:'c',sc:2,sh:K.bk});break;
+ case'bus':g.drawImage(busSpr(),x+8,y+8);card(11,x+48,y+5,o);break}}
+function drawMenu(){g.drawImage(feltBg('menu'),0,0);
+ T('CHOOSE YOUR GAME',192,8,K.yl,{al:'c',sh:K.rk});
+ const cw=80,ch=50,gx=8,gy=7,x0=Math.round((W-(4*cw+3*gx))/2),y0=36;
+ ORDER.forEach((id,i)=>{const G=GAMES[id];const cx=x0+(i%4)*(cw+gx),cy=y0+((i/4)|0)*(ch+gy);
+  const hov=mouse.x>=cx&&mouse.x<cx+cw&&mouse.y>=cy&&mouse.y<cy+ch;
+  R(cx,cy,cw,ch,K.fe3);frame(cx,cy,cw,ch,hov?K.yl:K.wh,2);if(hov)frame(cx+2,cy+2,cw-4,ch-4,K.yl,1);
+  icon(id,cx,cy);T(G.name,cx+cw/2,cy+ch-11,hov?K.yl:K.wh,{al:'c'});
+  Hit(cx,cy,cw,ch,()=>{sfx('click');openHub(id)})});
+ Btn('JOIN ROOM',256,3,66,12,()=>{RM.joinCode='';RM.status='';RM.err=false;RM.screen='join'},{st:'yellow'});
+ sndBtns();
+ if(RM.notice){T(RM.notice,192,H-9,K.yl,{al:'c',sh:K.bk})}}
+function sndBtns(){Btn(snd.sfx?'SFX':'sfx',332,3,22,12,()=>{snd.sfx=!snd.sfx},{st:snd.sfx?'green':'gray'});Btn(snd.mus?'MUS':'mus',357,3,22,12,()=>{snd.mus=!snd.mus},{st:snd.mus?'green':'gray'})}
+function rulesBox(G,x,y,w,h,chars,key){const lines=[];G.rules.forEach(r=>wrap(r,chars).forEach(l=>lines.push(l)));const per=Math.floor((h-26)/9);const pages=Math.max(1,Math.ceil(lines.length/per));let pg=UI[key]||0;if(pg>=pages)pg=0;UI[key]=pg;
+ lines.slice(pg*per,pg*per+per).forEach((l,i)=>T(l,x,y+i*9,K.wh));
+ if(pages>1){T((pg+1)+'/'+pages,x+w-22,y+h-24,K.gy,{al:'c'});Btn('<',x+w-60,y+h-26,14,12,()=>{UI[key]=(pg+pages-1)%pages},{st:'gray'});Btn('>',x+w-40,y+h-26,14,12,()=>{UI[key]=(pg+1)%pages},{st:'gray'})}}
+function openHub(id){UI.rp=0;RM.game=id;RM.nbots=GAMES[id].defBots;RM.screen='hub';RM.notice='';RM.status=''}
+
+/* ---------- hub ---------- */
+function drawHub(){const G=GAMES[RM.game];g.drawImage(feltBg('sub'),0,0);
+ T(G.name,192,14,K.yl,{al:'c',sc:2,sh:K.rk});
+ panel(16,40,232,142,'HOW TO PLAY');
+ rulesBox(G,22,48,224,142,37,'rp');
+ const bmin=Math.max(0,G.min-1),bmax=G.max-1;if(RM.nbots<bmin)RM.nbots=bmin;if(RM.nbots>bmax)RM.nbots=bmax;
+ const px=258;panel(px,40,114,142,'TABLE');
+ T('BOTS',px+8,52,K.wh);Btn('-',px+44,48,14,14,()=>{RM.nbots=Math.max(bmin,RM.nbots-1)},{st:'gray',dis:RM.nbots<=bmin});T(String(RM.nbots),px+70,52,K.yl,{al:'c'});Btn('+',px+82,48,14,14,()=>{RM.nbots=Math.min(bmax,RM.nbots+1)},{st:'gray',dis:RM.nbots>=bmax});
+ let oy=68;(G.opts||[]).forEach(d=>{const cur=gameOpts(G)[d.key];const idx=Math.max(0,d.vals.indexOf(cur));
+  Btn(d.label+': '+(d.names?d.names[idx]:cur),px+6,oy,102,13,()=>{RM.opts[G.id]=RM.opts[G.id]||{};RM.opts[G.id][d.key]=d.vals[(idx+1)%d.vals.length]},{st:'blue'});oy+=16});
+ Btn('PLAY VS BOTS',px+6,104,102,16,()=>{if(!G.min||1+RM.nbots>=G.min)playSolo()},{st:'green',dis:1+RM.nbots<G.min});
+ Btn('HOST ROOM',px+6,124,102,16,()=>{openRoom()},{st:'blue'});
+ Btn('JOIN ROOM',px+6,144,102,16,()=>{RM.joinCode='';RM.status='';RM.err=false;RM.screen='join'},{st:'yellow'});
+ T(G.min===G.max?G.min+' PLAYERS':G.min+'-'+G.max+' PLAYERS',px+57,167,K.gy,{al:'c'});
+ Btn('BACK',16,188,60,14,()=>{RM.screen='menu'},{st:'gray'});
+ T('ONLINE ROOMS NEED INTERNET',100,193,K.gy);
+ sndBtns()}
+
+/* ---------- join ---------- */
+const KEYS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'.split('');
+function addJoinChar(ch){if(RM.screen!=='join')return;ch=ch.toUpperCase();if(KEYS.includes(ch)&&RM.joinCode.length<4){RM.joinCode+=ch;sfx('click')}}
+function drawJoin(){g.drawImage(feltBg('sub'),0,0);
+ T('JOIN A ROOM',192,14,K.yl,{al:'c',sc:2,sh:K.rk});T('TYPE THE 4 LETTER ROOM CODE',192,38,K.wh,{al:'c'});
+ for(let i=0;i<4;i++){const bx=132+i*30;pbox(bx,50,26,30,K.bk,K.wh);const ch=RM.joinCode[i];if(ch)T(ch,bx+13,58,K.yl,{al:'c',sc:2});else if(i===RM.joinCode.length&&((now/400)|0)%2===0)R(bx+8,72,10,2,K.yl)}
+ KEYS.forEach((k,i)=>{const kx=96+(i%8)*24,ky=88+((i/8)|0)*18;Btn(k,kx,ky,22,16,()=>addJoinChar(k),{st:'white'})});
+ Btn('DEL',96,162,40,16,()=>{RM.joinCode=RM.joinCode.slice(0,-1)},{st:'gray'});
+ Btn('JOIN',148,162,60,16,()=>{if(RM.joinCode.length===4)joinRoom(RM.joinCode)},{st:'green',dis:RM.joinCode.length<4});
+ Btn('BACK',220,162,60,16,()=>{RM.screen='menu'},{st:'gray'});
+ if(RM.status)T(RM.status,192,186,RM.err?K.rl:K.wh,{al:'c',sh:K.bk});sndBtns()}
+function drawJoining(){g.drawImage(feltBg('sub'),0,0);T('JOINING '+RM.code+'...',192,80,K.yl,{al:'c',sc:2,sh:K.rk});
+ T(RM.status,192,110,RM.err?K.rl:K.wh,{al:'c'});if(((now/300)|0)%3===0&&!RM.err)T('. . .',192,126,K.wh,{al:'c'});
+ Btn('BACK',162,150,60,16,()=>{leaveRoom('');RM.screen='join'},{st:'gray'})}
+
+/* ---------- lobby ---------- */
+function drawLobby(){const host=RM.role==='host';const G=GAMES[RM.game];g.drawImage(feltBg('sub'),0,0);
+ T(G.name,192,12,K.yl,{al:'c',sc:2,sh:K.rk});
+ T('ROOM CODE',192,36,K.wh,{al:'c'});
+ const code=host?RM.code:RM.code;pbox(132,46,120,30,K.bk,K.wh);
+ if(code)T(code,192,52,K.yl,{al:'c',sc:3,sh:K.rk});else T('...',192,56,K.gm,{al:'c',sc:2});
+ const tn=host&&RM.transport?RM.transport.name:'';
+ T(host?(RM.status||(tn==='online'?'ONLINE - SHARE THIS CODE':'OFFLINE MODE - SAME BROWSER TABS ONLY')):'WAITING FOR HOST TO START...',192,82,RM.status?K.rl:K.gn2,{al:'c'});
+ const names=host?mkNames(RM.slots):(RM.lobby?RM.lobby.names:[]);const max=host?G.max:(RM.lobby?RM.lobby.max:G.max);const you=host?0:(RM.lobby?RM.lobby.you:-1);
+ panel(112,94,160,76,'PLAYERS');
+ for(let i=0;i<max;i++){const y=104+i*16;const nm=names[i];const isBot=host?RM.slots[i]&&RM.slots[i].k==='b':(nm&&nm.startsWith('BOT'));
+  pbox(120,y,144,13,nm?(isBot?'#444444':K.bl):K.fe3,K.bk);T((i+1)+'',126,y+3,K.gy);
+  T(nm?nm+(i===0?' (HOST)':'')+(i===you&&!host?' (YOU)':''):'OPEN SEAT',142,y+3,nm?K.wh:K.gm)}
+ if(host){Btn('+ BOT',22,104,60,16,()=>{if(RM.slots.length<G.max)RM.slots.push({k:'b'});lobbySend()},{st:'blue',dis:RM.slots.length>=G.max});
+  Btn('- BOT',22,126,60,16,()=>{const bi=RM.slots.map(s=>s.k).lastIndexOf('b');if(bi>=0){RM.slots.splice(bi,1);lobbySend()}},{st:'blue',dis:!RM.slots.some(s=>s.k==='b')});
+  Btn('START',300,104,64,20,()=>{if(RM.code||RM.transport)startGame()},{st:'green',dis:!RM.code});}
+ Btn('LEAVE',host?300:162,host?132:176,64,16,()=>leaveRoom(''),{st:'red'});
+ if(!host)T('HOST PICKS BOTS AND STARTS THE GAME',192,H-18,K.gy,{al:'c'});sndBtns()}
+
+/* ---------- in game ---------- */
+function drawPlay(){const S=RM.S;if(!S){g.drawImage(feltBg('play'),0,0);T('LOADING...',192,100,K.wh,{al:'c'});return}
+ const G=GAMES[S.g];g.drawImage(feltBg('play'),0,0);
+ G.draw(S,RM.me);
+ if(S.phase==='result'&&!UI.help&&!UI.confirm){const np=G.nextPos||[150,194];Btn('NEXT',np[0],np[1],84,16,()=>act({t:'next'}),{st:'green',blink:1})}
+ if(S.phase==='over'&&!UI.help&&!UI.confirm){const ls=(G.over?G.over(S,RM.me):[S.msg||'GAME OVER']);const h=34+ls.length*10+24;const y=Math.max(26,Math.round(104-h/2));
+  pbox(76,y,232,h,'#06220f',K.yl);T('GAME OVER',192,y+7,K.yl,{al:'c',sc:2,sh:K.rk});ls.forEach((l,i)=>T(l,192,y+28+i*10,K.wh,{al:'c'}));
+  const by=y+h-22;if(RM.role==='client'){T('WAITING FOR HOST...',192,by+4,K.gy,{al:'c'});Btn('LEAVE',162,by,60,16,()=>leaveRoom(''),{st:'red',dis:false})}
+  else{Btn('PLAY AGAIN',92,by,82,16,()=>startGame(),{st:'green'});Btn(RM.role==='host'?'LOBBY':'MENU',184,by,52,16,()=>{RM.role==='host'?toLobby():leaveRoom('')},{st:'blue'});if(RM.role==='host')Btn('LEAVE',246,by,52,16,()=>leaveRoom(''),{st:'red'})}}
+ // chrome
+ Btn('MENU',3,1,32,12,()=>{UI.confirm=true},{st:'gray'});Btn('?',38,1,14,12,()=>{UI.help=true},{st:'yellow'});
+ if(RM.role!=='solo'&&RM.code)T('ROOM '+RM.code,60,4,K.yl,{sh:K.bk});
+ sndBtns();
+ if(UI.help){pbox(30,22,324,170,'#06220f',K.yl);T(G.name+' RULES',192,29,K.yl,{al:'c',sh:K.rk});buttons=[];rulesBox(G,40,44,300,146,50,'hp');Btn('CLOSE',160,174,64,14,()=>{UI.help=false},{st:'red'})}
+ if(UI.confirm){buttons=[];pbox(90,70,204,70,'#06220f',K.yl);T(RM.role==='host'?'CLOSE ROOM AND LEAVE?':'LEAVE THE TABLE?',192,80,K.yl,{al:'c'});
+  Btn('YES',112,108,60,16,()=>{UI.confirm=false;leaveRoom('')},{st:'red'});Btn('NO',212,108,60,16,()=>{UI.confirm=false},{st:'green'})}}
+
+function drawScreen(){switch(RM.screen){case'title':return drawTitle();case'menu':return drawMenu();case'hub':return drawHub();case'join':return drawJoin();case'joining':return drawJoining();case'lobby':return drawLobby();case'play':return drawPlay()}}
+/* ---------- shared poker-family betting engine (draw / hold'em / stud) ---------- */
+const potOf=S=>sum(S.contrib);
+function pSetup(S,n,chips){S.chips=Array(n).fill(chips);S.rebuys=Array(n).fill(0);S.contrib=Array(n).fill(0);S.fold=Array(n).fill(false);S.allin=Array(n).fill(false);
+ S.bet=Array(n).fill(0);S.acted=Array(n).fill(false);S.toCall=0;S.raises=0;S.minRaise=20;S.unit=20;S.turn=0}
+function pRebuy(S,min){for(let i=0;i<S.n;i++)if(S.chips[i]<min){S.chips[i]+=500;S.rebuys[i]++}}
+function pNewHand(S){S.contrib=Array(S.n).fill(0);S.fold=Array(S.n).fill(false);S.allin=Array(S.n).fill(false);S.bet=Array(S.n).fill(0);S.acted=Array(S.n).fill(false);S.toCall=0;S.raises=0;S.res=null}
+const pCan=(S,i)=>!S.fold[i]&&!S.allin[i];
+function pNext(S,from){for(let k=1;k<=S.n;k++){const j=(from+k)%S.n;if(pCan(S,j))return j}return -1}
+function pPost(S,i,amt){amt=Math.max(0,Math.min(amt,S.chips[i]));S.chips[i]-=amt;S.bet[i]+=amt;S.contrib[i]+=amt;if(S.chips[i]===0)S.allin[i]=true;if(S.bet[i]>S.toCall)S.toCall=S.bet[i];return amt}
+function pAnte(S,i,amt){amt=Math.min(amt,S.chips[i]);S.chips[i]-=amt;S.contrib[i]+=amt;if(S.chips[i]===0)S.allin[i]=true}
+function pRound(S,first,unit,minRaise){S.bet=Array(S.n).fill(0);S.acted=Array(S.n).fill(false);S.toCall=0;S.raises=0;S.unit=unit||S.unit;S.minRaise=minRaise||S.unit;
+ S.turn=pCan(S,first)?first:pNext(S,first);return range(S.n).filter(i=>pCan(S,i)).length}
+function pDone(S){const act=range(S.n).filter(i=>pCan(S,i));if(!act.length)return true;if(act.every(i=>S.acted[i]&&S.bet[i]===S.toCall))return true;if(act.length===1&&S.bet[act[0]]>=S.toCall)return true;return false}
+function pLive(S){return range(S.n).filter(i=>!S.fold[i])}
+// returns false if illegal. a: {t:'fold'|'call'|'raise', to?}
+function pApply(S,i,a){if(!pCan(S,i))return false;const need=S.toCall-S.bet[i],cap=S.bet[i]+S.chips[i];
+ if(a.t==='fold'){S.fold[i]=true;S.acted[i]=true;return true}
+ if(a.t==='call'){pPost(S,i,need);S.acted[i]=true;return true}
+ if(a.t==='raise'){let to;
+  if(S.nl){to=Math.min(Math.floor(a.to||0),cap);if(to<=S.toCall)return false;if(to-S.toCall<S.minRaise&&to<cap)return false}
+  else{if(S.raises>=4)return false;to=Math.min(S.toCall+S.unit,cap);if(to<=S.toCall)return false}
+  const by=to-S.toCall;if(by>S.minRaise&&S.nl)S.minRaise=by;
+  pPost(S,i,to-S.bet[i]);S.raises++;S.acted=S.acted.map((v,j)=>j===i);return true}
+ return false}
+// after an action: returns 'fold' (one left), 'done' (round over) or 'next'
+function pAfter(S){if(pLive(S).length===1)return'fold';if(pDone(S))return'done';S.turn=pNext(S,S.turn);return'next'}
+function pSettle(S,score){const res=Array(S.n).fill(0);const lv=[...new Set(S.contrib.filter(c=>c>0))].sort((a,b)=>a-b);let prev=0;
+ for(const l of lv){const part=range(S.n).filter(i=>S.contrib[i]>=l);const amt=(l-prev)*part.length;prev=l;let el=part.filter(i=>!S.fold[i]);if(!el.length)el=pLive(S);
+  const b=Math.max(...el.map(i=>score[i]));const w=el.filter(i=>score[i]===b);const sh=Math.floor(amt/w.length);w.forEach(i=>res[i]+=sh);res[w[0]]+=amt-sh*w.length}
+ res.forEach((v,i)=>S.chips[i]+=v);return res}
+function pFoldWin(S,w){const p=potOf(S);S.chips[w]+=p;const res=Array(S.n).fill(0);res[w]=p;return res}
+function pNet(S,res){return res.map((v,i)=>v-S.contrib[i])}
+
+function strCat(cat,top){const t=[.16,.42,.62,.75,.82,.86,.92,.97,1][cat];return cat===0?.08+(top/12)*.12:cat===1?.36+(top/12)*.12:t}
+function strOf(v){return strCat(catOf(v),Math.floor(v/28561)%13)}
+function pBot(S,i,str){const need=S.toCall-S.bet[i],chips=S.chips[i],pot=potOf(S);str=Math.max(0,Math.min(1,str+(Math.random()-.5)*.16));
+ const canRaise=chips>need&&(S.nl||S.raises<4);
+ const rz=()=>{if(!S.nl)return{t:'raise'};const sz=Math.max(S.minRaise,Math.round((pot*(.35+str*.6))/5)*5);const to=S.toCall+sz;return{t:'raise',to:Math.min(to,S.bet[i]+chips)}};
+ if(need===0){if(canRaise&&str>.6&&Math.random()<.65)return rz();if(canRaise&&Math.random()<.07)return rz();return{t:'call'}}
+ const odds=need/(pot+need);if(canRaise&&str>.84&&Math.random()<.6)return rz();
+ if(str>odds+.1||Math.random()<.07||need<=S.unit*.3&&str>.2)return{t:'call'};return{t:'fold'}}
+function pBetUI(S,me,y){y=y||194;if(GAMES[S.g].turn(S)!==me)return false;
+ const need=S.toCall-S.bet[me],chips=S.chips[me],cap=S.bet[me]+chips,pot=potOf(S);const bs=[];
+ bs.push(['FOLD',{t:'fold'},'red']);bs.push([need>0?'CALL '+Math.min(need,chips):'CHECK',{t:'call'},'green']);
+ if(chips>need){
+  if(S.nl){const mn=S.toCall+S.minRaise;const opts=[];if(mn<cap)opts.push(['MIN '+mn,mn]);const half=S.toCall+Math.max(S.minRaise,Math.ceil((pot+need)/2/5)*5),full=S.toCall+Math.max(S.minRaise,pot+need);
+   const mid=half>mn&&half<cap&&full>half&&full<cap;if(full>mn&&full<cap)opts.push(['POT '+full,full]);else if(half>mn&&half<cap)opts.push(['HALF '+half,half]);opts.push(['ALL IN '+cap,cap]);
+   opts.slice(0,3).forEach(o=>bs.push([o[0],{t:'raise',to:o[1]},'yellow']))}
+  else if(S.raises<4){const to=Math.min(S.toCall+S.unit,cap);bs.push([(S.toCall>0?'RAISE ':'BET ')+(to-S.bet[me]),{t:'raise'},'yellow'])}}
+ const w=Math.min(76,Math.floor((W-12-(bs.length-1)*4)/bs.length));const tot=bs.length*w+(bs.length-1)*4;let x=Math.round((W-tot)/2);
+ bs.forEach(b=>{Btn(b[0],x,y,w,16,()=>act(b[1]),{st:b[2]});x+=w+4});return true}
+function pLabelExtra(S,i){return money(S.chips[i])+(S.bet[i]?' B'+S.bet[i]:'')}
+function pPotLine(S,y){if(potOf(S)>0)chipTxt(192,y||112,potOf(S),'c')}
+function pHandWord(S,i){return S.res&&S.res.names&&S.res.names[i]?S.res.names[i]:''}
+function pResultMsg(S,me){if(!S.res)return'';const parts=[];S.res.win.forEach((v,i)=>{if(v>0&&!(S.res.winOnlyNet))parts.push(nameFor(S,i,me)+' WINS '+money(v)+(S.res.names&&S.res.names[i]?' ('+S.res.names[i]+')':''))});return parts.join('  ')}
+/* ===================== WAR ===================== */
+function warFlip(S){S.table=range(S.n).map(()=>[]);S.round++;S.war=0;
+ let cont=range(S.n).filter(i=>S.piles[i].length>0);const pot=[];let winner=-1;
+ for(let guard=0;guard<40;guard++){const up={};
+  cont.forEach(i=>{const c=S.piles[i].shift();S.table[i].push({c,d:false});pot.push(c);up[i]=c});
+  const mx=Math.max(...cont.map(i=>rk(up[i])));const tied=cont.filter(i=>rk(up[i])===mx);
+  if(tied.length===1){winner=tied[0];break}
+  S.war++;const nx=[];
+  tied.forEach(i=>{const dn=Math.min(3,Math.max(0,S.piles[i].length-1));for(let k=0;k<dn;k++){const c=S.piles[i].shift();S.table[i].push({c,d:true});pot.push(c)}if(S.piles[i].length>0)nx.push(i)});
+  if(nx.length<=1){winner=nx.length?nx[0]:tied[0];break}cont=nx}
+ if(winner<0)winner=cont[0];
+ S.piles[winner].push(...shuffle(pot));S.winner=winner;S.pc=pot.length;S.msg='';
+ const alive=range(S.n).filter(i=>S.piles[i].length>0);
+ if(alive.length===1){S.phase='over';S.msg='';S.champ=alive[0]}
+ else if(S.round>=500){S.phase='over';S.champ=alive.sort((a,b)=>S.piles[b].length-S.piles[a].length)[0]}
+ else S.phase='show'}
+GAMES.war={id:'war',name:'WAR',min:2,max:4,defBots:1,
+ rules:['THE DECK IS DEALT OUT EVENLY, FACE DOWN.','EVERYONE FLIPS THEIR TOP CARD. HIGH CARD WINS ALL OF THE CARDS ON THE TABLE. ACE IS HIGH.','TIE FOR HIGH CARD = WAR! EACH TIED PLAYER PUTS 3 CARDS FACE DOWN AND FLIPS ONE MORE. HIGHEST TAKES EVERYTHING.','RUN OUT OF CARDS AND YOU ARE OUT. COLLECT THE WHOLE DECK TO WIN.','PRESS FLIP FOR EACH ROUND OR TURN ON AUTO. ANYONE AT THE TABLE CAN PRESS FLIP.'],
+ init(n){const d=shuffle(range(52));const S={n,piles:range(n).map(()=>[]),table:range(n).map(()=>[]),phase:'flip',round:0,msg:'PRESS FLIP TO START',winner:-1,war:0};d.forEach((c,i)=>S.piles[i%n].push(c));return S},
+ turn(S){return S.phase==='over'?null:-2},
+ act(S,seat,a){if(a.t==='flip'||a.t==='next'){if(S.phase==='over')return false;warFlip(S);return true}if(a.t==='auto'){S.auto=!S.auto;return true}return false},
+ auto(S){if(S.phase!=='over')warFlip(S)},autoFast:600,
+ mine(S,me){return S.champ===me?1:-1},
+ over(S,me){return[nameFor(S,S.champ,me)+' COLLECTED THE DECK!','ROUNDS PLAYED: '+S.round]},
+ draw(S,me){const n=S.n,gap=70;T('ROUND '+S.round,192,12,K.gy,{al:'c'});
+  for(let i=0;i<n;i++){const cx=192-(n*gap)/2+gap/2+i*gap;const cnt=S.piles[i].length;const w=S.winner===i&&S.phase==='show';
+   T(nameFor(S,i,me),cx,34,w?K.yl:K.wh,{al:'c',sh:K.bk});T(cnt+' CARDS',cx,44,cnt?K.gy:K.rl,{al:'c'});
+   const it=S.table[i];it.forEach((e,k)=>{const y=58+k*7;const last=k===it.length-1;card(e.d?-1:e.c,cx-13,y,{hl:w&&last})});
+   if(!it.length&&cnt)card(-1,cx-13,58)}
+  msgBar(S.round?(S.war?'WAR! ':'')+nameFor(S,S.winner,me)+' TAKES '+S.pc+' CARDS':'PRESS FLIP TO START',S.table[0]&&S.table[0].length>5?156:150);
+  if(S.phase!=='over'){Btn(S.phase==='flip'?'FLIP!':'FLIP NEXT',132,194,82,16,()=>act({t:'flip'}),{st:'green',blink:S.phase==='flip'});Btn(S.auto?'AUTO: ON':'AUTO: OFF',222,194,76,16,()=>act({t:'auto'}),{st:S.auto?'yellow':'gray'})}}};
+
+/* ===================== DRAW POKER ===================== */
+function dpDeal(S){S.hand++;S.dealer=(S.dealer+1)%S.n;pRebuy(S,40);pNewHand(S);S.deck=shuffle(range(52));S.hands=range(S.n).map(()=>S.deck.splice(0,5));S.drawn=Array(S.n).fill(false);
+ for(let i=0;i<S.n;i++)pAnte(S,i,10);S.phase='bet1';S.msg='';const c=pRound(S,(S.dealer+1)%S.n,20);if(c<2)dpDrawPhase(S)}
+function dpDrawPhase(S){S.phase='draw';let f=(S.dealer+1)%S.n;for(let k=0;k<S.n&&S.fold[f];k++)f=(f+1)%S.n;S.turn=f}
+function dpShow(S){const sc=range(S.n).map(i=>S.fold[i]?-1:ev5(S.hands[i]));const res=pSettle(S,sc);
+ S.res={win:res,net:pNet(S,res),names:S.hands.map((h,i)=>S.fold[i]?'':handName(h)),show:true};S.phase='result'}
+function dpFoldWin(S){const w=pLive(S)[0];const res=pFoldWin(S,w);S.res={win:res,net:pNet(S,res),names:[],show:false};S.phase='result'}
+function dpDiscard(h){const r=h.map(rk),cnt={};r.forEach(x=>cnt[x]=(cnt[x]||0)+1);const v=ev5(h),cat=catOf(v);if(cat>=4)return[];
+ if(cat>=1){const idx=[];h.forEach((c,i)=>{if(cnt[rk(c)]<2)idx.push(i)});return idx.slice(0,3)}
+ for(let s=0;s<4;s++){const m=h.filter(c=>su(c)===s);if(m.length===4)return[h.findIndex(c=>su(c)!==s)]}
+ const ord=h.map((c,i)=>i).sort((a,b)=>rk(h[b])-rk(h[a]));return ord.slice(2)}
+GAMES.draw={id:'draw',name:'DRAW POKER',min:2,max:4,defBots:2,
+ rules:['5-CARD DRAW. EVERYONE ANTES $10 AND GETS 5 CARDS FACE DOWN.','BET ROUND 1: CHECK, BET, CALL, RAISE OR FOLD (FIXED LIMIT, $20 BETS).','THE DRAW: CLICK UP TO 3 CARDS TO THROW AWAY, THEN PRESS DRAW TO GET NEW ONES.','BET ROUND 2 ($40 BETS), THEN SHOWDOWN. BEST 5-CARD POKER HAND WINS THE POT.','RANKS: STRAIGHT FLUSH, QUADS, FULL HOUSE, FLUSH, STRAIGHT, TRIPS, TWO PAIR, PAIR, HIGH CARD. BROKE? YOU GET A FREE REBUY.'],
+ init(n){const S={n,dealer:n-1,hand:0,nl:false};pSetup(S,n,500);dpDeal(S);return S},
+ turn(S){return S.phase==='result'?-2:S.turn},
+ act(S,seat,a){if(a.t==='next'){if(S.phase!=='result')return false;dpDeal(S);return true}
+  if(seat!==S.turn)return false;
+  if(S.phase==='draw'){if(a.t!=='draw'||!Array.isArray(a.idx)||a.idx.length>3)return false;const idx=[...new Set(a.idx)].filter(i=>i>=0&&i<5);
+   idx.forEach(i=>{S.hands[seat][i]=S.deck.pop()});S.drawn[seat]=true;
+   let nx=-1;for(let k=1;k<=S.n;k++){const j=(seat+k)%S.n;if(!S.fold[j]&&!S.drawn[j]){nx=j;break}}
+   if(nx>=0)S.turn=nx;else{S.phase='bet2';const c=pRound(S,(S.dealer+1)%S.n,40);if(c<2)dpShow(S)}return true}
+  if(S.phase!=='bet1'&&S.phase!=='bet2')return false;
+  if(!pApply(S,seat,a))return false;const r=pAfter(S);
+  if(r==='fold')dpFoldWin(S);else if(r==='done'){if(S.phase==='bet1')dpDrawPhase(S);else dpShow(S)}
+  return true},
+ bot(S,i){if(S.phase==='draw')return{t:'draw',idx:dpDiscard(S.hands[i])};const v=ev5(S.hands[i]);return pBot(S,i,S.phase==='bet1'?strOf(v)*.92:strOf(v))},
+ mine(S,me){return S.res&&S.res.net[me]>0?1:S.res&&S.res.net[me]<0?-1:0},
+ draw(S,me){
+  if(UI.dh!==S.hand||S.phase!=='draw'){UI.dsel=[];UI.dh=S.hand}
+  for(let i=0;i<S.n;i++){const pos=posOf(S,me,i);const f=S.fold[i];const show=S.phase==='result'&&S.res&&S.res.show;
+   const word=S.phase==='result'?(S.res.names[i]||''):'';
+   seatLabel(S,me,i,f?'FOLD':pLabelExtra(S,i)+(S.dealer===i?' (D)':'')+(word?' '+word:''),{dim:f});
+   if(f)continue;const fp=fanPos(pos,5,pos==='b'?{y:150,step:24}:{});
+   S.hands[i].forEach((c,k)=>{const face=i===me||show;const sel=i===me&&UI.dsel.includes(k);card(face?c:-1,fp[k][0],fp[k][1],{sel});
+    if(i===me&&S.phase==='draw'&&S.turn===me)Hit(fp[k][0],fp[k][1]-5,k<4?24:26,41,()=>{UI.dsel=UI.dsel.includes(k)?UI.dsel.filter(x=>x!==k):(UI.dsel.length<3?UI.dsel.concat(k):UI.dsel)})})}
+  pPotLine(S,112);T(S.phase==='bet1'?'BETTING 1':S.phase==='bet2'?'BETTING 2':S.phase==='draw'?'THE DRAW':'',192,100,K.gy,{al:'c'});
+  if(S.phase==='result')msgBar(pResultMsg(S,me));
+  else if(S.phase==='draw'){if(S.turn===me){msgBar('PICK UP TO 3 CARDS TO REPLACE');Btn(UI.dsel.length?'DRAW '+UI.dsel.length:'STAND PAT',146,194,92,16,()=>{act({t:'draw',idx:UI.dsel});UI.dsel=[]},{st:'green',blink:1})}else msgBar(nameFor(S,S.turn,me)+' IS DRAWING...')}
+  else if(S.turn===me)pBetUI(S,me);else msgBar(nameFor(S,S.turn,me)+' IS THINKING...')}};
+
+/* ===================== TEXAS HOLD'EM ===================== */
+function hDeal(S){S.hand++;S.dealer=(S.dealer+1)%S.n;pRebuy(S,60);pNewHand(S);S.deck=shuffle(range(52));S.hole=range(S.n).map(()=>[S.deck.pop(),S.deck.pop()]);S.board=[];S.phase='pre';S.msg='';
+ const n=S.n,sb=n===2?S.dealer:(S.dealer+1)%n,bb=n===2?(S.dealer+1)%n:(S.dealer+2)%n;const first=n===2?sb:(bb+1)%n;
+ pRound(S,first,20,20);pPost(S,sb,10);pPost(S,bb,20);S.sbSeat=sb;S.bbSeat=bb;S.turn=first;S.minRaise=20}
+function hShow(S){const sc=range(S.n).map(i=>S.fold[i]?-1:best5(S.hole[i].concat(S.board)));const res=pSettle(S,sc);
+ S.res={win:res,net:pNet(S,res),names:S.hole.map((h,i)=>S.fold[i]?'':handName(h.concat(S.board))),show:true};S.phase='result'}
+function hFoldWin(S){const w=pLive(S)[0];const res=pFoldWin(S,w);S.res={win:res,net:pNet(S,res),names:[],show:false};S.phase='result'}
+function hStreet(S){for(let g2=0;g2<5;g2++){if(S.phase==='river'){hShow(S);return}
+  const nx={pre:'flop',flop:'turn',turn:'river'}[S.phase];S.phase=nx;if(nx==='flop')S.board.push(S.deck.pop(),S.deck.pop(),S.deck.pop());else S.board.push(S.deck.pop());
+  const c=pRound(S,(S.dealer+1)%S.n,20,20);if(c>=2)return}}
+function hStrength(S,i){const h=S.hole[i];const a=Math.max(rk(h[0]),rk(h[1])),b=Math.min(rk(h[0]),rk(h[1]));
+ if(!S.board.length){if(a===b)return .5+a/12*.4;let s=(a+b)/24*.4+(su(h[0])===su(h[1])?.05:0)+(a-b<=2?.05:0)+(a>=11?.1:0);return Math.min(.7,s)}
+ const all=h.concat(S.board);const v=best5(all);const cat=catOf(v);let s=strOf(v);
+ if(cat===1){const pr=Math.floor(v/28561)%13;if(a!==pr&&b!==pr)s=.2;else if(pr<8)s=.4}
+ if(cat===2){const p1=Math.floor(v/28561)%13,p2=Math.floor(v/2197)%13;if(![a,b].includes(p1)&&![a,b].includes(p2))s=.25}
+ if(cat<=1&&S.board.length<5){for(let s2=0;s2<4;s2++){const m=all.filter(c=>su(c)===s2).length;if(m===4&&h.some(c=>su(c)===s2))s+=.18}}
+ return s}
+GAMES.holdem={id:'holdem',name:"TEXAS HOLDEM",min:2,max:4,defBots:2,
+ rules:['NO-LIMIT TEXAS HOLD\'EM. BLINDS ARE $10 AND $20. EVERYONE GETS 2 PRIVATE HOLE CARDS.','FIVE SHARED CARDS COME DOWN: THE FLOP (3), THE TURN (1) AND THE RIVER (1), WITH A BETTING ROUND AFTER EACH.','MAKE THE BEST 5-CARD HAND USING ANY MIX OF YOUR 2 CARDS AND THE 5 ON THE TABLE.','ON YOUR TURN: FOLD, CHECK/CALL, OR RAISE (MIN, HALF POT, POT OR ALL IN). SIDE POTS ARE HANDLED FOR YOU.','BROKE? YOU GET A FREE REBUY OF $500 AT THE NEXT HAND.'],
+ init(n){const S={n,dealer:n-1,hand:0,nl:true,bb:20};pSetup(S,n,500);hDeal(S);return S},
+ turn(S){return S.phase==='result'?-2:S.turn},
+ act(S,seat,a){if(a.t==='next'){if(S.phase!=='result')return false;hDeal(S);return true}
+  if(seat!==S.turn||S.phase==='result')return false;if(!pApply(S,seat,a))return false;const r=pAfter(S);
+  if(r==='fold')hFoldWin(S);else if(r==='done')hStreet(S);return true},
+ bot(S,i){return pBot(S,i,hStrength(S,i))},
+ mine(S,me){return S.res&&S.res.net[me]>0?1:S.res&&S.res.net[me]<0?-1:0},
+ draw(S,me){
+  for(let i=0;i<S.n;i++){const pos=posOf(S,me,i);const f=S.fold[i];const show=S.phase==='result'&&S.res&&S.res.show;const word=S.phase==='result'?(S.res.names[i]||''):'';
+   const tag=(S.dealer===i?' (D)':'')+(S.sbSeat===i?' SB':'')+(S.bbSeat===i?' BB':'');
+   seatLabel(S,me,i,f?'FOLD':pLabelExtra(S,i)+tag+(word?' '+word:''),{dim:f});
+   if(f)continue;const fp=fanPos(pos,2,{step:pos==='b'?30:14});
+   S.hole[i].forEach((c,k)=>card(i===me||show?c:-1,fp[k][0],fp[k][1]))}
+  for(let k=0;k<5;k++){const x=121+k*29;if(k<S.board.length)card(S.board[k],x,72);else emptySlot(x,72)}
+  pPotLine(S,112);
+  if(S.phase==='result')msgBar(pResultMsg(S,me));
+  else if(S.turn===me)pBetUI(S,me);else msgBar(nameFor(S,S.turn,me)+' IS THINKING...')}};
+
+/* ===================== SEVEN CARD STUD ===================== */
+const SOR={3:0,2:1,1:2,0:3};
+function sDeal(S){S.hand++;S.dealer=(S.dealer+1)%S.n;pRebuy(S,80);pNewHand(S);S.deck=shuffle(range(52));S.up=range(S.n).map(()=>[]);S.down=range(S.n).map(()=>[]);S.street=3;S.phase='bet';S.msg='';
+ for(let i=0;i<S.n;i++){pAnte(S,i,5);S.down[i].push(S.deck.pop(),S.deck.pop());S.up[i].push(S.deck.pop())}
+ let bring=0,bk=1e9;for(let i=0;i<S.n;i++){const c=S.up[i][0];const k=rk(c)*10+SOR[su(c)];if(k<bk){bk=k;bring=i}}
+ pRound(S,bring,10,10);pPost(S,bring,5);S.bring=bring;S.turn=pNext(S,bring);if(S.turn<0)S.turn=bring}
+function sShow(S){const sc=range(S.n).map(i=>S.fold[i]?-1:best5(S.up[i].concat(S.down[i])));const res=pSettle(S,sc);
+ S.res={win:res,net:pNet(S,res),names:range(S.n).map(i=>S.fold[i]?'':handName(S.up[i].concat(S.down[i]))),show:true};S.phase='result'}
+function sFoldWin(S){const w=pLive(S)[0];const res=pFoldWin(S,w);S.res={win:res,net:pNet(S,res),names:[],show:false};S.phase='result'}
+function sStreet(S){for(let g2=0;g2<6;g2++){if(S.street===7){sShow(S);return}S.street++;
+  for(let i=0;i<S.n;i++)if(!S.fold[i]){const c=S.deck.pop();if(S.street===7)S.down[i].push(c);else S.up[i].push(c)}
+  let first=-1,bv=-1;for(let k=1;k<=S.n;k++){const i=(S.dealer+k)%S.n;if(S.fold[i])continue;const v=ev5(S.up[i]);if(v>bv){bv=v;first=i}}
+  const c=pRound(S,first,S.street>=5?20:10,S.street>=5?20:10);if(c>=2)return}}
+GAMES.stud={id:'stud',name:'7 CARD STUD',min:2,max:4,defBots:2,
+ rules:['SEVEN CARD STUD, FIXED LIMIT. EVERYONE ANTES $5 AND GETS 2 CARDS DOWN AND 1 CARD UP.','THE LOWEST UP-CARD MUST BRING IN $5. THEN BET, CALL OR FOLD.','4TH TO 6TH STREET: ONE MORE CARD FACE UP EACH, BETTING AFTER EACH. THE BEST SHOWING HAND ACTS FIRST. ($10 BETS ON 4TH, $20 AFTER.)','7TH STREET: LAST CARD IS DEALT FACE DOWN.','SHOWDOWN: BEST 5-CARD HAND OUT OF YOUR 7 WINS. THERE ARE NO COMMUNITY CARDS.'],
+ init(n){const S={n,dealer:n-1,hand:0,nl:false};pSetup(S,n,500);sDeal(S);return S},
+ turn(S){return S.phase==='result'?-2:S.turn},
+ act(S,seat,a){if(a.t==='next'){if(S.phase!=='result')return false;sDeal(S);return true}
+  if(seat!==S.turn||S.phase!=='bet')return false;if(!pApply(S,seat,a))return false;const r=pAfter(S);
+  if(r==='fold')sFoldWin(S);else if(r==='done')sStreet(S);return true},
+ bot(S,i){const cs=S.up[i].concat(S.down[i]);let s=strOf(cs.length>=5?best5(cs):ev5(cs));if(S.street===3){const hi=Math.max(...cs.map(rk));s=Math.max(s,.25+hi/12*.2)}return pBot(S,i,s)},
+ mine(S,me){return S.res&&S.res.net[me]>0?1:S.res&&S.res.net[me]<0?-1:0},
+ draw(S,me){
+  for(let i=0;i<S.n;i++){const pos=posOf(S,me,i);const f=S.fold[i];const show=S.phase==='result'&&S.res&&S.res.show;const word=S.phase==='result'?(S.res.names[i]||''):'';
+   seatLabel(S,me,i,f?'FOLD':pLabelExtra(S,i)+(S.dealer===i?' (D)':'')+(word?' '+word:''),{dim:f});
+   if(f)continue;const all=[];S.down[i].forEach((c,k)=>{if(!(S.street===7&&k===2))all.push({c,d:true})});S.up[i].forEach(c=>all.push({c,d:false}));
+   if(S.down[i].length>2)all.push({c:S.down[i][2],d:true});
+   const ord=[];S.down[i].slice(0,2).forEach(c=>ord.push({c,d:true}));S.up[i].forEach(c=>ord.push({c,d:false}));if(S.down[i].length>2)ord.push({c:S.down[i][2],d:true});
+   const fp=fanPos(pos,ord.length,pos==='b'?{step:23}:{step:12});
+   ord.forEach((e,k)=>{const vis=!e.d||i===me||show;card(vis?e.c:-1,fp[k][0],fp[k][1]+(e.d?5:0),{dim:e.d&&i===me&&!show&&false})})}
+  T('STREET '+S.street,192,100,K.gy,{al:'c'});pPotLine(S,112);
+  if(S.phase==='result')msgBar(pResultMsg(S,me));
+  else if(S.turn===me)pBetUI(S,me);else msgBar(nameFor(S,S.turn,me)+' IS THINKING...')}};
+/* ---------- shared bet helpers (blackjack / pai gow) ---------- */
+function betUI(S,me,y){const amts=[10,25,50,100];const bs=amts.map(a=>[a,S.chips[me]>=a]);let x=Math.round((W-(4*62+3*4))/2);
+ bs.forEach(([a,ok])=>{Btn('BET $'+a,x,y||194,62,16,()=>act({t:'bet',amt:a}),{st:'yellow',dis:!ok});x+=66})}
+function botBetAmt(S,i){const opts=[10,10,25,25,25,50,100].filter(a=>a<=S.chips[i]);return opts.length?pick(opts):S.chips[i]}
+function slotX(S,i){const sw=Math.min(112,Math.floor(368/S.n));return Math.round(192-(S.n*sw)/2+sw/2+i*sw)}
+
+/* ===================== BLACKJACK ===================== */
+const bjVal=c=>{const r=rk(c);return r===12?11:r>=8?10:r+2};
+function bjInfo(cs){let t=0,a=0;cs.forEach(c=>{t+=bjVal(c);if(rk(c)===12)a++});while(t>21&&a>0){t-=10;a--}return{t,soft:a>0&&t<=21}}
+const bjTot=cs=>bjInfo(cs).t;
+const bjNat=h=>h.c.length===2&&bjTot(h.c)===21&&!h.spl;
+function bjShoe(S){if(!S.deck||S.deck.length<30){S.deck=shuffle([].concat(range(52),range(52),range(52),range(52)))}}
+function bjNew(S){pRebuyBJ(S);bjShoe(S);S.dealer=[];S.reveal=false;S.hands=range(S.n).map(()=>[{c:[],bet:0,done:false,spl:false,st:''}]);S.phase='bet';S.turn=0;S.hi=0;S.msg='PLACE YOUR BETS';S.res=null}
+function pRebuyBJ(S){for(let i=0;i<S.n;i++)if(S.chips[i]<10){S.chips[i]+=500;S.rebuys[i]++}}
+function bjDeal(S){for(let r=0;r<2;r++){for(let i=0;i<S.n;i++)S.hands[i][0].c.push(S.deck.pop());S.dealer.push(S.deck.pop())}
+ const up=bjVal(S.dealer[0]);S.phase='play';S.msg='';
+ if((up===11||up===10)&&bjTot(S.dealer)===21){S.reveal=true;S.phase='dealer';bjSettle(S);return}
+ S.hands.forEach(hs=>{const h=hs[0];if(bjNat(h)){h.done=true;h.st='BJ'}});bjFindTurn(S,0,0)}
+function bjFindTurn(S,seat,hi){for(let i=seat;i<S.n;i++){const hs=S.hands[i];for(let k=(i===seat?hi:0);k<hs.length;k++)if(!hs[k].done){S.turn=i;S.hi=k;return}}
+ S.phase='dealer';S.reveal=false}
+function bjAdvance(S){bjFindTurn(S,S.turn,S.hi+1)}
+function bjSettle(S){const dt=bjTot(S.dealer),dbj=S.dealer.length===2&&dt===21;S.res=[];
+ for(let i=0;i<S.n;i++){let net=0;S.res.push(S.hands[i].map(h=>{const t=bjTot(h.c);let ret=0,tag;
+  if(t>21){tag='BUST'}else if(dbj){if(bjNat(h)){ret=h.bet;tag='PUSH'}else tag='LOSE'}
+  else if(bjNat(h)){ret=Math.floor(h.bet*2.5);tag='BLACKJACK'}
+  else if(dt>21||t>dt){ret=h.bet*2;tag='WIN'}else if(t===dt){ret=h.bet;tag='PUSH'}else tag='LOSE';
+  S.chips[i]+=ret;net+=ret-h.bet;return{tag,net:ret-h.bet}}));S.res[i].total=net}
+ S.phase='result';S.msg=dbj?'DEALER HAS BLACKJACK':dt>21?'DEALER BUSTS WITH '+dt:'DEALER STANDS ON '+dt}
+function bjCan(S,i,hi,kind){const h=S.hands[i][hi];if(!h||h.done)return false;
+ if(kind==='double')return h.c.length===2&&S.chips[i]>=h.bet;
+ if(kind==='split'){if(h.c.length!==2||S.hands[i].length>1||S.chips[i]<h.bet)return false;return rk(h.c[0])===rk(h.c[1])||(bjVal(h.c[0])===10&&bjVal(h.c[1])===10)}
+ return true}
+function bjBotMove(S,i){const hs=S.hands[i],h=hs[S.hi],{t,soft}=bjInfo(h.c),up=bjVal(S.dealer[0]);
+ if(bjCan(S,i,S.hi,'split')){const r=rk(h.c[0]);if(r===12||r===6)return{t:'split'}}
+ if(bjCan(S,i,S.hi,'double')){if(!soft&&(t===11||(t===10&&up<=9)||(t===9&&up>=3&&up<=6)))return{t:'double'};if(soft&&t>=17&&t<=18&&up>=3&&up<=6)return{t:'double'}}
+ if(soft){if(t>=19)return{t:'stand'};if(t===18)return up>=9?{t:'hit'}:{t:'stand'};return{t:'hit'}}
+ if(t>=17)return{t:'stand'};if(t>=13)return up<=6?{t:'stand'}:{t:'hit'};if(t===12)return up>=4&&up<=6?{t:'stand'}:{t:'hit'};return{t:'hit'}}
+GAMES.blackjack={id:'blackjack',name:'BLACKJACK',min:1,max:4,defBots:2,delay:800,autoDelay:850,
+ rules:['BEAT THE DEALER WITHOUT GOING OVER 21. FACE CARDS ARE 10, ACES ARE 1 OR 11.','PICK YOUR BET, THEN EVERYONE GETS 2 CARDS. YOU CAN SEE ONE OF THE DEALER\'S.','HIT = TAKE A CARD. STAND = KEEP YOUR HAND. DOUBLE = DOUBLE YOUR BET FOR EXACTLY ONE MORE CARD. SPLIT = SPLIT A PAIR INTO 2 HANDS (ONCE).','BLACKJACK (ACE + 10) PAYS 3 TO 2. REGULAR WINS PAY 1 TO 1. A TIE IS A PUSH.','DEALER MUST HIT UNTIL 17 AND STANDS ON ALL 17S. NO INSURANCE OR SURRENDER.'],
+ init(n){const S={n,rebuys:Array(n).fill(0),chips:Array(n).fill(500)};bjNew(S);return S},
+ turn(S){if(S.phase==='result')return -2;if(S.phase==='dealer')return -3;return S.turn},
+ act(S,seat,a){if(a.t==='next'){if(S.phase!=='result')return false;bjNew(S);return true}
+  if(seat!==S.turn)return false;
+  if(S.phase==='bet'){if(a.t!=='bet')return false;const amt=Math.min(Math.max(1,Math.floor(a.amt)),S.chips[seat]);if(amt<1)return false;S.chips[seat]-=amt;S.hands[seat][0].bet=amt;
+   if(seat+1<S.n)S.turn=seat+1;else bjDeal(S);return true}
+  if(S.phase!=='play')return false;const hs=S.hands[seat],h=hs[S.hi];
+  if(a.t==='hit'){h.c.push(S.deck.pop());const t=bjTot(h.c);if(t>=21)h.done=true;if(h.done)bjAdvance(S);return true}
+  if(a.t==='stand'){h.done=true;bjAdvance(S);return true}
+  if(a.t==='double'){if(!bjCan(S,seat,S.hi,'double'))return false;S.chips[seat]-=h.bet;h.bet*=2;h.c.push(S.deck.pop());h.done=true;bjAdvance(S);return true}
+  if(a.t==='split'){if(!bjCan(S,seat,S.hi,'split'))return false;const ace=rk(h.c[0])===12;S.chips[seat]-=h.bet;
+   const h2={c:[h.c.pop()],bet:h.bet,done:false,spl:true,st:''};h.spl=true;h.c.push(S.deck.pop());h2.c.push(S.deck.pop());hs.push(h2);
+   if(ace){h.done=true;h2.done=true;bjAdvance(S)}else{if(bjTot(h.c)===21)h.done=true;if(bjTot(h2.c)===21)h2.done=true;if(h.done)bjAdvance(S)}return true}
+  return false},
+ auto(S){if(!S.reveal){S.reveal=true;return}const live=S.hands.some(hs=>hs.some(h=>bjTot(h.c)<=21&&!bjNat(h)));
+  if(live&&bjTot(S.dealer)<17){S.dealer.push(S.deck.pop());return}bjSettle(S)},
+ bot(S,i){if(S.phase==='bet')return{t:'bet',amt:botBetAmt(S,i)};return bjBotMove(S,i)},
+ mine(S,me){const r=S.res&&S.res[me];return r?(r.total>0?1:r.total<0?-1:0):0},
+ draw(S,me){
+  // dealer
+  T('DEALER',192,12,K.wh,{al:'c',sh:K.bk});const dc=S.dealer;const dfp=fanPos('t',Math.max(dc.length,1),{step:16,y:22});
+  dc.forEach((c,k)=>card(k===1&&!S.reveal?-1:c,dfp[k][0],dfp[k][1]));
+  if(dc.length)T(S.reveal?String(bjTot(dc)):'?',192+((dc.length-1)*16+26)/2+10,34,K.yl,{sh:K.bk});
+  T('BLACKJACK PAYS 3 TO 2',192,80,'#2a8f55',{al:'c'});T('DEALER STANDS ON ALL 17S',192,90,'#2a8f55',{al:'c'});
+  for(let i=0;i<S.n;i++){const cx=slotX(S,i);const sw=Math.min(112,Math.floor(368/S.n));const turn=GAMES.blackjack.turn(S)===i;
+   T((turn?'>':'')+nameFor(S,i,me),cx,100,turn?K.yl:K.wh,{al:'c',sh:K.bk});T(money(S.chips[i]),cx,109,K.gy,{al:'c'});
+   const hs=S.hands[i];hs.forEach((h,k)=>{const split=hs.length>1;const hx=split?cx+(k?1:-1)*Math.floor(sw/4):cx;const wmax=split?sw/2-4:sw-6;
+    const n2=h.c.length;let step=Math.min(22,n2>1?(wmax-26)/(n2-1):22);step=Math.max(6,step);const tot=(n2-1)*step+26;
+    h.c.forEach((c,j)=>card(c,Math.round(hx-tot/2+j*step),122,{hl:turn&&S.hi===k&&S.phase==='play'?K.yl:false}));
+    if(n2){let txt=String(bjTot(h.c));if(S.res&&S.res[i])txt=S.res[i][k].tag;else if(h.st==='BJ')txt='BJ!';else if(bjTot(h.c)>21)txt='BUST';
+     if(h.bet)chipTxt(hx,163,h.bet,'c');T(txt,hx,175,S.res&&S.res[i]?(S.res[i][k].net>0?K.gn2:S.res[i][k].net<0?K.rl:K.yl):K.wh,{al:'c',sh:K.bk});
+     if(S.res&&S.res[i])T((S.res[i][k].net>=0?'+':'-')+Math.abs(S.res[i][k].net),hx,184,K.gy,{al:'c'})}})}
+  if(S.phase==='bet'&&S.turn===me){msgBar('HOW MUCH DO YOU WANT TO BET?',63);betUI(S,me)}
+  else{msgBar(S.msg||(S.phase==='play'?nameFor(S,S.turn,me)+(S.turn===me?' - YOUR MOVE':' IS PLAYING'):''),63)}
+  if(S.phase==='play'&&S.turn===me){const bs=[['HIT',{t:'hit'},'green'],['STAND',{t:'stand'},'red']];if(bjCan(S,me,S.hi,'double'))bs.push(['DOUBLE',{t:'double'},'yellow']);if(bjCan(S,me,S.hi,'split'))bs.push(['SPLIT',{t:'split'},'blue']);
+   const w=74,tot=bs.length*w+(bs.length-1)*4;let x=Math.round((W-tot)/2);bs.forEach(b=>{Btn(b[0],x,194,w,16,()=>act(b[1]),{st:b[2]});x+=w+4})}}};
+
+/* ===================== PAI GOW POKER ===================== */
+const val5=(cat,ks)=>{let v=cat;for(let i=0;i<5;i++)v=v*13+(ks[i]||0);return v};
+function pgLow(cs){const a=rk(cs[0]),b=rk(cs[1]);return a===b?val5(1,[a]):val5(0,[Math.max(a,b),Math.min(a,b)])}
+function pgSplit(c7){let best=null,bs=-1;for(let i=0;i<7;i++)for(let j=i+1;j<7;j++){const low=[c7[i],c7[j]],high=c7.filter((_,k)=>k!==i&&k!==j);const hv=ev5(high),lv=pgLow(low);if(hv<lv)continue;
+  const sc=hv/371293*.5+lv/371293*1.0+Math.random()*.001;if(sc>bs){bs=sc;best={low:[i,j]}}}
+ if(!best){const o=c7.map((c,i)=>i).sort((a,b)=>rk(c7[b])-rk(c7[a]));best={low:[o[0],o[1]]}}return best}
+function pgNew(S){for(let i=0;i<S.n;i++)if(S.chips[i]<10){S.chips[i]+=500;S.rebuys[i]++}S.phase='bet';S.turn=0;S.bets=Array(S.n).fill(0);S.hands=[];S.low=Array(S.n).fill(null);S.high=Array(S.n).fill(null);S.dh=null;S.dl=null;S.dealer=[];S.res=null;S.msg='PLACE YOUR BETS';S.dset=false}
+function pgDeal(S){const d=shuffle(range(52));S.hands=range(S.n).map(()=>d.splice(0,7));S.dealer=d.splice(0,7);S.phase='set';S.turn=0;S.msg='SET YOUR HANDS'}
+function pgApplySet(S,seat,lowIdx){const h=S.hands[seat];const low=lowIdx.map(i=>h[i]),high=h.filter((_,k)=>!lowIdx.includes(k));if(ev5(high)<pgLow(low))return false;S.low[seat]=low;S.high[seat]=high;return true}
+function pgResolve(S){const sp=pgSplit(S.dealer);S.dl=sp.low.map(i=>S.dealer[i]);S.dh=S.dealer.filter((_,k)=>!sp.low.includes(k));const dh=ev5(S.dh),dl=pgLow(S.dl);S.res=[];
+ for(let i=0;i<S.n;i++){const hw=ev5(S.high[i])>dh,lw=pgLow(S.low[i])>dl;let tag,net=0;if(hw&&lw){tag='WIN';net=S.bets[i]}else if(!hw&&!lw){tag='LOSE';net=-S.bets[i]}else tag='PUSH';S.chips[i]+=S.bets[i]+net;S.res.push({tag,net,hw,lw})}
+ S.phase='result';S.msg=''}
+GAMES.paigow={id:'paigow',name:'PAI GOW',min:1,max:4,defBots:2,delay:800,
+ rules:['PAI GOW POKER: YOU PLAY AGAINST THE DEALER. EACH PLAYER GETS 7 CARDS.','SPLIT YOUR 7 CARDS INTO A 5-CARD HIGH HAND AND A 2-CARD LOW HAND. THE 5-CARD HAND MUST OUTRANK THE 2-CARD HAND OR IT IS A FOUL AND WON\'T BE ALLOWED.','BEAT THE DEALER\'S HIGH HAND AND LOW HAND TO WIN. WIN ONE AND LOSE ONE = PUSH (BET RETURNED). TIES (COPIES) GO TO THE DEALER.','2-CARD HANDS ARE ONLY A PAIR OR HIGH CARD. NO JOKER IN THIS VERSION. NO COMMISSION.','CLICK 2 CARDS FOR YOUR LOW HAND THEN SET, OR PRESS HOUSE WAY FOR AN AUTO SETUP.'],
+ init(n){const S={n,rebuys:Array(n).fill(0),chips:Array(n).fill(500)};pgNew(S);return S},
+ turn(S){return S.phase==='result'?-2:S.turn},
+ act(S,seat,a){if(a.t==='next'){if(S.phase!=='result')return false;pgNew(S);return true}if(seat!==S.turn)return false;
+  if(S.phase==='bet'){if(a.t!=='bet')return false;const amt=Math.min(Math.max(1,Math.floor(a.amt)),S.chips[seat]);if(amt<1)return false;S.chips[seat]-=amt;S.bets[seat]=amt;if(seat+1<S.n)S.turn=seat+1;else pgDeal(S);return true}
+  if(S.phase==='set'){if(a.t!=='set')return false;let low=a.low;if(a.auto||!low)low=pgSplit(S.hands[seat]).low;
+   if(!Array.isArray(low)||low.length!==2||low[0]===low[1]||low.some(i=>!(i>=0&&i<7)))return false;if(!pgApplySet(S,seat,low))return false;
+   if(seat+1<S.n)S.turn=seat+1;else pgResolve(S);return true}return false},
+ bot(S,i){if(S.phase==='bet')return{t:'bet',amt:botBetAmt(S,i)};return{t:'set',auto:true}},
+ mine(S,me){return S.res&&S.res[me]?(S.res[me].net>0?1:S.res[me].net<0?-1:0):0},
+ draw(S,me){const done=S.phase==='result';T('DEALER'+(done?' - '+handName(S.dh):''),192,12,K.wh,{al:'c',sh:K.bk});
+  if(done){const fl=fanPos('t',2,{step:16,y:22}),fh=fanPos('t',5,{step:13,y:22});const gx=-48;S.dl.forEach((c,k)=>card(c,fl[k][0]+gx-40,22));S.dh.forEach((c,k)=>card(c,fh[k][0]+gx+60,22));T('LOW',104,58,K.gy,{al:'c'});T('HIGH',204,58,K.gy,{al:'c'});}
+  else{const fp=fanPos('t',7,{step:12,y:22});for(let k=0;k<7;k++)if(S.dealer.length)card(-1,fp[k][0],fp[k][1])}
+  T('PAI GOW POKER',192,64,'#2a8f55',{al:'c',sc:2});
+  // other players
+  const others=range(S.n).filter(i=>i!==me);others.forEach((i,k)=>{const cx=Math.round(192-(others.length*88)/2+44+k*88);const turn=GAMES.paigow.turn(S)===i;
+   T((turn?'>':'')+nameFor(S,i,me),cx,80,turn?K.yl:K.wh,{al:'c',sh:K.bk});T(money(S.chips[i]),cx,89,K.gy,{al:'c'});if(S.bets[i])chipTxt(cx,99,S.bets[i],'c');
+   const st=done?S.res[i].tag:S.phase==='set'?(S.low[i]?'SET':'SETTING'):S.phase==='bet'?(S.bets[i]?'BET IN':''):'';if(st)T(st,cx,109,done?(S.res[i].net>0?K.gn2:S.res[i].net<0?K.rl:K.yl):K.gy,{al:'c'})});
+  // me
+  T((GAMES.paigow.turn(S)===me?'>':'')+'YOU',10,150,GAMES.paigow.turn(S)===me?K.yl:K.wh,{sh:K.bk});T(money(S.chips[me]),10,160,K.gy);if(S.bets[me])chipTxt(10,172,S.bets[me],'l');
+  if(S.hands[me]){const h=S.hands[me];
+   if(S.low[me]){const fl=fanPos('b',2,{step:16,y:150}),fh=fanPos('b',5,{step:15,y:150});S.low[me].forEach((c,k)=>card(c,fl[k][0]-86,150));S.high[me].forEach((c,k)=>card(c,fh[k][0]+30,150));T('LOW',106,140,K.gy,{al:'c'});T('HIGH',222,140,K.gy,{al:'c'});}
+   else{if(UI.pgh!==S.hands){UI.psel=[];UI.pgh=S.hands}const fp=fanPos('b',7,{step:24,maxw:300});
+    h.forEach((c,k)=>{const sel=UI.psel.includes(k);card(c,fp[k][0],fp[k][1],{sel});if(S.phase==='set'&&S.turn===me)Hit(fp[k][0],fp[k][1]-5,k<6?24:26,41,()=>{UI.psel=sel?UI.psel.filter(x=>x!==k):(UI.psel.length<2?UI.psel.concat(k):UI.psel)})})}}
+  if(S.phase==='bet'&&S.turn===me){msgBar('PLACE YOUR BET',118);betUI(S,me)}
+  else if(S.phase==='set'&&S.turn===me){msgBar(UI.psel.length===2?'LOW HAND PICKED - PRESS SET':'CLICK 2 CARDS FOR YOUR LOW HAND',118);
+   Btn('SET HANDS',120,194,84,16,()=>{if(UI.psel.length===2){const ok=!(ev5(S.hands[me].filter((_,k)=>!UI.psel.includes(k)))<pgLow(UI.psel.map(i=>S.hands[me][i])));if(!ok){UI.pgmsg='FOUL! HIGH HAND MUST BEAT LOW HAND';sfx('err');return}UI.pgmsg='';act({t:'set',low:UI.psel});UI.psel=[]}},{st:'green',dis:UI.psel.length!==2,blink:UI.psel.length===2});
+   Btn('HOUSE WAY',212,194,84,16,()=>{act({t:'set',auto:true});UI.psel=[]},{st:'blue'});if(UI.pgmsg)T(UI.pgmsg,192,128,K.rl,{al:'c',sh:K.bk})}
+  else if(done){const r=S.res[me];const own=[r.hw?'WON HIGH':'LOST HIGH',r.lw?'WON LOW':'LOST LOW'].join(' / ');msgBar('YOU: '+r.tag+' ('+own+') '+(r.net>0?'+':'')+(r.net||0),118)}
+  else msgBar(S.msg+'...',118)}};
+
+/* ===================== RIDE THE BUS ===================== */
+const BQ=['RED OR BLACK?','HIGHER OR LOWER?','INSIDE OR OUTSIDE?','WHAT SUIT?'];
+function busOk(q,hand,c,v){if(q===0)return(isRed(c)?'R':'B')===v;
+ if(q===1){const a=rk(hand[0]),b=rk(c);return a!==b&&(v==='H'?b>a:b<a)}
+ if(q===2){const lo=Math.min(rk(hand[0]),rk(hand[1])),hi=Math.max(rk(hand[0]),rk(hand[1])),r=rk(c);if(r===lo||r===hi)return true;return v==='I'?(r>lo&&r<hi):(r<lo||r>hi)}
+ return su(c)===v}
+function busDraw(S){if(S.deck.length<4)S.deck=shuffle(range(52));return S.deck.pop()}
+function busStartPyr(S){if(S.n<2){busStartBus(S,0);return}S.phase='pyr';S.pyr=[];for(let r=3;r>=0;r--)for(let k=0;k<=r;k++)S.pyr.push({c:S.deck.pop(),up:false,row:r,k});S.pi=0;S.msg='THE PYRAMID! MATCHING CARDS GIVE OUT PENALTIES'}
+function busStartBus(S,d){S.driver=d;S.phase='bus';S.turn=d;S.bq=0;S.bh=[];S.rides=0;S.msg=S.names[d]+' MUST RIDE THE BUS!'}
+function busGuess(S,seat,v){const bus=S.phase==='bus';const q=bus?S.bq:S.q;const hand=bus?S.bh:S.hands[seat];const c=busDraw(S);const ok=busOk(q,hand,c,v);S.last={seat,c,ok,q};
+ if(bus){if(ok){S.bh.push(c);S.bq++;S.msg='CORRECT!';if(S.bq>=4){S.phase='over';S.msg=''}}else{S.rides++;S.bh=[];S.bq=0;S.msg='WRONG! BACK TO THE START... ('+c+')';S.lastBad=c}}
+ else{S.hands[seat].push(c);if(!ok)S.pen[seat]++;S.msg=ok?'CORRECT!':'WRONG! +1 PENALTY';S.q++;if(S.q>=4){S.q=0;if(seat+1<S.n)S.turn=seat+1;else busStartPyr(S)}}}
+function busPyrStep(S){const p=S.pyr[S.pi++];p.up=true;const pen=4-p.row;const lines=[];
+ for(let i=0;i<S.n;i++){const mine=S.hands[i].filter(c=>rk(c)===rk(p.c));if(!mine.length)continue;S.hands[i]=S.hands[i].filter(c=>rk(c)!==rk(p.c));
+  mine.forEach(()=>{const others=range(S.n).filter(j=>j!==i);const t=pick(others);S.pen[t]+=pen;lines.push(i+'>'+t)})}
+ S.pmsg=lines;S.msg=lines.length?'MATCH! '+lines.map(l=>{const[a,b]=l.split('>').map(Number);return S.names[a]+' GIVES '+pen+' TO '+S.names[b]}).slice(0,2).join(', '):'NO MATCHES';
+ if(S.pi>=S.pyr.length){let d=0,bk=[-1,-1];for(let i=0;i<S.n;i++){const k=[S.hands[i].length,Math.max(-1,...S.hands[i].map(rk))];if(k[0]>bk[0]||(k[0]===bk[0]&&k[1]>bk[1])){bk=k;d=i}}busStartBus(S,d)}}
+GAMES.bus={id:'bus',name:'RIDE THE BUS',min:1,max:4,defBots:2,delay:750,autoDelay:1100,
+ rules:['PART 1: EVERYONE ANSWERS 4 QUESTIONS IN A ROW, EACH WITH A NEW CARD: RED OR BLACK? HIGHER OR LOWER (THAN YOUR 1ST CARD)? INSIDE OR OUTSIDE YOUR 2 CARDS? WHAT SUIT? A WRONG GUESS = +1 PENALTY.','PART 2, THE PYRAMID: CARDS FLIP ONE BY ONE. IF YOU HOLD THE SAME RANK YOU DISCARD IT AND GIVE OUT PENALTIES (1 FOR THE BOTTOM ROW UP TO 4 AT THE TOP).','PART 3: WHOEVER HAS THE MOST CARDS LEFT RIDES THE BUS. ANSWER ALL 4 QUESTIONS IN A ROW WITHOUT A MISS. ONE MISS AND YOU START OVER!','ACE IS HIGH. A MATCH ON HIGHER/LOWER IS A MISS. A MATCH ON INSIDE/OUTSIDE COUNTS AS CORRECT.'],
+ init(n){const S={n,deck:shuffle(range(52)),hands:range(n).map(()=>[]),pen:Array(n).fill(0),phase:'q',turn:0,q:0,msg:'ANSWER 4 QUESTIONS IN A ROW',last:null,rides:0,bh:[],bq:0};return S},
+ turn(S){if(S.phase==='over')return null;if(S.phase==='pyr')return -3;return S.turn},
+ act(S,seat,a){if(seat!==S.turn)return false;if(S.phase!=='q'&&S.phase!=='bus')return false;if(a.t!=='guess')return false;const q=S.phase==='bus'?S.bq:S.q;
+  const ok=q===0?(a.v==='R'||a.v==='B'):q===1?(a.v==='H'||a.v==='L'):q===2?(a.v==='I'||a.v==='O'):(a.v>=0&&a.v<=3);if(!ok)return false;busGuess(S,seat,a.v);return true},
+ auto(S){busPyrStep(S)},
+ bot(S,i){const bus=S.phase==='bus';const q=bus?S.bq:S.q;const h=bus?S.bh:S.hands[i];
+  if(q===0)return{t:'guess',v:pick(['R','B'])};if(q===1)return{t:'guess',v:rk(h[0])<6?'H':'L'};
+  if(q===2)return{t:'guess',v:Math.abs(rk(h[0])-rk(h[1]))>=5?'I':'O'};
+  const cnt=[0,0,0,0];h.forEach(c=>cnt[su(c)]++);const m=Math.min(...cnt);return{t:'guess',v:pick([0,1,2,3].filter(s=>cnt[s]===m))}},
+ mine(S,me){return S.driver===me?-1:1},
+ over(S,me){const d=nameFor(S,S.driver,me);const l=[d+' RODE THE BUS AND GOT OFF!',S.rides?('AFTER '+S.rides+' FAILED RIDE'+(S.rides>1?'S':'')):'ON THE FIRST TRY!'];
+  l.push('PENALTIES: '+range(S.n).map(i=>nameFor(S,i,me)+' '+S.pen[i]).join('  '));return l},
+ draw(S,me){const bus=S.phase==='bus'||S.phase==='over';
+  for(let i=0;i<S.n;i++){const pos=posOf(S,me,i);const turn=GAMES.bus.turn(S)===i;seatLabel(S,me,i,'PEN '+S.pen[i]+(S.phase==='bus'||S.phase==='over'?(S.driver===i?' DRIVER':''):''),{col:S.driver===i&&bus?K.rl:undefined});
+   const hand=S.hands[i];const fp=fanPos(pos,Math.max(1,hand.length),{step:pos==='b'?20:12});
+   hand.forEach((c,k)=>card((i===me||S.phase==='q')?c:-1,fp[k][0],fp[k][1]))}
+  if(S.phase==='q'||S.phase==='bus'||S.phase==='over'){const q=S.phase==='bus'?S.bq:S.q;
+   if(S.phase!=='over')T(S.phase==='bus'?'THE BUS RIDE':'QUALIFYING',192,60,K.gy,{al:'c'});
+   if(S.phase==='bus'||S.phase==='over'){g.drawImage(busSpr(),178,68);const bh=S.bh;bh.forEach((c,k)=>card(c,121+k*29,76));for(let k=bh.length;k<4;k++)emptySlot(121+k*29,76);
+    if(S.msg&&S.phase==='bus')msgBar(S.msg,114,1)}
+   else{if(S.last){const lc=S.last;card(lc.c,179,70);T(lc.ok?'RIGHT!':'WRONG!',192,110,lc.ok?K.gn2:K.rl,{al:'c',sh:K.bk})}else card(-1,179,70)}
+   const myq=GAMES.bus.turn(S)===me;if(S.phase!=='over'){T(nameFor(S,S.turn,me)+': '+BQ[q],192,124,K.yl,{al:'c',sh:K.bk})}
+   if(myq){const opts=q===0?[['RED','R','red'],['BLACK','B','gray']]:q===1?[['HIGHER','H','green'],['LOWER','L','red']]:q===2?[['INSIDE','I','green'],['OUTSIDE','O','red']]:[0,1,2,3].map(s=>[SN[s],s,s===1||s===2?'red':'gray']);
+    const w=opts.length>2?72:96;const tot=opts.length*w+(opts.length-1)*4;let x=Math.round((W-tot)/2);opts.forEach(o=>{Btn(o[0],x,194,w,16,()=>act({t:'guess',v:o[1]}),{st:o[2]});x+=w+4})}}
+  else if(S.phase==='pyr'){T('THE PYRAMID',192,44,K.yl,{al:'c',sh:K.bk});
+   for(let r=0;r<4;r++){T('+'+(4-r),Math.round(192-r*11-36),61+r*17,K.gy);
+    S.pyr.filter(p=>p.row===r).forEach(p=>{const cx=192+(p.k-r/2)*22;card(p.up?p.c:-1,Math.round(cx-9),53+r*17,{small:true,hl:S.pi>0&&S.pyr[S.pi-1]===p?K.yl:false})})}
+   if(S.msg)msgBar(S.msg,132,1)}}};
+/* ===================== GOLF (6 card) ===================== */
+const gv=c=>{const r=rk(c);return r===12?1:r===0?-2:r===11?0:r>=9?10:r+2};
+function gScore(G){let s=0;for(let j=0;j<3;j++){const a=G[j].c,b=G[j+3].c;s+=rk(a)===rk(b)?0:gv(a)+gv(b)}return s}
+function gDeal(S){S.hole++;S.deck=shuffle(range(52));S.grid=range(S.n).map(()=>range(6).map(()=>({c:S.deck.pop(),up:false})));S.disc=[S.deck.pop()];S.hand=-1;S.from='';S.endBy=-1;S.flips=Array(S.n).fill(0);S.phase='flip2';S.turn=(S.hole-1)%S.n;S.first=S.turn;S.msg='FLIP 2 OF YOUR CARDS';S.hs=null}
+function gDraw1(S){if(!S.deck.length){const top=S.disc.pop();S.deck=shuffle(S.disc);S.disc=[top]}return S.deck.pop()}
+function gNext(S){const seat=S.turn;if(S.endBy<0&&S.grid[seat].every(x=>x.up))S.endBy=seat;
+ S.turn=(S.turn+1)%S.n;if(S.endBy>=0&&S.turn===S.endBy){gEnd(S);return}S.phase='draw';S.hand=-1;S.from=''}
+function gEnd(S){S.grid.forEach(G=>G.forEach(x=>x.up=true));S.hs=S.grid.map(G=>gScore(G));S.hs.forEach((v,i)=>S.tot[i]+=v);
+ S.phase=S.hole>=S.holes?'over':'result';S.msg=''}
+GAMES.golf={id:'golf',name:'GOLF',min:2,max:4,defBots:2,delay:700,nextPos:[246,184],opts:[{key:'holes',label:'HOLES',vals:[3,5,9],def:3}],
+ rules:['6-CARD GOLF: LOWEST SCORE WINS. EACH PLAYER HAS 6 CARDS IN A 3x2 GRID. FLIP 2 TO START.','ON YOUR TURN TAKE THE TOP OF THE DECK OR THE DISCARD PILE. SWAP IT WITH ANY OF YOUR 6 CARDS (THE NEW CARD GOES FACE UP). OR DISCARD IT FROM THE DECK AND FLIP A FACE-DOWN CARD.','WHEN SOMEONE HAS ALL 6 FACE UP, EVERYONE ELSE GETS ONE LAST TURN.','SCORES: ACE 1, 2 = -2, 3-10 FACE VALUE, J AND Q 10, KING 0. TWO CARDS OF THE SAME RANK IN A COLUMN CANCEL TO 0.','AFTER ALL HOLES, THE LOWEST TOTAL WINS.'],
+ init(n,o){const S={n,holes:o.holes||3,hole:0,tot:Array(n).fill(0)};gDeal(S);return S},
+ turn(S){return S.phase==='result'?-2:S.phase==='over'?null:S.turn},
+ act(S,seat,a){if(a.t==='next'){if(S.phase!=='result')return false;gDeal(S);return true}if(seat!==S.turn)return false;const G=S.grid[seat];
+  if(S.phase==='flip2'){if(a.t!=='flip'||!G[a.i]||G[a.i].up)return false;G[a.i].up=true;S.flips[seat]++;
+   if(S.flips[seat]>=2){const nx=(seat+1)%S.n;if(nx===S.first){S.phase='draw';S.turn=S.first;S.msg=''}else S.turn=nx}return true}
+  if(S.phase==='draw'){if(a.t!=='take')return false;if(a.src==='disc'){S.hand=S.disc.pop();S.from='disc'}else if(a.src==='deck'){S.hand=gDraw1(S);S.from='deck'}else return false;S.phase='place';return true}
+  if(S.phase==='place'){if(a.t==='place'){if(!G[a.i])return false;const old=G[a.i].c;G[a.i]={c:S.hand,up:true};S.disc.push(old);S.hand=-1;gNext(S);return true}
+   if(a.t==='discard'){if(S.from!=='deck')return false;if(G.every(x=>x.up)){S.disc.push(S.hand);S.hand=-1;gNext(S);return true}S.disc.push(S.hand);S.hand=-1;S.phase='flip1';return true}return false}
+  if(S.phase==='flip1'){if(a.t!=='flip'||!G[a.i]||G[a.i].up)return false;G[a.i].up=true;gNext(S);return true}return false},
+ bot(S,i){const G=S.grid[i];const down=range(6).filter(k=>!G[k].up);
+  if(S.phase==='flip2'||S.phase==='flip1'){const pref=down.filter(k=>{const p=G[(k+3)%6];return !(p.up&&rk(p.c)===999)});return{t:'flip',i:pick(pref.length?pref:down)}}
+  const partner=k=>G[(k+3)%6];
+  const matchSlot=c=>{for(let k=0;k<6;k++){const p=partner(k);if(p.up&&rk(p.c)===rk(c)&&!(G[k].up&&rk(G[k].c)===rk(c)))return k}return -1};
+  if(S.phase==='draw'){const top=S.disc[S.disc.length-1];if(matchSlot(top)>=0||gv(top)<=1)return{t:'take',src:'disc'};if(gv(top)<=3&&down.length)return{t:'take',src:Math.random()<.5?'disc':'deck'};return{t:'take',src:'deck'}}
+  const c=S.hand,v=gv(c);const m=matchSlot(c);if(m>=0)return{t:'place',i:m};
+  const ups=range(6).filter(k=>G[k].up&&!(rk(partner(k).c)===rk(G[k].c)&&partner(k).up)).sort((a,b)=>gv(G[b].c)-gv(G[a].c));
+  if(ups.length&&gv(G[ups[0]].c)-v>=2)return{t:'place',i:ups[0]};
+  if(down.length&&v<=3)return{t:'place',i:pick(down)};
+  if(S.from==='deck')return{t:'discard'};
+  if(ups.length)return{t:'place',i:ups[0]};return{t:'place',i:pick(down)}},
+ mine(S,me){if(S.phase==='over')return S.tot[me]===Math.min(...S.tot)?1:-1;return S.hs&&S.hs[me]===Math.min(...S.hs)?1:-1},
+ over(S,me){const o=range(S.n).sort((a,b)=>S.tot[a]-S.tot[b]);return['WINNER: '+nameFor(S,o[0],me)+' WITH '+S.tot[o[0]]].concat(o.map(i=>nameFor(S,i,me)+': '+S.tot[i]))},
+ draw(S,me){const turn=S.turn;const myTurn=GAMES.golf.turn(S)===me;const fin=S.phase==='result'||S.phase==='over';
+  for(let i=0;i<S.n;i++){const pos=posOf(S,me,i);const G=S.grid[i];const sm=i!==me;
+   const cw=sm?SW:CW,chh=sm?SH:CH,sx=sm?20:28,sy=sm?27:38;let x0,y0;
+   if(!sm){x0=151;y0=133}else if(pos==='t'){x0=162;y0=30}else if(pos==='l'){x0=10;y0=72}else{x0=314;y0=72}
+   const lx=sm?(pos==='r'?374:pos==='l'?10:192):10,ly=sm?(pos==='t'?10:60):152,al=sm?(pos==='r'?'r':pos==='l'?'l':'c'):'l';
+   const live=turn===i&&!fin;
+   T((live?'>':'')+nameFor(S,i,me)+(sm?' TOT '+S.tot[i]+(S.hs?' (+'+S.hs[i]+')':''):''),lx,ly,live?K.yl:K.wh,{al,sh:K.bk});
+   if(!sm)T('TOT '+S.tot[i]+(S.hs?' (+'+S.hs[i]+')':''),lx,ly+9,K.gy,{al});
+   G.forEach((x,k)=>{const cx=x0+(k%3)*sx,cy=y0+((k/3)|0)*sy;const clickable=!sm&&myTurn&&((S.phase==='flip2'||S.phase==='flip1')?!x.up:S.phase==='place');
+    card(x.up?x.c:-1,cx,cy,{small:sm,hl:clickable&&Math.floor(now/350)%2===0?K.yl:false});if(clickable)Hit(cx,cy,cw,chh,()=>act({t:S.phase==='place'?'place':'flip',i:k}))})}
+  const dx=140,dy=84;card(-1,dx,dy);T('DECK',dx+13,dy+39,K.gy,{al:'c'});const top=S.disc[S.disc.length-1];if(top!==undefined)card(top,dx+40,dy);else emptySlot(dx+40,dy);T('DISCARD',dx+53,dy+39,K.gy,{al:'c'});
+  if(S.phase==='draw'&&myTurn){Hit(dx,dy,CW,CH,()=>act({t:'take',src:'deck'}));Hit(dx+40,dy,CW,CH,()=>act({t:'take',src:'disc'}));if(Math.floor(now/350)%2===0){frame(dx-1,dy-1,CW+2,CH+2,K.yl);frame(dx+39,dy-1,CW+2,CH+2,K.yl)}}
+  if(S.hand>=0){card(S.hand,dx+90,dy,{hl:K.yl});T('IN HAND',dx+103,dy+39,K.yl,{al:'c'})}
+  let m;
+  if(S.phase==='draw'&&myTurn)m='YOUR TURN: TAKE THE DECK OR THE DISCARD PILE';
+  else if(S.phase==='place'&&myTurn)m=S.from==='deck'?'CLICK ONE OF YOUR CARDS TO SWAP, OR DISCARD IT':'CLICK ONE OF YOUR CARDS TO SWAP WITH';
+  else if(S.phase==='flip1'&&myTurn)m='FLIP A FACE-DOWN CARD';
+  else if(S.phase==='flip2'&&myTurn)m='FLIP '+(2-S.flips[me])+' OF YOUR CARDS';
+  else if(S.phase==='result')m='HOLE '+S.hole+' DONE! LOWEST: '+nameFor(S,S.hs.indexOf(Math.min(...S.hs)),me)+' ('+Math.min(...S.hs)+')';
+  else if(S.endBy>=0&&S.phase!=='over')m=nameFor(S,S.endBy,me)+' IS OUT - LAST TURNS!';
+  else m=nameFor(S,S.turn,me)+"'S TURN";
+  wrap(m,21).slice(0,4).forEach((l,i)=>T(l,246,138+i*9,K.yl,{sh:K.bk}));
+  if(S.phase==='place'&&myTurn&&S.from==='deck')Btn('DISCARD IT',246,176,76,16,()=>act({t:'discard'}),{st:'red'});
+  T('HOLE '+S.hole+'/'+S.holes,376,204,K.gy,{al:'r'})}};
+
+/* ===================== EUCHRE ===================== */
+const EUR=[7,8,9,10,11,12];
+function euDeck(){const d=[];for(let s=0;s<4;s++)EUR.forEach(r=>d.push(s*13+r));return shuffle(d)}
+const eEff=(c,t)=>(rk(c)===9&&su(c)===3-t)?t:su(c);
+function ePw(c,led,t){const r=rk(c),s=su(c);if(r===9&&s===t)return 100;if(r===9&&s===3-t)return 99;if(s===t)return 50+r;if(s===led)return r;return -1}
+function euNextSeat(S,s){let n=(s+1)%4;if(n===S.out)n=(n+1)%4;return n}
+function euDeal(S){S.deck=euDeck();S.hands=range(4).map(()=>S.deck.splice(0,5));S.turned=S.deck.pop();S.phase='bid1';S.turn=(S.dealer+1)%4;S.pass=0;S.trump=-1;S.maker=-1;S.out=-1;S.alone=false;S.trick=[];S.tricks=[0,0,0,0];S.led=-1;S.tw=-1;S.msg='';S.last=null;S.hp=null}
+function euStartPlay(S){S.phase='play';let l=(S.dealer+1)%4;if(l===S.out)l=(l+1)%4;S.turn=l;S.trick=[];S.led=-1}
+function euLegal(S,seat){const h=S.hands[seat];if(!S.trick.length)return h.slice();const led=S.led;const f=h.filter(c=>eEff(c,S.trump)===led);return f.length?f:h.slice()}
+function euScoreHand(h,t){let s=0;h.forEach(c=>{const r=rk(c),su_=su(c);if(r===9&&su_===t)s+=3.2;else if(r===9&&su_===3-t)s+=2.6;else if(su_===t)s+=({12:2.2,11:1.6,10:1.2,8:.9,7:.7})[r]||.7;else if(r===12)s+=1.0});return s}
+function euScore(S){const mt=S.maker%2;const tm=S.tricks.reduce((a,v,i)=>a+(i%2===mt?v:0),0);let team,pts;
+ if(tm>=3){team=mt;pts=tm===5?(S.alone?4:2):1}else{team=1-mt;pts=2}S.pts[team]+=pts;
+ S.hp={team,pts,tm,euchred:tm<3};S.msg=(tm<3?'EUCHRED! ':'')+(team===0?'TEAM 1&3':'TEAM 2&4')+' SCORES '+pts;S.phase=S.pts[team]>=S.goal?'over':'result'}
+GAMES.euchre={id:'euchre',name:'EUCHRE',min:4,max:4,defBots:3,delay:850,autoDelay:1300,opts:[{key:'goal',label:'PLAY TO',vals:[5,10],def:10}],
+ rules:['EUCHRE: 4 PLAYERS IN 2 TEAMS. YOU AND THE PLAYER ACROSS FROM YOU ARE PARTNERS. 24 CARDS (9 TO ACE).','BIDDING: THE DEALER TURNS UP A CARD. EACH PLAYER MAY ORDER IT UP (ITS SUIT IS TRUMP) OR PASS. IF ALL PASS, NAME ANY OTHER SUIT. THE DEALER MUST CALL (STICK THE DEALER).','THE JACK OF TRUMP (RIGHT BOWER) IS THE TOP CARD, THEN THE OTHER JACK OF THE SAME COLOR (LEFT BOWER), THEN A K Q 10 9.','FOLLOW SUIT IF YOU CAN. HIGHEST TRUMP OR HIGHEST OF THE LED SUIT WINS THE TRICK.','BIDDING TEAM NEEDS 3 OF 5 TRICKS: 1 POINT, ALL 5 = 2 POINTS. FAIL AND THE OTHERS GET 2. GOING ALONE: ALL 5 = 4 POINTS. FIRST TO THE GOAL WINS.'],
+ init(n,o){const S={n:4,dealer:3,pts:[0,0],goal:o.goal||10};euDeal(S);return S},
+ turn(S){if(S.phase==='result')return -2;if(S.phase==='tshow')return -3;if(S.phase==='over')return null;return S.turn},
+ act(S,seat,a){if(a.t==='next'){if(S.phase!=='result')return false;S.dealer=(S.dealer+1)%4;euDeal(S);return true}if(seat!==S.turn)return false;
+  if(S.phase==='bid1'){if(a.t==='pass'){S.pass++;if(S.pass>=4){S.phase='bid2';S.pass=0;S.turn=(S.dealer+1)%4}else S.turn=(S.turn+1)%4;return true}
+   if(a.t==='order'){S.trump=su(S.turned);S.maker=seat;S.alone=!!a.alone;S.out=S.alone?(seat+2)%4:-1;
+    if(S.out!==S.dealer){S.hands[S.dealer].push(S.turned);S.phase='discard';S.turn=S.dealer}else euStartPlay(S);S.msg='';return true}return false}
+  if(S.phase==='bid2'){if(a.t==='pass'){if(seat===S.dealer)return false;S.pass++;S.turn=(S.turn+1)%4;return true}
+   if(a.t==='call'){if(!(a.suit>=0&&a.suit<4)||a.suit===su(S.turned))return false;S.trump=a.suit;S.maker=seat;S.alone=!!a.alone;S.out=S.alone?(seat+2)%4:-1;euStartPlay(S);return true}return false}
+  if(S.phase==='discard'){if(a.t!=='discard')return false;const i=S.hands[seat].indexOf(a.c);if(i<0)return false;S.hands[seat].splice(i,1);euStartPlay(S);return true}
+  if(S.phase==='play'){if(a.t!=='play')return false;if(!euLegal(S,seat).includes(a.c))return false;const h=S.hands[seat];h.splice(h.indexOf(a.c),1);
+   if(!S.trick.length)S.led=eEff(a.c,S.trump);S.trick.push({s:seat,c:a.c});const need=S.out>=0?3:4;
+   if(S.trick.length>=need){let bw=-2,w=-1;S.trick.forEach(t=>{const p=ePw(t.c,S.led,S.trump);if(p>bw){bw=p;w=t.s}});S.tw=w;S.tricks[w]++;S.phase='tshow'}else S.turn=euNextSeat(S,seat);return true}
+  return false},
+ auto(S){S.last=S.trick.slice();S.trick=[];if(S.hands.every((h,i)=>i===S.out||!h.length)){euScore(S);return}S.phase='play';S.turn=S.tw;S.led=-1},
+ bot(S,i){const h=S.hands[i];
+  if(S.phase==='bid1'){const t=su(S.turned);let hand=h.slice();if(i===S.dealer)hand.push(S.turned);const sc=euScoreHand(hand,t);const part=(S.dealer+2)%4===i;const th=i===S.dealer?5.2:part?5.9:(S.dealer+1)%2===i%2?6.3:5.7;
+   return sc>=th?{t:'order',alone:sc>=9.8}:{t:'pass'}}
+  if(S.phase==='bid2'){let bt=-1,bs=-1;for(let s=0;s<4;s++){if(s===su(S.turned))continue;const sc=euScoreHand(h,s);if(sc>bs){bs=sc;bt=s}}
+   if(bs>=5.4||i===S.dealer)return{t:'call',suit:bt,alone:bs>=9.8};return{t:'pass'}}
+  if(S.phase==='discard'){const k=c=>ePw(c,-2,S.trump)<50?rk(c):100+ePw(c,-2,S.trump);return{t:'discard',c:h.slice().sort((a,b)=>k(a)-k(b))[0]}}
+  const legal=euLegal(S,i);const t=S.trump;const pwr=c=>ePw(c,S.led<0?su(c):S.led,t);
+  if(!S.trick.length){const bow=legal.filter(c=>rk(c)===9&&(su(c)===t||su(c)===3-t));if(bow.length&&S.maker%2===i%2)return{t:'play',c:legal.slice().sort((a,b)=>ePw(b,-2,t)-ePw(a,-2,t))[0]};
+   const ace=legal.filter(c=>rk(c)===12&&eEff(c,t)!==t);if(ace.length)return{t:'play',c:ace[0]};
+   const nt=legal.filter(c=>eEff(c,t)!==t);const pool=nt.length?nt:legal;return{t:'play',c:pool.slice().sort((a,b)=>rk(a)-rk(b))[0]}}
+  let bw=-2,w=-1;S.trick.forEach(x=>{const p=ePw(x.c,S.led,t);if(p>bw){bw=p;w=x.s}});
+  if(w%2===i%2)return{t:'play',c:legal.slice().sort((a,b)=>ePw(a,S.led,t)-ePw(b,S.led,t))[0]};
+  const win=legal.filter(c=>ePw(c,S.led,t)>bw).sort((a,b)=>ePw(a,S.led,t)-ePw(b,S.led,t));if(win.length)return{t:'play',c:win[0]};
+  return{t:'play',c:legal.slice().sort((a,b)=>(ePw(a,S.led,t)<50?ePw(a,S.led,t)+rk(a)/20:99)-(ePw(b,S.led,t)<50?ePw(b,S.led,t)+rk(b)/20:99))[0]}},
+ mine(S,me){const tm=me%2;return S.hp?(S.hp.team===tm?1:-1):(S.pts[tm]>S.pts[1-tm]?1:-1)},
+ over(S,me){const w=S.pts[0]>S.pts[1]?0:1;return[(w===me%2?'YOUR TEAM WINS!':'THE OTHER TEAM WINS')+' '+S.pts[w]+' TO '+S.pts[1-w]]},
+ draw(S,me){const us=me%2,them=1-us;
+  T('US '+S.pts[us]+'  THEM '+S.pts[them]+'  TO '+S.goal,8,14,K.yl,{sh:K.bk});
+  if(S.trump>=0){T('TRUMP',8,25,K.gy);g.drawImage(suitSpr(S.trump,7,S.trump===1||S.trump===2?K.rl:K.wh,1),42,24);T('TRICKS US '+(S.tricks[us]+S.tricks[us+2])+' THEM '+(S.tricks[them]+S.tricks[them+2]),8,36,K.wh,{sh:K.bk})}
+  for(let i=0;i<4;i++){const pos=posOf(S,me,i);const h=S.hands[i];const tag=(S.dealer===i?' (D)':'')+(S.maker===i?' MAKER':'')+(S.out===i?' OUT':'')+(S.maker===i&&S.alone?' ALONE':'');
+   seatLabel(S,me,i,tag.trim()?tag.trim():'',{dim:S.out===i});
+   if(S.out===i)continue;const fp=fanPos(pos,Math.max(1,h.length),{step:pos==='b'?20:pos==='t'?14:10});
+   const legal=S.phase==='play'&&S.turn===me&&i===me?euLegal(S,me):[];
+   h.forEach((c,k)=>{const mine=i===me;const ok=!mine||S.phase==='discard'&&S.turn===me||legal.includes(c);card(mine?c:-1,fp[k][0],fp[k][1],{dim:mine&&S.phase==='play'&&S.turn===me&&!legal.includes(c)});
+    if(mine&&((S.phase==='play'&&S.turn===me&&legal.includes(c))||(S.phase==='discard'&&S.turn===me)))Hit(fp[k][0],fp[k][1],k<h.length-1?20:26,36,()=>act({t:S.phase==='discard'?'discard':'play',c}))})}
+  // trick cards
+  const slot={b:[179,100],t:[179,62],l:[146,81],r:[212,81]};
+  S.trick.forEach(t=>{const p=slot[posOf(S,me,t.s)];card(t.c,p[0],p[1],{hl:S.phase==='tshow'&&S.tw===t.s})});
+  if(S.phase==='bid1'||S.phase==='discard'){card(S.phase==='bid1'?S.turned:-1,179,76);T(S.phase==='bid1'?'TURNED UP':'PICKED UP',192,114,K.gy,{al:'c'})}
+  // messages / buttons
+  const myt=S.turn===me&&GAMES.euchre.turn(S)===me;
+  if(S.phase==='bid1'){msgBar(myt?'ORDER IT UP, OR PASS?':nameFor(S,S.turn,me)+' IS BIDDING...',126,1);
+   if(myt){const bs=[[(S.dealer===me?'PICK UP':'ORDER UP'),{t:'order'},'green'],[(S.dealer===me?'PICK UP ALONE':'ORDER ALONE'),{t:'order',alone:true},'yellow'],['PASS',{t:'pass'},'red']];let x=Math.round((W-(bs.length*92+8))/2);bs.forEach(b=>{Btn(b[0],x,194,92,16,()=>act(b[1]),{st:b[2]});x+=96})}}
+  else if(S.phase==='bid2'){msgBar(myt?'NAME TRUMP, OR PASS?':nameFor(S,S.turn,me)+' IS BIDDING...',126,1);
+   if(myt){const ts=[0,1,2,3].filter(s=>s!==su(S.turned));let x=8;ts.forEach(s=>{Btn(SN[s],x,194,66,16,()=>act({t:'call',suit:s,alone:!!UI.alone}),{st:s===1||s===2?'red':'gray'});x+=70});
+    Btn(UI.alone?'ALONE: ON':'ALONE: OFF',x,194,62,16,()=>{UI.alone=!UI.alone},{st:UI.alone?'yellow':'blue'});x+=66;if(S.dealer!==me)Btn('PASS',x,194,44,16,()=>act({t:'pass'}),{st:'red'})}}
+  else if(S.phase==='discard')msgBar(myt?'CLICK A CARD TO DISCARD':nameFor(S,S.dealer,me)+' IS DISCARDING...',126,1);
+  else if(S.phase==='play')msgBar(myt?'YOUR PLAY':nameFor(S,S.turn,me)+' TO PLAY',126,1);
+  else if(S.phase==='tshow')msgBar(nameFor(S,S.tw,me)+' TAKES THE TRICK',126,1);
+  else if(S.phase==='result'||S.phase==='over')msgBar((S.hp&&S.hp.team===us?'YOUR TEAM: ':'THEIR TEAM: ')+S.msg,126,1)}};
+
+/* ===================== GO FISH ===================== */
+function gfBooks(S,seat){const cnt={};S.hands[seat].forEach(c=>cnt[rk(c)]=(cnt[rk(c)]||0)+1);
+ Object.keys(cnt).forEach(r=>{if(cnt[r]===4){S.hands[seat]=S.hands[seat].filter(c=>rk(c)!==+r);S.books[seat].push(+r);for(let j=0;j<S.n;j++)S.asked[j]=S.asked[j].filter(x=>x!==+r)}})}
+function gfDone(S){return S.books.reduce((a,b)=>a+b.length,0)>=13||(!S.pool.length&&S.hands.filter(h=>h.length).length<=1)}
+const gfHasOpp=(S,seat)=>range(S.n).some(j=>j!==seat&&S.hands[j].length>0);
+function gfNext(S){for(let k=0;k<S.n*2+2;k++){if(gfDone(S)){S.phase='over';return}S.turn=(S.turn+1)%S.n;gfFill(S);if(!S.hands[S.turn].length)continue;
+  if(gfHasOpp(S,S.turn))return;if(S.pool.length){S.hands[S.turn].push(S.pool.pop());gfBooks(S,S.turn)}}S.phase='over'}
+function gfAgain(S,seat){gfFill(S);if(!S.hands[seat].length||!gfHasOpp(S,seat))gfNext(S)}
+function gfFill(S){const h=S.hands[S.turn];if(!h.length&&S.pool.length){h.push(S.pool.pop());gfBooks(S,S.turn)}}
+function gfAsk(S,seat,to,r){const th=S.hands[to];const got=th.filter(c=>rk(c)===r);S.asked[seat].push(r);S.asked[seat]=[...new Set(S.asked[seat])];const A=S.names[seat],B=S.names[to];
+ S.last={by:seat,to,r,got:got.length};
+ if(got.length){S.hands[to]=th.filter(c=>rk(c)!==r);S.hands[seat].push(...got);S.asked[to]=S.asked[to].filter(x=>x!==r);gfBooks(S,seat);S.msg=A+' ASKED '+B+' FOR '+RL[r]+'S: GOT '+got.length+'!';
+  if(gfDone(S)){S.phase='over';return}gfAgain(S,seat);return}
+ if(S.pool.length){const c=S.pool.pop();S.hands[seat].push(c);const lucky=rk(c)===r;gfBooks(S,seat);S.msg=A+' ASKED '+B+' FOR '+RL[r]+'S: GO FISH!'+(lucky?' LUCKY CATCH - GO AGAIN':'');
+  if(gfDone(S)){S.phase='over';return}if(lucky){gfAgain(S,seat);return}}
+ else S.msg=A+' ASKED '+B+' FOR '+RL[r]+'S: GO FISH! (EMPTY POND)';
+ gfNext(S)}
+GAMES.gofish={id:'gofish',name:'GO FISH',min:2,max:4,defBots:2,delay:900,
+ rules:['COLLECT BOOKS: ALL 4 CARDS OF A SAME RANK. MOST BOOKS WINS.','EVERYONE GETS 7 CARDS (5 IF 3 OR 4 PLAYERS). THE REST IS THE POND.','ON YOUR TURN PICK A PLAYER AND A RANK YOU ALREADY HOLD. CLICK THEIR NAME, THEN ONE OF YOUR CARDS TO ASK.','IF THEY HAVE IT THEY GIVE YOU ALL OF THEM AND YOU GO AGAIN. IF NOT: GO FISH! DRAW FROM THE POND. DRAW THE RANK YOU ASKED FOR AND YOU GO AGAIN.','NO CARDS LEFT IN YOUR HAND ON YOUR TURN? DRAW ONE.'],
+ init(n){const d=shuffle(range(52));const per=n<=2?7:5;const S={n,hands:range(n).map(()=>d.splice(0,per)),pool:d,books:range(n).map(()=>[]),asked:range(n).map(()=>[]),turn:0,phase:'play',msg:'CLICK A PLAYER, THEN A CARD',last:null};
+  S.names=range(n).map(i=>'P'+(i+1));for(let i=0;i<n;i++)gfBooks(S,i);return S},
+ turn(S){return S.phase==='over'?null:S.turn},
+ act(S,seat,a){if(seat!==S.turn||a.t!=='ask'||S.phase!=='play')return false;if(a.to===seat||!(a.to>=0&&a.to<S.n)||!S.hands[a.to].length)return false;if(!S.hands[seat].some(c=>rk(c)===a.r))return false;gfAsk(S,seat,a.to,a.r);return true},
+ fallback(S,t){gfNext(S)},
+ bot(S,i){const h=S.hands[i];const opp=range(S.n).filter(j=>j!==i&&S.hands[j].length);if(!opp.length)return null;const ranks=[...new Set(h.map(rk))];
+  for(const j of opp){const k=ranks.filter(r=>S.asked[j].includes(r));if(k.length&&Math.random()<.85)return{t:'ask',to:j,r:pick(k)}}
+  const cnt={};h.forEach(c=>cnt[rk(c)]=(cnt[rk(c)]||0)+1);const mx=Math.max(...Object.values(cnt));const best=ranks.filter(r=>cnt[r]===mx);return{t:'ask',to:pick(opp),r:Math.random()<.6?pick(best):pick(ranks)}},
+ mine(S,me){const m=Math.max(...S.books.map(b=>b.length));return S.books[me].length===m?1:-1},
+ over(S,me){const o=range(S.n).sort((a,b)=>S.books[b].length-S.books[a].length);return[nameFor(S,o[0],me)+' WINS WITH '+S.books[o[0]].length+' BOOKS!'].concat(o.map(i=>nameFor(S,i,me)+': '+S.books[i].length+' BOOKS'))},
+ draw(S,me){const opp=range(S.n).filter(i=>i!==me&&S.hands[i].length);if(!(UI.tgt>=0)||!opp.includes(UI.tgt))UI.tgt=opp[0];
+  for(let i=0;i<S.n;i++){const pos=posOf(S,me,i);const h=i===me?S.hands[i].slice().sort((a,b)=>rk(a)-rk(b)):S.hands[i];const bk=S.books[i].length;
+   const sel=i!==me&&UI.tgt===i&&S.turn===me;const[x,y,al]=labelXY(pos);
+   T((S.turn===i?'>':'')+(sel?'[':'')+nameFor(S,i,me)+(sel?']':'')+' BK:'+bk,x,y,S.turn===i?K.yl:K.wh,{al,sh:K.bk});
+   const fp=fanPos(pos,Math.max(1,h.length),{step:pos==='b'?16:pos==='t'?10:8});
+   h.forEach((c,k)=>{const ok=i===me&&S.turn===me&&S.phase==='play';card(i===me?c:-1,fp[k][0],fp[k][1],{sel:ok&&UI.tgt>=0&&false});if(ok)Hit(fp[k][0],fp[k][1],k<h.length-1?16:26,36,()=>{if(UI.tgt>=0)act({t:'ask',to:UI.tgt,r:rk(c)})})});
+   if(i!==me&&S.turn===me&&S.hands[i].length){const w=Math.max(60,tw(S.names[i])+30);Hit(pos==='r'?374-w:pos==='l'?10:192-w/2,pos==='t'?8:56,w,fp[0][1]+40-(pos==='t'?8:56),()=>{UI.tgt=i;sfx('click')})}
+   if(bk&&i!==me){const sx=pos==='r'?374:pos==='l'?10:192;T(S.books[i].map(r=>RL[r]).join(' '),sx,pos==='t'?56:fp[0][1]+40,K.gn2,{al:pos==='r'?'r':pos==='l'?'l':'c'})}}
+  if(S.books[me].length)T('MY BOOKS: '+S.books[me].map(r=>RL[r]).join(' '),10,194,K.gn2,{sh:K.bk});
+  card(-1,179,70);T('POND '+S.pool.length,192,108,K.gy,{al:'c'});
+  msgBar(S.turn===me&&S.phase==='play'?(UI.tgt>=0?'ASK '+nameFor(S,UI.tgt,me)+' FOR A RANK: CLICK A CARD':''):nameFor(S,S.turn,me)+' IS ASKING...',118,1);
+  if(S.msg)T(S.msg,192,130,K.wh,{al:'c',sh:K.bk})}};
+
+/* ===================== MEMORY (MATCH 2) ===================== */
+GAMES.memory={id:'memory',name:'MEMORY',min:1,max:4,defBots:1,delay:900,autoDelay:1300,opts:[{key:'size',label:'CARDS',vals:[12,20,28],def:20}],
+ rules:['CARDS ARE LAID FACE DOWN. ON YOUR TURN FLIP ANY TWO CARDS.','IF THEY MATCH IN RANK (LIKE TWO 7S) YOU KEEP THE PAIR AND GO AGAIN.','IF NOT, THEY FLIP BACK AND IT IS THE NEXT PLAYER\'S TURN. REMEMBER WHERE EVERYTHING IS!','THE PLAYER WITH THE MOST PAIRS WINS. SOLO MODE: TRY TO CLEAR THE BOARD IN THE FEWEST TURNS.'],
+ init(n,o){const size=o.size||20;const ranks=shuffle(range(13)).slice(0,size/2);const cards=[];ranks.forEach(r=>{const ss=shuffle([0,1,2,3]).slice(0,2);ss.forEach(s=>cards.push(s*13+r))});shuffle(cards);
+  return{n,size,cols:size===12?4:size===20?5:7,grid:cards,got:cards.map(()=>-1),up:[],phase:'play',turn:0,score:Array(n).fill(0),bm:range(n).map(()=>({})),tries:0,msg:''}},
+ turn(S){return S.phase==='peek'?-3:S.phase==='over'?null:S.turn},
+ act(S,seat,a){if(seat!==S.turn||S.phase!=='play'||a.t!=='flip')return false;const i=a.i;if(!(i>=0&&i<S.grid.length)||S.got[i]>=0||S.up.includes(i)||S.up.length>=2)return false;
+  S.up.push(i);for(let b=0;b<S.n;b++)if(S.bot[b]&&Math.random()<.6)S.bm[b][i]=rk(S.grid[i]);
+  if(S.up.length===2){S.tries++;const[x,y]=S.up;if(rk(S.grid[x])===rk(S.grid[y])){S.got[x]=S.got[y]=seat;S.score[seat]++;S.up=[];S.msg='MATCH!';
+    if(S.got.every(v=>v>=0))S.phase='over'}else{S.phase='peek';S.msg='NO MATCH'}}return true},
+ auto(S){S.up=[];S.turn=(S.turn+1)%S.n;S.phase='play';S.msg=''},
+ bot(S,i){const m=S.bm[i];const un=range(S.grid.length).filter(k=>S.got[k]<0&&!S.up.includes(k));
+  if(!S.up.length){const known=Object.keys(m).map(Number).filter(k=>S.got[k]<0);for(const a of known){const b=known.find(k=>k!==a&&m[k]===m[a]);if(b!==undefined)return{t:'flip',i:a}}
+   const fresh=un.filter(k=>!(k in m));return{t:'flip',i:pick(fresh.length?fresh:un)}}
+  const a=S.up[0];const r=rk(S.grid[a]);const j=Object.keys(m).map(Number).find(k=>k!==a&&S.got[k]<0&&m[k]===r);if(j!==undefined)return{t:'flip',i:j};
+  const fresh=un.filter(k=>!(k in m));return{t:'flip',i:pick(fresh.length?fresh:un)}},
+ mine(S,me){return S.score[me]===Math.max(...S.score)?1:-1},
+ over(S,me){const o=range(S.n).sort((a,b)=>S.score[b]-S.score[a]);if(S.n===1)return['BOARD CLEARED IN '+S.tries+' TRIES'];return[nameFor(S,o[0],me)+' WINS WITH '+S.score[o[0]]+' PAIRS'].concat(o.map(i=>nameFor(S,i,me)+': '+S.score[i]))},
+ draw(S,me){const cols=S.cols,rows=Math.ceil(S.grid.length/cols);const gw=cols*30-4,gh=rows*40-4;const x0=Math.round(192-gw/2)+14,y0=Math.round(112-gh/2)-6;const cc=[K.yl,K.rl,K.bl2,K.gn2];
+  for(let i=0;i<S.n;i++){const y=24+i*30;T((S.turn===i&&S.phase!=='over'?'>':'')+nameFor(S,i,me),8,y,S.turn===i?K.yl:K.wh,{sh:K.bk});T(S.score[i]+' PAIRS',8,y+9,cc[i],{sh:K.bk})}
+  T('TRIES '+S.tries,8,150,K.gy);
+  S.grid.forEach((c,k)=>{const cx=x0+(k%cols)*30,cy=y0+((k/cols)|0)*40;const matched=S.got[k]>=0,up=S.up.includes(k);
+   card(matched||up?c:-1,cx,cy,{dim:matched});if(matched)frame(cx-1,cy-1,CW+2,CH+2,cc[S.got[k]%4],1);
+   if(up)frame(cx-1,cy-1,CW+2,CH+2,K.yl,1);
+   if(!matched&&!up&&S.turn===me&&S.phase==='play'&&S.up.length<2)Hit(cx,cy,CW,CH,()=>act({t:'flip',i:k}))});
+  msgBar(S.msg||(S.turn===me?'YOUR TURN - FLIP A CARD':nameFor(S,S.turn,me)+' IS PICKING...'),y0+gh+8>196?190:y0+gh+10,1)}};
+/* ===================== SOLITAIRE (Klondike, draw 1) ===================== */
+const sr=c=>(rk(c)+1)%13; // ace low
+const fcount=P=>sum(P.found.map(f=>f.length));
+function solBoard(deck){const d=deck.slice();const tab=[];for(let i=0;i<7;i++){const col=[];for(let j=0;j<=i;j++)col.push({c:d.pop(),up:j===i});tab.push(col)}
+ return{stock:d,waste:[],found:[[],[],[],[]],tab,cyc:0,done:false,win:false,moves:0}}
+function canFound(P,c){return sr(c)===P.found[su(c)].length}
+function canTab(P,c,i){const col=P.tab[i];if(!col)return false;if(!col.length)return sr(c)===12;const t=col[col.length-1];return t.up&&isRed(t.c)!==isRed(c)&&sr(c)===sr(t.c)-1}
+function solMove(P,from,to){let cards;
+ if(from.k==='w'){if(!P.waste.length)return false;cards=[P.waste[P.waste.length-1]]}
+ else if(from.k==='t'){const col=P.tab[from.i];if(!col||!(from.j>=0&&from.j<col.length)||!col[from.j].up)return false;cards=col.slice(from.j).map(x=>x.c);
+  for(let k=1;k<cards.length;k++)if(!(sr(cards[k])===sr(cards[k-1])-1&&isRed(cards[k])!==isRed(cards[k-1])))return false}
+ else if(from.k==='f'){const f=P.found[from.s];if(!f||!f.length)return false;cards=[f[f.length-1]]}else return false;
+ if(to.k==='f'){if(cards.length!==1||!canFound(P,cards[0]))return false;if(from.k==='f')return false}
+ else if(to.k==='t'){if(!canTab(P,cards[0],to.i))return false;if(from.k==='t'&&from.i===to.i)return false}else return false;
+ if(from.k==='w')P.waste.pop();else if(from.k==='t'){const col=P.tab[from.i];col.splice(from.j);if(col.length&&!col[col.length-1].up)col[col.length-1].up=true}else P.found[from.s].pop();
+ if(to.k==='f')P.found[su(cards[0])].push(cards[0]);else P.tab[to.i].push(...cards.map(c=>({c,up:true})));
+ P.moves++;P.cyc=0;if(fcount(P)===52)P.win=true;return true}
+function solDrawCard(P){if(P.stock.length)P.waste.push(P.stock.pop());else if(P.waste.length){P.stock=P.waste.reverse();P.waste=[];P.cyc++}else return false;return true}
+function solAuto(P){let any=false;for(let g2=0;g2<60;g2++){let m=false;
+  if(P.waste.length&&solMove(P,{k:'w'},{k:'f'}))m=true;
+  else for(let i=0;i<7;i++){const col=P.tab[i];if(col.length&&solMove(P,{k:'t',i,j:col.length-1},{k:'f'})){m=true;break}}
+  if(!m)break;any=true}return any}
+function solBotMove(P){
+ if(P.waste.length){const c=P.waste[P.waste.length-1];if(canFound(P,c))return{t:'mv',from:{k:'w'},to:{k:'f'}}}
+ for(let i=0;i<7;i++){const col=P.tab[i];if(col.length){const c=col[col.length-1].c;if(canFound(P,c))return{t:'mv',from:{k:'t',i,j:col.length-1},to:{k:'f'}}}}
+ for(let i=0;i<7;i++){const col=P.tab[i];const j0=col.findIndex(x=>x.up);if(j0<=0)continue;
+  for(let k=0;k<7;k++){if(k===i)continue;if(canTab(P,col[j0].c,k))return{t:'mv',from:{k:'t',i,j:j0},to:{k:'t',i:k}}}}
+ if(P.waste.length){const c=P.waste[P.waste.length-1];for(let k=0;k<7;k++)if(canTab(P,c,k))return{t:'mv',from:{k:'w'},to:{k:'t',i:k}}}
+ // tableau stack moves that free an empty column for a king waiting in waste
+ if(P.stock.length||(P.waste.length&&P.cyc<3))return{t:'draw'};
+ return{t:'done'}}
+function solCheck(S){const w=S.boards.findIndex(P=>P.win);if(w>=0){S.winner=w;S.phase='over';return}if(S.boards.every(P=>P.done)){S.winner=-1;S.phase='over'}}
+GAMES.solitaire={id:'solitaire',name:'SOLITAIRE',min:1,max:4,defBots:0,delay:420,
+ rules:['KLONDIKE SOLITAIRE, DRAW ONE. BUILD 4 FOUNDATION PILES FROM ACE UP TO KING, ONE PER SUIT.','TABLEAU: STACK CARDS DOWN IN ALTERNATING COLORS (RED 7 ON BLACK 8). ONLY KINGS CAN GO ON EMPTY COLUMNS.','CLICK A CARD TO PICK IT UP (AND THE CARDS ON TOP OF IT), THEN CLICK WHERE IT GOES. DOUBLE CLICK A CARD TO SEND IT HOME. CLICK THE STOCK TO DRAW.','MULTIPLAYER IS A RACE: EVERYONE GETS THE SAME DEAL. FIRST TO CLEAR THE BOARD WINS, OR MOST CARDS HOME WHEN EVERYONE IS STUCK. BOTS PLAY TOO.'],
+ init(n){const deck=shuffle(range(52));return{n,boards:range(n).map(()=>solBoard(deck)),phase:'play',winner:-1}},
+ turn(S){if(S.phase==='over')return null;for(let i=0;i<S.n;i++)if(S.bot[i]&&!S.boards[i].done&&!S.boards[i].win)return i;return null},
+ act(S,seat,a){if(S.phase!=='play')return false;const P=S.boards[seat];if(!P||P.done||P.win)return false;let ok=false;
+  if(a.t==='draw')ok=solDrawCard(P);else if(a.t==='mv')ok=solMove(P,a.from||{},a.to||{});else if(a.t==='auto')ok=solAuto(P);else if(a.t==='done'){P.done=true;ok=true}
+  if(ok)solCheck(S);return ok},
+ bot(S,i){return solBotMove(S.boards[i])},
+ fallback(S,t){S.boards[t].done=true;solCheck(S)},
+ mine(S,me){return S.winner===me?1:-1},
+ over(S,me){const l=[];if(S.winner>=0)l.push(nameFor(S,S.winner,me)+' CLEARED THE BOARD!');else l.push(S.n>1?'NOBODY CLEARED IT - MOST CARDS HOME:':'NO MORE MOVES - CARDS HOME: '+fcount(S.boards[me]));
+  if(S.n>1)range(S.n).sort((a,b)=>fcount(S.boards[b])-fcount(S.boards[a])).forEach(i=>l.push(nameFor(S,i,me)+': '+fcount(S.boards[i])+'/52'));return l},
+ draw(S,me){const P=S.boards[me];const X=i=>12+i*32;const sel=UI.sel;
+  const hlSel=(k)=>sel&&sel.k===k;
+  // stock + waste
+  if(P.stock.length)card(-1,X(0),14);else emptySlot(X(0),14,CW,CH,'O');Hit(X(0),14,CW,CH,()=>solClick(S,{k:'stock'}));
+  if(P.waste.length){const c=P.waste[P.waste.length-1];card(c,X(1),14,{sel:hlSel('w')});Hit(X(1),14-5,CW,CH+5,()=>solClick(S,{k:'waste'}))}else emptySlot(X(1),14);
+  T(String(P.stock.length),X(0)+13,52,K.gy,{al:'c'});
+  for(let s=0;s<4;s++){const x=X(3+s);const f=P.found[s];if(f.length)card(f[f.length-1],x,14,{sel:hlSel('f')&&sel.s===s});else{emptySlot(x,14);g.drawImage(suitSpr(s,7,'#3a9a5a',1),x+9,28)}Hit(x,14,CW,CH,()=>solClick(S,{k:'found',s}))}
+  // tableau
+  for(let i=0;i<7;i++){const col=P.tab[i];const x=X(i);const ups=col.filter(c=>c.up).length,dns=col.length-ups;
+   const maxh=152;let us=9;if(ups>1&&36+dns*2+(ups-1)*us>maxh)us=Math.max(4,Math.floor((maxh-36-dns*2)/(ups-1)));
+   if(!col.length){emptySlot(x,60,CW,CH,'K');Hit(x,60,CW,CH,()=>solClick(S,{k:'tab',i,j:-1}));continue}
+   let y=60;const ys=[];col.forEach((e,j)=>{ys.push(y);const selected=sel&&sel.k==='t'&&sel.i===i&&j>=sel.j;card(e.up?e.c:-1,x,y-(selected?3:0),{});if(selected)frame(x-1,y-4,CW+2,(j===col.length-1?CH:us)+2+(j===col.length-1?0:0),K.yl,1);y+=e.up?us:2});
+   for(let j=col.length-1;j>=0;j--){const h=j===col.length-1?CH:(col[j].up?us:2);if(col[j].up||j===col.length-1)Hit(x,ys[j],CW,h,()=>solClick(S,{k:'tab',i,j}))}}
+  // side panel
+  const px=244;panel(px,18,132,86,'RACE');
+  const order=S.n>1?range(S.n):[];order.forEach((i,k)=>{const y=29+k*14;T(nameFor(S,i,me),px+8,y,i===me?K.yl:K.wh);T(fcount(S.boards[i])+'/52',px+124,y,S.boards[i].win?K.gn2:K.gy,{al:'r'});const st=S.boards[i].done?'STUCK':S.boards[i].win?'WIN!':'';if(st)T(st,px+50,y,K.rl)});
+  if(S.n===1){T('MOVES '+P.moves,px+8,30,K.gy);T('HOME '+fcount(P)+'/52',px+8,44,K.wh)}
+  Btn('AUTO HOME',px,112,64,14,()=>act({t:'auto'}),{st:'blue'});Btn('GIVE UP',px+68,112,64,14,()=>{UI.sel=null;act({t:'done'})},{st:'red'});
+  wrap('CLICK A CARD THEN CLICK WHERE IT GOES. DOUBLE CLICK SENDS IT HOME.',21).forEach((l,i)=>T(l,px+2,134+i*9,K.gy));
+  if(P.done&&S.phase==='play')msgBar('YOU GAVE UP - WAITING FOR THE OTHERS...',200,1)}};
+function solClick(S,tgt){const P=S.boards[RM.me];if(!P||P.done||P.win)return;const sel=UI.sel;
+ if(tgt.k==='stock'){UI.sel=null;act({t:'draw'});return}
+ if(!sel){if(tgt.k==='waste'){if(P.waste.length)UI.sel={k:'w'}}else if(tgt.k==='tab'&&tgt.j>=0){if(P.tab[tgt.i][tgt.j]&&P.tab[tgt.i][tgt.j].up)UI.sel={k:'t',i:tgt.i,j:tgt.j}}else if(tgt.k==='found'&&P.found[tgt.s].length)UI.sel={k:'f',s:tgt.s};return}
+ const same=(sel.k==='w'&&tgt.k==='waste')||(sel.k==='t'&&tgt.k==='tab'&&tgt.i===sel.i&&tgt.j===sel.j)||(sel.k==='f'&&tgt.k==='found'&&tgt.s===sel.s);
+ if(same){act({t:'mv',from:sel,to:{k:'f'}});UI.sel=null;return}
+ if(tgt.k==='found'){act({t:'mv',from:sel,to:{k:'f'}});UI.sel=null;return}
+ if(tgt.k==='tab'){act({t:'mv',from:sel,to:{k:'t',i:tgt.i}});UI.sel=null;return}
+ if(tgt.k==='waste'&&P.waste.length){UI.sel={k:'w'};return}UI.sel=null}
+/* ---------- main loop ---------- */
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);const sc=s>=2?Math.floor(s):s;cv.style.width=Math.round(W*sc)+'px';cv.style.height=Math.round(H*sc)+'px'}
+addEventListener('resize',fit);fit();
+function ptr(e){const r=cv.getBoundingClientRect();mouse.x=(e.clientX-r.left)*W/r.width;mouse.y=(e.clientY-r.top)*H/r.height}
+cv.addEventListener('pointerdown',e=>{ptr(e);mouse.down=true;ac();for(let i=buttons.length-1;i>=0;i--){const b=buttons[i];if(hitIn(b,mouse.x,mouse.y)){b.fn();break}}e.preventDefault()});
+cv.addEventListener('pointermove',ptr);
+addEventListener('pointerup',()=>{mouse.down=false});
+cv.addEventListener('pointerleave',()=>{mouse.x=-1;mouse.y=-1;mouse.down=false});
+document.addEventListener('keydown',e=>{
+ if(RM.screen==='join'){if(e.key==='Backspace'){RM.joinCode=RM.joinCode.slice(0,-1)}else if(e.key==='Enter'){if(RM.joinCode.length===4)joinRoom(RM.joinCode)}else if(e.key==='Escape'){RM.screen='menu'}else if(e.key.length===1)addJoinChar(e.key)}
+ else if(e.key==='Escape'){if(RM.screen==='hub')RM.screen='menu';else if(RM.screen==='play'){UI.help=false;UI.confirm=!UI.confirm}}
+ else if(e.key==='?'&&RM.screen==='play')UI.help=!UI.help});
+let errN=0;
+function loop(t){now=t;buttons=[];g=ctx;
+ if(RM.notice){if(!RM.noticeT)RM.noticeT=now;if(now-RM.noticeT>4500){RM.notice='';RM.noticeT=0}}
+ try{drawScreen()}catch(err){if(errN++<5)console.error(err);g=ctx;R(0,0,W,16,K.rd);T('ERROR: '+String(err.message).slice(0,58),4,4,K.wh);Btn('RESET',160,100,64,16,()=>{leaveRoom('');RM.screen='menu'},{st:'yellow'})}
+ requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script></body></html>
