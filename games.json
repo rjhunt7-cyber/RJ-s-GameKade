@@ -17,6 +17,14 @@
       "thumbnail": "games/aces-arcade.jpg?v=mvbxg363"
     },
     {
+      "id": "ballistic",
+      "title": "BALLISTIC",
+      "path": "games/ballistic.html",
+      "kind": "file",
+      "added": "2026-10-17T05:17:29.141Z",
+      "thumbnail": "games/ballistic.jpg?v=mvby38xh"
+    },
+    {
       "id": "dead-scope",
       "title": "Dead Scope",
       "path": "games/dead-scope.html",
@@ -49,6 +57,6 @@
       "thumbnail": "games/rjs-nutty-adventure.jpg?v=mvbifxzo"
     }
   ],
-  "count": 6,
-  "updated": "2026-10-17T04:59:28.614Z"
+  "count": 7,
+  "updated": "2026-10-17T05:17:29.141Z"
 }
