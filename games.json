@@ -55,8 +55,16 @@
       "kind": "file",
       "added": "2026-10-16T21:59:27.621Z",
       "thumbnail": "games/rjs-nutty-adventure.jpg?v=mvbifxzo"
+    },
+    {
+      "id": "toad-room-server",
+      "title": "Toad Room Server",
+      "path": "games/toad-room-server.html",
+      "kind": "file",
+      "added": "2026-10-17T16:41:52.775Z",
+      "thumbnail": "games/toad-room-server.jpg?v=mvcmjduj"
     }
   ],
-  "count": 7,
-  "updated": "2026-10-17T05:17:29.141Z"
+  "count": 8,
+  "updated": "2026-10-17T16:41:52.777Z"
 }
