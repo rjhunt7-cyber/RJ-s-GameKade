@@ -9,6 +9,14 @@
       "thumbnail": "games/8bit-chess.jpg?v=mvbfxh65"
     },
     {
+      "id": "dead-scope",
+      "title": "Dead Scope",
+      "path": "games/dead-scope.html",
+      "kind": "file",
+      "added": "2026-10-17T01:08:41.513Z",
+      "thumbnail": "games/dead-scope.jpg?v=mvbp7apl"
+    },
+    {
       "id": "grave-rush",
       "title": "Grave Rush",
       "path": "games/grave-rush.html",
@@ -33,6 +41,6 @@
       "thumbnail": "games/rjs-nutty-adventure.jpg?v=mvbifxzo"
     }
   ],
-  "count": 4,
-  "updated": "2026-10-17T01:07:14.316Z"
+  "count": 5,
+  "updated": "2026-10-17T01:08:41.514Z"
 }
