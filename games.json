@@ -25,6 +25,14 @@
       "thumbnail": "games/grave-rush.jpg?v=mvb48g1l"
     },
     {
+      "id": "knightmares",
+      "title": "Knightmares",
+      "path": "games/knightmares.html",
+      "kind": "file",
+      "added": "2026-10-17T04:08:45.902Z",
+      "thumbnail": "games/knightmares.jpg?v=mvbvmvg6"
+    },
+    {
       "id": "rjs-nutty-adventure",
       "title": "Rjs Nutty Adventure",
       "path": "games/rjs-nutty-adventure.html",
@@ -33,6 +41,6 @@
       "thumbnail": "games/rjs-nutty-adventure.jpg?v=mvbifxzo"
     }
   ],
-  "count": 4,
-  "updated": "2026-10-17T04:08:26.019Z"
+  "count": 5,
+  "updated": "2026-10-17T04:08:45.902Z"
 }
