@@ -940,7 +940,7 @@ function moveBody(b, dx, dz, dt, opts) {
     let nx = b.x + sx, nz = b.z + sz;
     // steep terrain
     const gh0 = groundH(b.x, b.z), gh1 = groundH(nx, nz);
-    if (b.y < gh1 + 0.3 && gh1 > gh0 + 0.005) { const sl = groundSlope(nx, nz); if (sl.ny < MAX_SLOPE_NY) {
+    if (gh1 > b.y + 0.04 && b.y < gh1 + 0.3 && gh1 > gh0 + 0.005) { const sl = groundSlope(nx, nz); if (sl.ny < MAX_SLOPE_NY) {
       // slide: remove uphill component
       const gl = Math.hypot(sl.gx, sl.gz) || 1, ux = sl.gx / gl, uz = sl.gz / gl; const dot = sx * ux + sz * uz;
       nx = b.x + sx - ux * Math.max(0, dot) * 1.05; nz = b.z + sz - uz * Math.max(0, dot) * 1.05; blocked = true;
@@ -1033,7 +1033,7 @@ function sbox(F, lx, ly0, lz, w, h, d, lyaw, o) {
   o = o || {}; const [x, z] = F.w(lx, lz); const y0 = F.y + ly0, yaw = F.yaw + (lyaw || 0);
   const b = o.b || wb(x, z); b.pushTRS(x, y0 + h / 2, z, yaw, o.rx || 0, o.rz || 0); b.box(0, 0, 0, w / 2, h / 2, d / 2, o); b.pop();
   let c = null; if (o.col !== false && !o.rx && !o.rz) c = addBoxCol(x, z, w / 2, d / 2, y0, y0 + h, yaw, o.surf || surfOfLayer(o.layer), o.colx);
-  if (KM_DEBUG_WORLD_CHECK && o.faces !== 0) { const ca = Math.abs(Math.cos(yaw)), sa = Math.abs(Math.sin(yaw)), ex = ca * w / 2 + sa * d / 2, ez = sa * w / 2 + ca * d / 2, ey = o.rx || o.rz ? Math.max(h, d, w) / 2 : h / 2; dbgRecordPart([x - ex, y0 + h / 2 - ey, z - ez], [x + ex, y0 + h / 2 + ey, z + ez], 'box'); }
+  if (KM_DEBUG_WORLD_CHECK && o.faces !== 0) { const ca = Math.abs(Math.cos(yaw)), sa = Math.abs(Math.sin(yaw)), ex = ca * w / 2 + sa * d / 2, ez = sa * w / 2 + ca * d / 2, ey = o.rx || o.rz ? Math.max(h, d, w) / 2 : h / 2; dbgRecordPart([x - ex, y0 + h / 2 - ey, z - ez], [x + ex, y0 + h / 2 + ey, z + ez], 'box', !!c, o.layer); }
   if (o.noGrass !== false && y0 < groundH(x, z) + 0.6) markNoGrass(x, z, w / 2 + 0.25, d / 2 + 0.25, yaw);
   return c;
 }
@@ -1041,7 +1041,7 @@ function scyl(F, lx, ly0, lz, r0, r1, h, seg, o) {
   o = o || {}; const [x, z] = F.w(lx, lz); const y0 = F.y + ly0; const b = o.b || wb(x, z);
   b.pushTRS(x, 0, z, F.yaw + (o.yaw || 0)); b.cyl(0, y0, 0, r0, r1, h, seg, o); b.pop();
   let c = null; if (o.col !== false) c = addCylCol(x, z, Math.max(r0, r1) * (o.colScale || 0.95), y0, y0 + h, o.surf || surfOfLayer(o.layer), o.colx);
-  if (KM_DEBUG_WORLD_CHECK) { const r = Math.max(r0, r1); dbgRecordPart([x - r, y0, z - r], [x + r, y0 + h, z + r], 'cylinder'); }
+  if (KM_DEBUG_WORLD_CHECK) { const r = Math.max(r0, r1); dbgRecordPart([x - r, y0, z - r], [x + r, y0 + h, z + r], 'cylinder', !!c, o.layer); }
   if (o.noGrass !== false && y0 < groundH(x, z) + 0.6) markNoGrass(x, z, Math.max(r0, r1) + 0.3, Math.max(r0, r1) + 0.3, 0);
   return c;
 }
@@ -1134,7 +1134,7 @@ function bed(F, lx, lz, yaw, o) {
   addBoxColF(B, 0, 0.05, 0, w / 2 - 0.05, len / 2 - 0.15, legH + 0.12, legH + 0.32, 'wood', { noStand: false });
   sbox(B, 0, 0, -len / 2 - 0.03, w + 0.08, 1.15, 0.07, 0, { layer: L.WOOD, surf: 'wood' }); // headboard
   sbox(B, 0, 0, len / 2 + 0.03, w + 0.08, 0.75, 0.07, 0, { layer: L.WOOD, surf: 'wood' });   // footboard
-  if (o.post) for (const sx of [-1, 1]) for (const sz of [-1, 1]) { sbox(B, sx * (w / 2 + 0.02), 0.8, sz * (len / 2 + 0.03), 0.1, 1.5, 0.1, 0, { layer: L.WOOD, col: false }); }
+  if (o.post) for (const sx of [-1, 1]) for (const sz of [-1, 1]) { sbox(B, sx * (w / 2 + 0.02), 0, sz * (len / 2 + 0.03), 0.1, 2.3, 0.1, 0, { layer: L.WOOD, col: false }); }
   if (o.post) { sbox(B, 0, 2.3, 0, w + 0.24, 0.08, len + 0.2, 0, { layer: L.CLOTH, col: false, faces: 63 }); }
   // hide: under the bed. entry point beside the long side (local +x)
   const [ex, ez] = B.w(w / 2 + 0.55, 0.2); const [hx, hz] = B.w(0, 0.3);
@@ -1209,7 +1209,7 @@ function cart(F, lx, lz, yaw) {
   sbox(B, 0, 0.7, 1.18, 1.4, 0.35, 0.05, 0, { layer: L.PLANK }); sbox(B, 0, 0.7, -1.18, 1.4, 0.35, 0.05, 0, { layer: L.PLANK });
   for (const s of [-1, 1]) { deco(B, s * 0.82, 0.48, 0.3, 0, b => { b.pushTRS(0, 0, 0, 0, 0, PI / 2); b.cyl(0, -0.05, 0, 0.48, 0.48, 0.1, 14, { layer: L.WOOD, tint: DARKW }); b.pop(); }); addBoxColF(B, s * 0.82, 0.3, 0, 0.06, 0.45, 0, 0.62, 'wood'); }
   sbox(B, 0, 0.45, 0.3, 1.7, 0.06, 0.06, 0, { layer: L.IRON, col: false });
-  for (const s of [-1, 1]) sbox(B, s * 0.45, 0.35, -2.0, 0.07, 0.07, 1.8, 0, { layer: L.WOOD, col: false, rx: -0.15 });
+  for (const s of [-1, 1]) { sbox(B, s * 0.45, 0.5, 0, 0.1, 0.12, 2.3, 0, { layer: L.WOOD, col: false, tint: DARKW }); sbox(B, s * 0.45, 0.47, -1.95, 0.07, 0.07, 1.6, 0, { layer: L.WOOD, col: false, rx: 0.1 }); }
   sbox(B, 0, 0, 0, 1.4, 0.62, 2.4, 0, { faces: 0, col: false });
 }
 function candleStick(F, lx, ly, lz, room) {
@@ -1266,7 +1266,7 @@ function hollowLog(x, z, yaw) {
 }
 function haystack(F, lx, lz, hide) {
   const [x, z] = F.w(lx, lz); deco(F, lx, 0, lz, 0, b => { b.ball(0, 0.75, 0, 1.15, 0.95, 1.15, 12, 7, { layer: L.HAY, uRep: 3, vRep: 2 }); b.cyl(0, 0, 0, 1.1, 1.05, 0.6, 12, { layer: L.HAY, caps: 1 }); });
-  addCylCol(x, z, 1.0, F.y, F.y + 1.5, 'dirt', { seeThrough: false }); markNoGrass(x, z, 1.4, 1.4, 0);
+  addCylCol(x, z, 1.12, F.y, F.y + 1.55, 'dirt', { seeThrough: false }); markNoGrass(x, z, 1.4, 1.4, 0);
   if (hide) { const [ex, ez] = F.w(lx, lz + 1.7); return addHide('hay', x, F.y + 0.75, z, F.yaw + PI, ex, ez, F.y); }
 }
 function coffin(F, lx, lz, yaw, ly, hide, es) {
@@ -1354,7 +1354,7 @@ function gableRoof(F, w, d, yTop, o) {
     if (o.gable !== L.STONE && o.gable !== L.PLANK) deco(F, gx, 0, 0, PI / 2, b => { b.box(0, yTop + rise * 0.45 + 0.02, 0, 0.08, rise * 0.45, (o.t || 0.25) / 2 + 0.055, { layer: L.TIMBER }); b.box(0, yTop + rise * 0.35, 0, d * 0.32, 0.08, (o.t || 0.25) / 2 + 0.05, { layer: L.TIMBER }); });
   }
   // tie beams inside
-  for (let x = -w / 2 + 1.6; x < w / 2 - 1; x += 2.2) sbox(F, x, yTop - 0.22, 0, 0.18, 0.2, d - 0.5, 0, { layer: L.TIMBER, col: false });
+  for (let x = -w / 2 + 1.6; x < w / 2 - 1; x += 2.2) sbox(F, x, yTop - 0.22, 0, 0.18, 0.2, d - 2 * (o.t || 0.25) + 0.08, 0, { layer: L.TIMBER, col: false });
   markNoGrass(F.x, F.z, w / 2 + 0.6, d / 2 + 0.6, F.yaw);
 }
 // generic timber house. spec: {x,z,yaw,w,d,storeys,doorX,roof,lit,upLit,kind,name}
@@ -1390,7 +1390,7 @@ function house(spec) {
   wall(F.sub(-w / 2 + t / 2, 0.3, 0, -PI / 2), d - 2 * t, 0, yTop - 0.3, t, mkOps('left', d).map(op => Object.assign(op, { y0: op.y0 - 0.3, y1: op.y1 - 0.3 })), wo);
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) sbox(F, sx * (w / 2 - 0.09), 0.3, sz * (d / 2 - 0.09), 0.28, yTop - 0.3, 0.28, 0, { layer: L.TIMBER, col: false, tint: [0.85, 0.8, 0.75] });
   // open door panel swung against the inside front wall
-  const ds = doorX > 0 ? 1 : -1; sbox(F, doorX - ds * 0.55 - ds * 0.03, fl, d / 2 - t - 0.53, 0.05, 2.25, 1.0, 0, { layer: L.PLANK, tint: [0.75, 0.62, 0.5], surf: 'wood' });
+  const ds = doorX > 0 ? 1 : -1; sbox(F, doorX - ds * 0.55 - ds * 0.03, fl, d / 2 - t - 0.5, 0.05, 2.25, 1.0, 0, { layer: L.PLANK, tint: [0.75, 0.62, 0.5], surf: 'wood' });
   deco(F, doorX - ds * 0.58, fl + 1.0, d / 2 - t - 0.95, 0, b => b.ball(0, 0, 0, 0.03, 0.06, 0.03, 6, 4, { layer: L.IRON }));
   // upper floor with stair hole
   if (st === 2) upperFloor(F, spec, w, d, t, SH);
@@ -1814,7 +1814,7 @@ function barn(F) {
   sbox(F, 0, -0.5, d / 2 - t / 2, w + 0.1, 0.58, t + 0.05, 0, { layer: L.STONE, aoGround: 0.6, faces: 63 - 4 });
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) sbox(F, sx * (w / 2 - 0.12), 0, sz * (d / 2 - 0.12), 0.26, H + 0.1, 0.26, 0, { layer: L.TIMBER, col: false });
   // open barn doors swung outward against the front wall
-  for (const s of [-1, 1]) sbox(F, s * 2.4, 0.1, d / 2 + 0.07, 1.55, 3.2, 0.06, 0, { layer: L.PLANK, tint: [0.6, 0.5, 0.42] });
+  for (const s of [-1, 1]) sbox(F, s * 2.4, 0.1, d / 2 + 0.03, 1.55, 3.2, 0.06, 0, { layer: L.PLANK, tint: [0.6, 0.5, 0.42] });
   gableRoof(F, w, d, H + 0.08, { layer: L.THATCH, gable: L.PLANK, t, pitch: 1.0 });
   haystack(F, -3.8, -2.3, true); haystack(F, 3.8, -2.4, true); haystack(F, -4.2, 1.6, false);
   const Fb = F.sub(0, 0.08, 0, 0); crate(Fb, 1.0, -3.4, 0.8, 0.1); crate(Fb, 0.0, -3.5, 0.8, -0.1); table(Fb, 3.6, 1.5, 1.4, 0.8, 0.0);
@@ -1905,7 +1905,8 @@ function buildBlackwood() {
     for (let r = 0; r < 3; r++) for (let k = 0; k < 4 - r; k++) deco(F, -4.2, 0.2 + r * 0.36, -2 + k * 0.4 + r * 0.2, 0, b => { b.pushTRS(0, 0, 0, 0, 0, PI / 2); b.cyl(0, -1.4, 0, 0.18, 0.18, 2.8, 8, { layer: L.BARK }); b.pop(); });
     addBoxColF(F, -4.2, -1.4, 0, 1.4, 0.9, 0, 1.1, 'wood');
     // lean-to
-    const LT = F.sub(-1.0, 0, -4.5, 0.1); for (const s of [-1, 1]) sbox(LT, s * 1.5, 0, 0.8, 0.12, 1.9, 0.12, 0, { layer: L.WOOD }); sbox(LT, 0, 1.4, 0, 3.4, 0.08, 2.0, 0, { layer: L.THATCH, rx: -0.55, col: false });
+    const LT = F.sub(-1.0, 0, -4.5, 0.1); for (const s of [-1, 1]) { sbox(LT, s * 1.5, 0, 0.8, 0.12, 1.9, 0.12, 0, { layer: L.WOOD }); sbox(LT, s * 1.5, 0, -0.8, 0.12, 0.95, 0.12, 0, { layer: L.WOOD }); } sbox(LT, 0, 1.4, 0, 3.4, 0.08, 2.0, 0, { layer: L.THATCH, rx: -0.55, col: false });
+    addBoxColF(LT, 0, -0.65, 0, 1.75, 0.35, 0, 1.15, 'wood');
     hollowLog(x - 6, z + 6, 1.9); addArea('The Woodcutter\u2019s Camp', x, z, 12, 12, 'camp'); }
   // more hollow logs scattered through the Blackwood
   for (const [x, z, a] of [[-40, 60, 0.3], [20, 75, 2.2], [-150, 40, 1.1], [80, 120, 0.7], [-60, 140, 2.8], [160, 0, 1.5], [-120, -90, 0.2], [150, 70, 2.4]]) hollowLog(x, z, a);
@@ -2195,7 +2196,7 @@ void main(){ vec3 c; if (v_t.z < 0.0) { float r = length(v_t.xy*2.0-1.0); float 
   o_col = vec4(c, 1.0); }`;
 const BRIGHT_FS = `uniform sampler2D u_tex; in vec2 v_uv; out vec4 o_col; void main(){ vec3 c = texture(u_tex, v_uv).rgb; float l = max(max(c.r,c.g),c.b); o_col = vec4(c * smoothstep(0.6, 2.2, l), 1.0); }`;
 const BLUR_FS = `uniform sampler2D u_tex; uniform vec2 u_dir; in vec2 v_uv; out vec4 o_col; void main(){ vec3 s = texture(u_tex, v_uv).rgb*0.227; s += (texture(u_tex, v_uv+u_dir*1.38).rgb + texture(u_tex, v_uv-u_dir*1.38).rgb)*0.316; s += (texture(u_tex, v_uv+u_dir*3.23).rgb + texture(u_tex, v_uv-u_dir*3.23).rgb)*0.07; o_col = vec4(s,1.0); }`;
-const POST_FS = `uniform sampler2D u_scene; uniform sampler2D u_bloom; uniform sampler2D u_prev; uniform float u_time; uniform float u_grain; uniform float u_bright; uniform float u_trails; uniform float u_tunnel; uniform float u_red; uniform float u_flash; uniform vec2 u_res; uniform float u_fade; uniform float u_glitch;
+const POST_FS = `uniform sampler2D u_scene; uniform sampler2D u_bloom; uniform sampler2D u_prev; uniform float u_time; uniform float u_grain; uniform float u_bright; uniform float u_trails; uniform float u_tunnel; uniform float u_red; uniform float u_flash; uniform vec2 u_res; uniform float u_fade; uniform float u_glitch; uniform float u_dread;
 in vec2 v_uv; out vec4 o_col;
 float h12(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 vec3 aces(vec3 x){ return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14), 0.0, 1.0); }
@@ -2212,10 +2213,12 @@ void main(){
   c = pow(c, vec3(1.0/2.2));
   // vignette + tunnel vision
   vec2 q = uv - 0.5; q.x *= u_res.x/u_res.y; float r = length(q);
-  c *= 1.0 - smoothstep(0.35, 1.05, r)*0.75;
+  float pulse = u_dread * (0.5 + 0.5*sin(u_time*(5.0 + u_dread*4.0)));
+  c *= 1.0 - smoothstep(0.35 - u_dread*0.15 - pulse*0.04, 1.05 - u_dread*0.25, r)*(0.75 + u_dread*0.2);
+  c = mix(c, vec3(dot(c, vec3(0.299,0.587,0.114)))*vec3(1.05,0.92,0.9), u_dread*0.35);
   float tv = smoothstep(0.08 + (1.0-u_tunnel)*0.5, 0.48 + (1.0-u_tunnel)*0.7, r); c *= 1.0 - tv*0.93*u_tunnel;
   // grain
-  float g = h12(uv*u_res + fract(u_time*13.7)*vec2(97.0, 41.0)) - 0.5; c += g * u_grain * 0.16 * (0.4 + (1.0-l));
+  float g = h12(uv*u_res + fract(u_time*13.7)*vec2(97.0, 41.0)) - 0.5; c += g * u_grain * (0.16 + u_dread*0.12) * (0.4 + (1.0-l));
   c += (h12(vec2(floor(uv.y*u_res.y*0.5), floor(u_time*30.0))) - 0.5) * 0.012 * u_grain;
   if (u_trails > 0.0) c = mix(c, texture(u_prev, uv).rgb, u_trails);
   c = mix(c, vec3(0.6,0.0,0.0), u_red*0.6) + vec3(u_flash);
@@ -2409,7 +2412,7 @@ function renderFrame(dt, V) {
   gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, R.b1Tex); gl.uniform1i(P.u.u_bloom, 1);
   gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, prevT); gl.uniform1i(P.u.u_prev, 2);
   gl.uniform1f(P.u.u_time, R.time); gl.uniform1f(P.u.u_grain, Settings.grain); gl.uniform1f(P.u.u_bright, Settings.brightness * (V.exposure || 1)); gl.uniform1f(P.u.u_trails, trails * (V.noTrails ? 0 : 1));
-  gl.uniform1f(P.u.u_tunnel, V.tunnel || 0); gl.uniform1f(P.u.u_red, V.red || 0); gl.uniform1f(P.u.u_flash, V.flash || 0); gl.uniform2f(P.u.u_res, R.cw, R.ch); gl.uniform1f(P.u.u_fade, V.fade === undefined ? 1 : V.fade); gl.uniform1f(P.u.u_glitch, V.glitch || 0); drawFSQ();
+  gl.uniform1f(P.u.u_tunnel, V.tunnel || 0); gl.uniform1f(P.u.u_red, V.red || 0); gl.uniform1f(P.u.u_flash, V.flash || 0); gl.uniform2f(P.u.u_res, R.cw, R.ch); gl.uniform1f(P.u.u_fade, V.fade === undefined ? 1 : V.fade); gl.uniform1f(P.u.u_glitch, V.glitch || 0); gl.uniform1f(P.u.u_dread, V.dread || 0); drawFSQ();
   gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, R.cw, R.ch); gl.useProgram(R.pCopy.p); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, curT); gl.uniform1i(R.pCopy.u.u_tex, 0); drawFSQ();
   gl.enable(gl.DEPTH_TEST); gl.bindVertexArray(null);
 }
@@ -2521,7 +2524,7 @@ function buildKnight() {
   rig.finish(); return rig;
 }
 // ---- the lantern: bail is one wire arc pinned to the cap, hanging from the grip point (origin) ----
-function lanternMesh(b, k) {
+function lanternMesh(b, k, openSide) {
   const I = { layer: L.IRON, tint: [0.75, 0.7, 0.65] }, ID = { layer: L.IRON, tint: [0.4, 0.37, 0.35] };
   const GLs = { layer: L.GLASS, flag: FL.EMISSIVE, emis: 0.16, tint: [1.25, 0.78, 0.38] };
   const capTop = -0.07 * k, pinY = capTop - 0.02 * k, half = 0.062 * k;
@@ -2532,12 +2535,16 @@ function lanternMesh(b, k) {
   for (const s of [-1, 1]) { b.ball(s * half, pinY, 0, 0.009 * k, 0.009 * k, 0.009 * k, 6, 4, ID); }
   // cap: ring on top, pierced pyramid roof, rim
   b.pushTRS(0, capTop + 0.004 * k, 0, 0, PI / 2, 0); b.cyl(0, -0.003 * k, 0, 0.014 * k, 0.014 * k, 0.006 * k, 8, Object.assign({ caps: 0 }, I)); b.pop();
-  b.cyl(0, capTop - 0.055 * k, 0, 0.074 * k, 0.012 * k, 0.05 * k, 4, Object.assign({ rot: PI / 4 }, I));
+  b.cyl(0, capTop - 0.055 * k, 0, 0.074 * k, 0.012 * k, 0.05 * k, 4, Object.assign({ rot: PI / 4 }, I)); b.cyl(0, capTop - 0.016 * k, 0, 0.016 * k, 0.014 * k, 0.012 * k, 8, ID);
   for (let q = 0; q < 4; q++) { const a = q * PI / 2; b.pushTRS(Math.sin(a) * 0.035 * k, capTop - 0.035 * k, Math.cos(a) * 0.035 * k, a, -0.75, 0); b.box(0, 0, 0.002 * k, 0.012 * k, 0.006 * k, 0.002 * k, { layer: L.ROCK, tint: [0.02, 0.02, 0.02] }); b.pop(); }
   const top = capTop - 0.055 * k; b.box(0, top - 0.006 * k, 0, 0.068 * k, 0.007 * k, 0.068 * k, I);
   // glass body with corner posts, bands and leaded panes
   const g0 = top - 0.165 * k, gh = 0.152 * k;
-  for (const [nx, nz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { b.pushTRS(nx * 0.055 * k, g0 + gh / 2, nz * 0.055 * k, Math.atan2(nx, nz)); b.box(0, 0, 0, 0.05 * k, gh / 2, 0.003 * k, GLs); b.box(0, 0, 0.0035 * k, 0.002 * k, gh / 2, 0.001 * k, ID); b.box(0, 0.01 * k, 0.0035 * k, 0.05 * k, 0.002 * k, 0.001 * k, ID); b.pop(); }
+  // candle, wax drips and a living flame inside
+  b.cyl(0, g0, 0, 0.016 * k, 0.015 * k, 0.065 * k, 8, { layer: L.BONE, tint: [1.45, 1.38, 1.2] }); for (let q = 0; q < 3; q++) b.ball(Math.cos(q * 2.1) * 0.015 * k, g0 + 0.045 * k - q * 0.012 * k, Math.sin(q * 2.1) * 0.015 * k, 0.004 * k, 0.012 * k, 0.004 * k, 4, 3, { layer: L.BONE, tint: [1.4, 1.3, 1.1] });
+  b.cyl(0, g0 + 0.065 * k, 0, 0.0015 * k, 0.0015 * k, 0.008 * k, 3, { layer: L.ROCK, tint: [0.1, 0.1, 0.1] }); b.ball(0, g0 + 0.088 * k, 0, 0.009 * k, 0.022 * k, 0.009 * k, 6, 5, { layer: L.FIRE, flag: FL.EMISSIVE, emis: 1, tint: [2.4, 1.5, 0.6] }); b.ball(0, g0 + 0.082 * k, 0, 0.005 * k, 0.011 * k, 0.005 * k, 5, 4, { layer: L.FIRE, flag: FL.EMISSIVE, emis: 1, tint: [2.6, 2.4, 1.6] });
+  b.ball(0, top - 0.015 * k, 0, 0.04 * k, 0.008 * k, 0.04 * k, 6, 3, { layer: L.ROCK, tint: [0.03, 0.025, 0.02] }); // soot under the cap
+  for (const [nx, nz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { b.pushTRS(nx * 0.055 * k, g0 + gh / 2, nz * 0.055 * k, Math.atan2(nx, nz)); if (openSide && nx === -1) { for (const yy of [-0.33, 0.33]) b.box(0, yy * gh, 0.0035 * k, 0.05 * k, 0.0025 * k, 0.0015 * k, ID); b.box(0, 0, 0.0035 * k, 0.0025 * k, gh / 2, 0.0015 * k, ID); b.pop(); continue; } b.box(0, 0, 0, 0.05 * k, gh / 2, 0.003 * k, GLs); b.box(0, 0, 0.0035 * k, 0.002 * k, gh / 2, 0.001 * k, ID); b.box(0, 0.01 * k, 0.0035 * k, 0.05 * k, 0.002 * k, 0.001 * k, ID); b.pop(); }
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) b.box(sx * 0.058 * k, g0 + gh / 2, sz * 0.058 * k, 0.0075 * k, gh / 2 + 0.004 * k, 0.0075 * k, I);
   b.box(0, g0 + gh * 0.5, 0, 0.061 * k, 0.004 * k, 0.061 * k, ID);
   b.box(0, g0 - 0.008 * k, 0, 0.072 * k, 0.01 * k, 0.072 * k, I); b.cyl(0, g0 - 0.04 * k, 0, 0.045 * k, 0.066 * k, 0.03 * k, 4, Object.assign({ rot: PI / 4 }, I));
@@ -2550,7 +2557,9 @@ function keyMesh(b, night, s, glow) {
   s = s || 1; const th = 0.0045 * s, R0 = 0.026 * s, cz = 0.03 * s;
   for (let i = 0; i < 14; i++) { const a0 = i / 14 * TAU, a1 = (i + 1) / 14 * TAU; const p0 = [Math.sin(a0) * R0, cz + Math.cos(a0) * R0], p1 = [Math.sin(a1) * R0, cz + Math.cos(a1) * R0];
     const my = (p0[0] + p1[0]) / 2, mz = (p0[1] + p1[1]) / 2, len = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]); b.pushTRS(0, my, mz, 0, -Math.atan2(p1[0] - p0[0], p1[1] - p0[1]), 0); b.box(0, 0, 0, th, 0.0055 * s, len / 2 + 0.0012 * s, o); b.pop(); }
-  b.box(0, 0, cz - R0 - 0.004 * s, th * 1.4, 0.008 * s, 0.006 * s, o);               // collar where the bow meets the shaft
+  for (let q = 0; q < 4; q++) { const a = q * PI / 2 + PI / 4, r2 = R0 * 0.42; const qy = Math.sin(a) * R0 * 0.38, qz = cz + Math.cos(a) * R0 * 0.38; for (let i = 0; i < 8; i++) { const a0 = i / 8 * TAU, a1 = (i + 1) / 8 * TAU; const p0 = [qy + Math.sin(a0) * r2, qz + Math.cos(a0) * r2], p1 = [qy + Math.sin(a1) * r2, qz + Math.cos(a1) * r2]; const my = (p0[0] + p1[0]) / 2, mz = (p0[1] + p1[1]) / 2, len = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]); b.pushTRS(0, my, mz, 0, -Math.atan2(p1[0] - p0[0], p1[1] - p0[1]), 0); b.box(0, 0, 0, th * 0.8, 0.0028 * s, len / 2 + 0.0008 * s, o); b.pop(); } }
+  b.ball(0, 0, cz, th * 1.6, 0.006 * s, 0.006 * s, 6, 4, o); // boss in the middle of the bow
+  b.box(0, 0, cz - R0 - 0.004 * s, th * 1.4, 0.008 * s, 0.006 * s, o); b.box(0, 0, cz - R0 - 0.014 * s, th * 1.25, 0.0065 * s, 0.003 * s, o); b.box(0, 0, -0.06 * s, th * 1.25, 0.0062 * s, 0.003 * s, o); // collar rings
   b.box(0, 0, -0.045 * s, th, 0.0045 * s, 0.05 * s, o);                              // shaft
   b.box(0, -0.016 * s, -0.082 * s, th, 0.0125 * s, 0.011 * s, o);                    // bit
   b.box(0, -0.03 * s, -0.088 * s, th, 0.004 * s, 0.005 * s, o); b.box(0, -0.03 * s, -0.074 * s, th, 0.004 * s, 0.003 * s, o); // teeth
@@ -2568,7 +2577,9 @@ function gauntletMesh(b) {
   for (let f = 0; f < 4; f++) { const x = -0.033 + f * 0.022; const w = f === 3 ? 0.0085 : 0.0098;
     for (let k = 0; k < angs.length - 1; k++) { const r = Rr + (k === 0 ? 0.006 : 0.003); const [y0, z0] = P(angs[k], r), [y1, z1] = P(angs[k + 1], r); const my = (y0 + y1) / 2, mz = (z0 + z1) / 2, len = Math.hypot(y1 - y0, z1 - z0);
       b.pushTRS(x, my, mz, 0, Math.atan2(-(y1 - y0), -(z1 - z0)) + PI, 0); b.box(0, 0, 0, w, 0.0075, len / 2 + 0.003, k % 2 ? DK : ST); b.pop(); }
-    const [ky, kz] = P(80, Rr + 0.01); b.ball(x, ky, kz, w * 1.1, 0.011, 0.012, 6, 4, ST); }                       // knuckle cops
+    const [ky, kz] = P(80, Rr + 0.01); b.ball(x, ky, kz, w * 1.1, 0.011, 0.012, 6, 4, ST);                       // knuckle cops
+    { const [ty, tz] = P(-150, Rr + 0.004); b.pushTRS(x, ty, tz, 0, -0.6, 0); b.cyl(0, 0, 0, w * 0.75, 0.0, 0.016, 4, DK); b.pop(); } // pointed finger tip
+    { const [gy, gz] = P(78, Rr + 0.02); b.pushTRS(x, gy, gz, 0, 0.6, 0); b.cyl(0, 0, 0, 0.005, 0.0, 0.016, 4, ST); b.pop(); } }       // gadling spike
   // leather palm under the fingers
   b.pushTRS(0, -0.004, 0.022, 0, 0, 0); b.box(0, 0, 0, 0.044, 0.016, 0.016, LE); b.pop();
   // back of the hand: three overlapping lames from the knuckles back to the wrist
@@ -2587,9 +2598,13 @@ function buildViewModel() {
     rig.part('arm', b => { // vambrace from the cuff toward the lower right corner, joined to the cuff
       b.pushTRS(0.075, 0.03, -0.006, ry, rx, 0); b.cyl(0, 0.02, 0, 0.046, 0.054, 0.34, 12, Object.assign({ caps: 1 }, ST));
       for (let k = 0; k < 3; k++) { const y = 0.07 + k * 0.09, r = 0.049 + k * 0.0022; b.cyl(0, y, 0, r + 0.003, r + 0.003, 0.012, 12, Object.assign({ caps: 0 }, DK)); for (let q = 0; q < 3; q++) { const a = -0.9 + q * 0.6; b.ball(Math.cos(a) * (r + 0.004), y + 0.006, Math.sin(a) * (r + 0.004), 0.0035, 0.0035, 0.0035, 4, 3, RV); } }
-      b.cyl(0, 0.3, 0, 0.056, 0.056, 0.028, 12, Object.assign({ caps: 0 }, { layer: L.CLOTH, tint: [0.4, 0.28, 0.2] })); b.pop(); });
+      b.cyl(0, 0.3, 0, 0.056, 0.056, 0.028, 12, Object.assign({ caps: 0 }, { layer: L.CLOTH, tint: [0.4, 0.28, 0.2] }));
+      b.box(-0.049, 0.18, 0, 0.006, 0.16, 0.009, ST); // raised ridge along the top
+      for (const y of [0.11, 0.24]) { b.cyl(0, y, 0, 0.0525 + y * 0.022, 0.0525 + y * 0.022, 0.016, 12, Object.assign({ caps: 0 }, { layer: L.M_ROBE, tint: [0.75, 0.6, 0.45] })); b.box(-0.058 - y * 0.02, y + 0.008, 0.012, 0.004, 0.012, 0.009, { layer: L.IRON, tint: [1.1, 0.95, 0.6] }); b.box(-0.06 - y * 0.02, y + 0.008, 0.03, 0.002, 0.007, 0.012, { layer: L.M_ROBE, tint: [0.75, 0.6, 0.45] }); }
+      for (let q = 0; q < 16; q++) { const a = q / 16 * TAU; b.ball(Math.cos(a) * 0.05, 0.006, Math.sin(a) * 0.05, 0.006, 0.008, 0.006, 4, 3, { layer: L.IRON, tint: [0.55, 0.55, 0.6] }); } // mail fringe
+      b.pop(); });
     rig.part('hand', b => gauntletMesh(b));
-    rig.part('item', b => { if (item === 'lantern') lanternMesh(b, 0.72); else { b.pushTRS(0, 0.0, -0.03, 0, 0, 0); keyMesh(b, night, 1.45, 2.6); b.pop(); } });
+    rig.part('item', b => { if (item === 'lantern') lanternMesh(b, 0.72, true); else { b.pushTRS(0, 0.0, -0.03, 0, 0, 0); keyMesh(b, night, 1.45, 2.6); b.pop(); } });
     rig.finish(); vm.rigs[item + (item === 'key' ? night : '')] = rig;
   }
   return vm;
@@ -3118,7 +3133,7 @@ const Audio2 = window.Audio2 = {
     this.timer = setInterval(() => this.schedule(), 25);
   },
   // smooth parameter change without zipper noise; only re-schedules when the target really changes
-  rampTo(param, target, tc) { const t = this.ctx.currentTime; if (param._tgt !== undefined && Math.abs(param._tgt - target) < 1e-4) return; param._tgt = target; param.cancelScheduledValues(t); param.setValueAtTime(param.value, t); param.setTargetAtTime(target, t, tc); },
+  rampTo(param, target, tc) { const t = this.ctx.currentTime; if (param._tgt !== undefined && Math.abs(param._tgt - target) < 1e-4) return; param._tgt = target; if (param.cancelAndHoldAtTime) param.cancelAndHoldAtTime(t); else { param.cancelScheduledValues(t); param.setValueAtTime(param.value, t); } param.setTargetAtTime(target, t, tc); },
   noiseBuf(sec, fn) { const c = this.ctx, n = Math.floor(c.sampleRate * sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = fn ? fn(i, n) : Math.random() * 2 - 1; return b; },
   applyVolume() { if (!this.ok) return; this.master.gain.value = Settings.master; this.musicOut.gain.value = Settings.music * 0.9; },
   // ---- primitive voices ----
@@ -3127,7 +3142,7 @@ const Audio2 = window.Audio2 = {
   piano(t, midi, vol, dest) { const f = 440 * Math.pow(2, (midi - 69) / 12); const d = dest || this.voices; this.tone(d, t, f, 3.2, vol, 'triangle', 0.004); this.tone(d, t, f * 2.002, 1.4, vol * 0.35, 'sine', 0.003); this.tone(d, t, f * 0.998, 4.0, vol * 0.5, 'sine', 0.006); this.tone(d, t, f * 3.01, 0.5, vol * 0.12, 'sine', 0.002); },
   musicBox(t, midi, vol) { const f = 440 * Math.pow(2, (midi - 69) / 12); this.tone(this.voices, t, f * 2, 1.8, vol, 'sine', 0.002); this.tone(this.voices, t, f * 6.1, 0.35, vol * 0.25, 'sine', 0.001); this.tone(this.voices, t, f * 4.0, 0.9, vol * 0.2, 'sine', 0.002); },
   panner(x, y, z) { const c = this.ctx, p = c.createPanner(); p.panningModel = 'HRTF'; p.distanceModel = 'inverse'; p.refDistance = 2.5; p.maxDistance = 120; p.rolloffFactor = 1.3; this.setPos(p, x, y, z); p.connect(this.sfxBus); return p; },
-  setPos(p, x, y, z, smooth) { if (p.positionX) { if (smooth && p._set) { const t = this.ctx.currentTime; for (const [a, v] of [[p.positionX, x], [p.positionY, y], [p.positionZ, z]]) { if (Math.abs((a._tgt === undefined ? a.value : a._tgt) - v) < 0.01) continue; a._tgt = v; a.cancelScheduledValues(t); a.setValueAtTime(a.value, t); a.setTargetAtTime(v, t, 0.06); } } else { p.positionX.value = x; p.positionY.value = y; p.positionZ.value = z; p._set = true; } } else p.setPosition(x, y, z); },
+  setPos(p, x, y, z, smooth) { if (p.positionX) { if (smooth && p._set) { const t = this.ctx.currentTime; if (p._lt !== undefined && t - p._lt < 0.04) return; p._lt = t; for (const [a, v] of [[p.positionX, x], [p.positionY, y], [p.positionZ, z]]) { if (Math.abs((a._tgt === undefined ? a.value : a._tgt) - v) < 0.02) continue; a._tgt = v; a.setTargetAtTime(v, t, 0.08); } } else { p.positionX.value = x; p.positionY.value = y; p.positionZ.value = z; p._set = true; } } else p.setPosition(x, y, z); },
   // ---- music ----
   THEMES: {
     castle: { root: 50, tempo: 54, mel: [0, 3, 7, 3, 10, 8, 7, 3, 2, 3, 5, 2, 0, -2, 0, null], box: true },
@@ -3169,7 +3184,7 @@ const Audio2 = window.Audio2 = {
     this.rampTo(this.music.gain, mode === 'silent' ? 0 : 1, fast ? 0.25 : 0.9);
     this.rampTo(this.chaseG.gain, fast ? 1 : 0, fast ? 0.2 : 0.8);
     this.rampTo(this.voices.gain, vTarget, this.pendingArea ? 0.25 : 0.9);
-    this.rampTo(this.crackG.gain, mode === 'silent' ? 0 : 0.06, 0.5);
+    this.rampTo(this.crackG.gain, 0, 0.2);
   },
   // ---- listener ----
   listen(eye, fwd) { if (!this.ok) return; const L2 = this.ctx.listener; if (L2.positionX) { const t = this.ctx.currentTime; const set = (a, v) => { if (!this._lset) a.value = v; else a.setTargetAtTime(v, t, 0.025); }; set(L2.positionX, eye[0]); set(L2.positionY, eye[1]); set(L2.positionZ, eye[2]); set(L2.forwardX, fwd[0]); set(L2.forwardY, fwd[1]); set(L2.forwardZ, fwd[2]); L2.upX.value = 0; L2.upY.value = 1; L2.upZ.value = 0; this._lset = true; } else { L2.setPosition(...eye); L2.setOrientation(fwd[0], fwd[1], fwd[2], 0, 1, 0); } },
@@ -3203,7 +3218,7 @@ const Audio2 = window.Audio2 = {
     if (state === 'paused') { if (this.ctx.state === 'running') this.ctx.suspend(); return; } if (this.ctx.state === 'suspended') this.ctx.resume();
     if (state === 'title') { this.setMusic('safe', 'title', dt); this.heart = 0; this.rampTo(this.windG.gain, 0.02, 1.0); }
     else if (state === 'card') { this.setMusic('silent', null, dt * 3); this.heart = 0; }
-    else if (state === 'dead') { this.setMusic('silent', null, 10); this.heart = 0; this.rampTo(this.tellBus.gain, 0, 0.012); }
+    else if (state === 'dead') { this.musicMode = 'silent'; for (const g of [this.music.gain, this.chaseG.gain, this.voices.gain, this.tellBus.gain]) if (g._tgt !== 0) { g._tgt = undefined; this.rampTo(g, 0, 0.012); } if (this.fireG) this.rampTo(this.fireG.gain, 0, 0.1); this.heart = 0; }
     else if (state === 'ending') { this.setMusic(R.dawn > 0.4 ? 'safe' : 'silent', 'dawn', dt); this.heart = 0; this.rampTo(this.tellBus.gain, 0, 0.1); } },
   // ---- the jumpscare: a loud, wet, animal roar with a metal claw shriek and bone crunches ----
   jumpscare(kind) {
@@ -3240,11 +3255,11 @@ const Audio2 = window.Audio2 = {
   foot(surf, vol, who) {
     if (!this.ok || vol <= 0) return; const c = this.ctx, t = c.currentTime + 0.005; const d = this.sfxBus; const v = vol * 0.5;
     switch (surf) {
-      case 'wood': this.noise(d, t, 0.09, v * 0.7, 'lowpass', 900, 2); this.tone(d, t, 140 + Math.random() * 40, 0.08, v * 0.25); if (Math.random() < 0.035) this.sfx('creak', PL.x, PL.y, PL.z, 0.2); break;
-      case 'stone': this.noise(d, t, 0.05, v * 0.8, 'bandpass', 2200, 2); this.noise(d, t, 0.08, v * 0.4, 'lowpass', 500); break;
-      case 'metal': this.noise(d, t, 0.15, v * 0.6, 'bandpass', 1300, 12); this.noise(d, t, 0.2, v * 0.3, 'bandpass', 2700, 14); break;
-      case 'leaves': for (let k = 0; k < 3; k++) this.noise(d, t + k * 0.025, 0.07, v * 0.6, 'highpass', 2500 + Math.random() * 1500, 0.8); break;
-      case 'grass': this.noise(d, t, 0.12, v * 0.45, 'bandpass', 3200, 0.7, 0.02); break;
+      case 'wood': this.noise(d, t, 0.1, v * 0.55, 'lowpass', 750, 1.5, 0.006); this.tone(d, t, 140 + Math.random() * 40, 0.09, v * 0.2, 'sine', 0.008); if (Math.random() < 0.035) this.sfx('creak', PL.x, PL.y, PL.z, 0.2); break;
+      case 'stone': this.noise(d, t, 0.07, v * 0.45, 'bandpass', 1100, 1.2, 0.006); this.noise(d, t, 0.09, v * 0.45, 'lowpass', 420, 1, 0.006); break;
+      case 'metal': this.noise(d, t, 0.15, v * 0.45, 'bandpass', 1200, 10, 0.006); this.noise(d, t, 0.2, v * 0.2, 'bandpass', 2400, 12, 0.006); break;
+      case 'leaves': for (let k = 0; k < 3; k++) this.noise(d, t + k * 0.03, 0.08, v * 0.4, 'bandpass', 1500 + Math.random() * 900, 0.7, 0.008); break;
+      case 'grass': this.noise(d, t, 0.14, v * 0.35, 'bandpass', 1900, 0.6, 0.025); break;
       default: this.noise(d, t, 0.1, v * 0.8, 'lowpass', 650, 1); break;
     }
   },
@@ -3281,8 +3296,13 @@ const Audio2 = window.Audio2 = {
       else if (kk < 0.8) { for (let i = 0; i < 2 + Math.floor(Math.random() * 2); i++) { const s0 = t + i * 0.38; const o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(620, s0); o.frequency.linearRampToValueAtTime(480, s0 + 0.25); f.type = 'bandpass'; f.frequency.value = 1300; f.Q.value = 3; g.gain.setValueAtTime(0, s0); g.gain.linearRampToValueAtTime(0.14, s0 + 0.03); g.gain.linearRampToValueAtTime(0, s0 + 0.28); o.connect(f); f.connect(g); g.connect(p); o.start(s0); o.stop(s0 + 0.3); } }
       else this.sfx('creak', PL.x + Math.cos(a) * 15, PL.y + 3, PL.z + Math.sin(a) * 15, 0.3); }
   },
-  // fire crackle for the nearest flame: occasional soft ticks, not a stream of clicks
-  crackle(f) { if (!this.ok || !f) return; const t = this.ctx.currentTime; if (!this.crT || t > this.crT) { this.crT = t + 0.12 + Math.random() * 0.35; if (!this.crP) this.crP = this.panner(f.x, f.y, f.z); this.setPos(this.crP, f.x, f.y, f.z, true); this.noise(this.crP, t, 0.03, 0.05 + Math.random() * 0.08, 'bandpass', 2400 + Math.random() * 1200, 0.8, 0.004); if (Math.random() < 0.15) this.noise(this.crP, t, 0.12, 0.04, 'lowpass', 300); } },
+  // fire: a smooth low roar bed that follows the nearest flame, with an occasional soft pop (no streams of ticks)
+  crackle(f) { if (!this.ok) return; const c = this.ctx, t = c.currentTime;
+    if (!this.fireP) { this.fireP = this.panner(0, -100, 0); const src = c.createBufferSource(); src.buffer = this._nbLong || (this._nbLong = this.noiseBuf(4)); src.loop = true; const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; const bp = c.createBiquadFilter(); bp.type = 'peaking'; bp.frequency.value = 180; bp.gain.value = 6; this.fireG = c.createGain(); this.fireG.gain.value = 0;
+      const lfo = c.createOscillator(); lfo.frequency.value = 0.7; const lg = c.createGain(); lg.gain.value = 0.02; lfo.connect(lg); lg.connect(this.fireG.gain); lfo.start(); src.connect(lp); lp.connect(bp); bp.connect(this.fireG); this.fireG.connect(this.fireP); src.start(); }
+    if (!f) { this.rampTo(this.fireG.gain, 0, 0.4); return; }
+    if (this.fireF !== f) { this.fireF = f; this.setPos(this.fireP, f.x, f.y, f.z); } this.rampTo(this.fireG.gain, 0.09, 0.4);
+    if (!this.crT || t > this.crT) { this.crT = t + 1.2 + Math.random() * 3.0; this.noise(this.fireP, t, 0.07, 0.05, 'lowpass', 900, 0.7, 0.01); } },
   keyChime() { if (!this.ok) return; const t = this.ctx.currentTime; if (!this.kcT || t > this.kcT) { this.kcT = t + 1.6; this.tone(this.sfxBus, t, 1568 + Math.random() * 30, 1.4, 0.025); this.tone(this.sfxBus, t, 2350, 0.8, 0.012); } },
   // optional microphone noise
   async micStart() { try { const st = await navigator.mediaDevices.getUserMedia({ audio: true }); this.init(); const src = this.ctx.createMediaStreamSource(st); const an = this.ctx.createAnalyser(); an.fftSize = 512; src.connect(an); this.micAn = an; this.micBuf = new Float32Array(512); this.micStream = st; return true; } catch (e) { return false; } },
@@ -3429,7 +3449,7 @@ const Game = {
   save(night) { Store.set('save', { night: night || this.night, perks: this.perks, seed: this.seed }); },
   startNight(n) {
     this.night = n; this.booksBurnt = false; this.escapeT = 0; this.gateAnim = 0; this.wakeAt = 0; this.pebbles = 6; this.flashUsed = false; this.jumpscare = null; this.red = 0; this.flash = 0; this.mg = null; this.hideAnim = null;
-    despawnCourt(); hideAllOverlays(); Gore.clear(); Audio2.cutAll(); Audio2.unmuteTells(); MAIN.chaseLinger = 0;
+    despawnCourt(); resetDread(); hideAllOverlays(); Gore.clear(); Audio2.cutAll(); Audio2.unmuteTells(); MAIN.chaseLinger = 0;
     if (this.perks.holy === 0) delete this.perks.holy;
     for (const it of this.items) { it.vis = (it.kind === 'key' && it.night === n && n <= 7) || (it.kind === 'book' && it.night === n); }
     for (const d of W.dyn) if (d.kind === 'wdoor' || d.kind === 'lid') { d.open = 0; d.ang = 0; d.rz = 0; }
@@ -3715,11 +3735,12 @@ function step(dt) {
   if (PL.hidden && PL.item === 'lantern') lanPos = [PL.hidden.x, PL.hidden.y + 0.1, PL.hidden.z];
   const room = sceneParams(lanPos);
   if (PL.hidden) R.scene.lan[3] *= 0.35;
+  if (Game.state === 'play') R.scene.lan[3] *= Dread.gutter;
   if (Game.jumpscare && Game.jumpscare.face) { const f = Game.jumpscare.face; R.scene.lan = [f[0], f[1], f[2], 5]; R.scene.lanCol = [2.6, 1.5, 0.8]; }
   V.viewModel = vmRig; V.shadowCenter = [PL.x, PL.y, PL.z];
   if (vmRig) { const f = V.fwd; const lit = PL.item === 'lantern'; const p = lit ? lanPos : vmRig.worldOf('hand', 0, 0, 0); V.vmFill = [p[0] - f[0] * 0.3, p[1] + (lit ? 0.04 : 0.1), p[2] - f[2] * 0.3, lit ? 3.0 : 1.1]; }
   V.tunnel = (PL.item === 'key' && !Game.jumpscare && Game.state === 'play') ? 1 : (PL.hidden ? 0.35 : 0);
-  V.red = Game.red; V.flash = Game.flash; if (!Game.jumpscare) V.glitch = 0; Game.flash = Math.max(0, Game.flash - dt * 1.5); Game.red = Math.max(0, Game.red - dt * 0.7);
+  V.dread = Game.state === 'play' ? Dread.level : 0; V.red = Game.red; V.flash = Game.flash; if (!Game.jumpscare) V.glitch = 0; Game.flash = Math.max(0, Game.flash - dt * 1.5); Game.red = Math.max(0, Game.red - dt * 0.7);
   if (Game.state === 'card') { V.fade = clamp(1 - (Game.card - 4.3), 0, 1) * 0.35; if (Game.card < 1.2) V.fade = 1 - Game.card / 1.2 * 0.65; }
   if (Game.state === 'play' || Game.state === 'card') updateGroundCover(PL.x, PL.z, 2.5);
   renderFrame(dt, V);
@@ -3741,17 +3762,17 @@ function gameplay(dt) {
   // gate
   const P = W.portcullis; if (Game.gateAnim && P.open < 1) { P.open = Math.min(1, P.open + dt / 4); Game.applyGate(); }
   if (Game.wakeAt && Game.t > Game.wakeAt && !Court.list.length) { Game.wakeAt = 0; Game.wake(); }
-  updateCourt(dt);
+  updateCourt(dt); if (Game.jumpscare) return; updateDread(dt);
   // last night: escape
   if (Game.night === 8 && Game.booksBurnt && !PL.dead) { Game.escapeT -= dt; if (Game.escapeT <= 0) Game.die('fire'); else if (PL.z > -130.6 && PL.y > PLATEAU_H - 2) { Game.state = 'ending'; P.open = 0; Game.applyGate(); Audio2.sfx('slam', 0, PLATEAU_H + 2, -132, 1.5); despawnCourt(); Audio2.setMusic('silent', null, 1); setTimeout(() => { $('ending-text').textContent = ENDING; show('ending'); hide('hud'); Store.del('save'); try { document.exitPointerLock(); } catch (e) { } }, 6500); } }
   // nearest flame crackle
-  let nf = null, nd = 12; for (const f of R.lights) { const d = Math.hypot(f.x - PL.x, f.z - PL.z); if (d < nd) { nd = d; nf = f; } } Audio2.crackle(nf);
+  let nf = null, nd = 9; for (const f of R.lights) { if (f.kind === 'candle') continue; const d = Math.hypot(f.x - PL.x, f.z - PL.z); if (d < nd) { nd = d; nf = f; } } Audio2.crackle(nf);
   // music
   const room = roomAt(PL.x, PL.y + 0.5, PL.z); let near = 999, chasing = false; for (const m of Court.list) { const d = Math.hypot(m.x - PL.x, m.z - PL.z); near = Math.min(near, d); if ((m.state === 'chase' && (m.seesPlayer || d < 25)) || m.state === 'drag') chasing = true; }
   if (chasing) MAIN.chaseLinger = 4; else MAIN.chaseLinger -= dt;
   let mode = 'silent', area = null; if (MAIN.chaseLinger > 0) mode = 'chase'; else if (near < 35) mode = 'silent'; else if (room && (room.castle || room.lit) && !room.open) { mode = 'safe'; area = room.castle ? 'castle' : room.house && room.house.kind === 'tavern' ? 'tavern' : /chapel/i.test(room.name) ? 'chapel' : 'house'; }
   if (Game.night === 8 && Game.booksBurnt) mode = 'chase';
-  Audio2.setMusic(mode, area, dt); Audio2.heart = MAIN.chaseLinger > 0 ? 1 : (Game.mg ? 0.75 : 0); Audio2.ambience(dt, !room);
+  Audio2.setMusic(mode, area, dt); Audio2.heart = MAIN.chaseLinger > 0 ? 1 : Math.max(Game.mg ? 0.75 : 0, Dread.level > 0.3 ? Dread.level * 0.8 : 0); Audio2.ambience(dt, !room);
   // area names
   let best = null, ba = 1e9; for (const a of W.areas) { if (PL.y < a.y0 || PL.y > a.y1) continue; if (Math.abs(PL.x - a.x) <= a.hx && Math.abs(PL.z - a.z) <= a.hz) { const ar = a.hx * a.hz; if (ar < ba) { ba = ar; best = a; } } }
   if (best && best !== Game.lastArea) { Game.lastArea = best; $('area').textContent = best.name; Game.areaT = 4.5; }
@@ -3950,8 +3971,8 @@ function buildPortraits() {
   gl.bindTexture(gl.TEXTURE_2D_ARRAY, R.tex.albTex); gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
   // hang them: three on each side wall, the King above his throne
   const K = new Frame(KEEP.x, PLATEAU_H + 0.32, KEEP.z, 0); W.portraits = [];
-  const spots = { jester: [-6.7, -6.7, PI / 2, 1.6, 2.15, 2.9], chancellor: [-6.7, -0.1, PI / 2, 1.6, 2.15, 2.9], captain: [-6.7, 12.4, PI / 2, 1.6, 2.15, 2.9],
-    priest: [6.7, -6.7, -PI / 2, 1.6, 2.15, 2.9], wizard: [6.7, -0.1, -PI / 2, 1.6, 2.15, 2.9], original: [6.7, 12.4, -PI / 2, 1.6, 2.15, 2.9], king: [0, -14.5, 0, 1.7, 2.3, 6.1] };
+  const spots = { jester: [-6.7, -10.4, PI / 2, 1.6, 2.15, 2.9], chancellor: [-6.7, -2.0, PI / 2, 1.6, 2.15, 2.9], captain: [-6.7, 11.75, PI / 2, 1.6, 2.15, 2.9],
+    priest: [6.7, -10.4, -PI / 2, 1.6, 2.15, 2.9], wizard: [6.7, -2.0, -PI / 2, 1.6, 2.15, 2.9], original: [6.7, 11.75, -PI / 2, 1.6, 2.15, 2.9], king: [0, -14.5, 0, 1.7, 2.3, 6.1] };
   PORTRAIT_ORDER.forEach((k, i) => {
     const [lx, lz, yaw, pw, ph, cy] = spots[k]; const [x, z] = K.w(lx, lz); const y = K.y + cy;
     const fm = new MeshBuilder(512); const G2 = { layer: L.M_GOLD, local: true };
@@ -4008,7 +4029,7 @@ const Gore = {
   },
 };
 // ---------- optional world checks (off by default; set KM_DEBUG_WORLD_CHECK = true at the top of the script) ----------
-function dbgRecordPart(min, max, src) { if (!KM_DEBUG_WORLD_CHECK) return; (W.dbgParts || (W.dbgParts = [])).push({ min, max, src }); }
+function dbgRecordPart(min, max, src, col, layer) { if (!KM_DEBUG_WORLD_CHECK) return; (W.dbgParts || (W.dbgParts = [])).push({ min, max, src, col, layer }); }
 function runWorldChecks() {
   const parts = W.dbgParts || [], G = 2, hash = new Map(); const key = (i, j) => i * 100003 + j;
   parts.forEach((p, idx) => { for (let i = Math.floor(p.min[0] / G); i <= Math.floor(p.max[0] / G); i++) for (let j = Math.floor(p.min[2] / G); j <= Math.floor(p.max[2] / G); j++) { const k = key(i, j); let a = hash.get(k); if (!a) hash.set(k, a = []); a.push(idx); } });
@@ -4018,13 +4039,53 @@ function runWorldChecks() {
     if (!touch) isolated.push({ at: [cx, (p.min[1] + p.max[1]) / 2, cz].map(v => +v.toFixed(2)), size: [0, 1, 2].map(k => +(p.max[k] - p.min[k]).toFixed(2)), src: p.src }); });
   const items = []; const chk = (name, s) => { if (!s) return; const sup = supportAt(s.x, s.z, s.y + 0.05, 0.05, 0.1).h; if (Math.abs(s.y - sup) > 0.03) items.push({ name, y: +s.y.toFixed(3), surface: +sup.toFixed(3) }); };
   for (let n = 1; n <= 7; n++) chk('book ' + n, W.books[n]); W.clueSpots.forEach((s, i) => chk('clue ' + i, s)); chk('key altar', W.keyAltar);
+  // solid-looking parts at body height with no hitbox (you would walk through them)
+  const walk = []; for (const p of parts) { if (p.col) continue; const cx = (p.min[0] + p.max[0]) / 2, cz = (p.min[2] + p.max[2]) / 2; const sx = p.max[0] - p.min[0], sz = p.max[2] - p.min[2]; if (Math.min(sx, sz) < 0.12 && Math.max(sx, sz) < 0.5) continue;
+    const base = supportAt(cx, cz, p.min[1] + 0.02, 0.05, 0.0).h; if (p.max[1] < base + 0.35 || p.min[1] > base + 1.6) continue;
+    const hit = colQuery(p.min[0], p.min[2], p.max[0], p.max[2], c => { if (c.y1 > p.min[1] && c.y0 < p.max[1]) return true; }); if (!hit) walk.push({ at: [cx, (p.min[1] + p.max[1]) / 2, cz].map(v => +v.toFixed(2)), size: [sx, p.max[1] - p.min[1], sz].map(v => +v.toFixed(2)), layer: p.layer }); }
+  console.log('Solid-looking parts at body height with no hitbox:', walk.slice(0, 200));
   const cop = auditCoplanar();
   console.groupCollapsed('Knightmares world check: ' + isolated.length + ' isolated parts, ' + items.length + ' items off their surface, ' + cop.issues.length + ' coplanar face pairs');
   console.log('Parts not touching any neighbour or the ground (possible floating/disconnected):', isolated.slice(0, 200));
   console.log('Items whose base is not on the surface beneath:', items);
   console.log('Coplanar overlapping faces likely to z-fight [centre, normal, layerA, layerB, centreB]:', cop.issues.slice(0, 200));
-  console.groupEnd(); return { isolated, items, coplanar: cop.issues.length };
+  console.groupEnd(); return { isolated, items, walk, coplanar: cop.issues.length };
 }
+
+// ==== 23_dread.js ====
+// ---------- dread: the closer they are, the worse it gets ----------
+const Dread = { level: 0, gutter: 1, phantom: null, phantomT: 90, bellT: -1, bellRang: false, screamT: 120, breathT: 0 };
+function updateDread(dt) {
+  let d = 0; for (const m of Court.list) { const dist = Math.hypot(m.x - PL.x, m.z - PL.z); let k = clamp(1 - dist / 28, 0, 1) * (m.state === 'chase' ? 1 : 0.75); if (m.state === 'chase' && (m.seesPlayer || dist < 25)) k = Math.max(k, 0.85); d = Math.max(d, k); }
+  if (Game.keyBeacon() && Court.list.length) d = Math.max(d, 0.2);
+  Dread.level += (d - Dread.level) * Math.min(1, dt * (d > Dread.level ? 2.5 : 0.6));
+  // the lantern gutters when something is near
+  const L2 = Dread.level; if (L2 > 0.25 && Math.random() < dt * (2 + L2 * 6)) Dread.gutterTarget = 0.35 + Math.random() * 0.4; Dread.gutterTarget = Math.min(1, (Dread.gutterTarget || 1) + dt * 1.4); Dread.gutter += (Dread.gutterTarget - Dread.gutter) * Math.min(1, dt * 18);
+  // your own breathing while you hide and something is close
+  if (PL.hidden && L2 > 0.3 && Audio2.ok) { Dread.breathT -= dt; if (Dread.breathT <= 0) { Dread.breathT = 1.4 - L2 * 0.6; const t = Audio2.ctx.currentTime; Audio2.noise(Audio2.sfxBus, t, 0.5, 0.05 + L2 * 0.05, 'bandpass', 700, 1.4, 0.18); Audio2.noise(Audio2.sfxBus, t + 0.62 - L2 * 0.2, 0.45, 0.035 + L2 * 0.04, 'bandpass', 1100, 1.4, 0.12); } }
+  // the castle bell rings thirteen times, once a night, some time after the key is taken
+  if (PL.hasKey && !Dread.bellRang && Game.night <= 7) { if (Dread.bellT < 0) Dread.bellT = 50 + Math.random() * 120; Dread.bellT -= dt; if (Dread.bellT <= 0) { Dread.bellRang = true; ringBell(13); } }
+  // something far off in the Blackwood
+  Dread.screamT -= dt; if (Dread.screamT <= 0) { Dread.screamT = 100 + Math.random() * 120; if (!roomAt(PL.x, PL.y + 0.5, PL.z) && L2 < 0.3) distantCry(); }
+  updatePhantom(dt);
+}
+function ringBell(n) { if (!Audio2.ok) return; const c = Audio2.ctx; const p = Audio2.panner(0, PLATEAU_H + 22, KEEP.z); p.refDistance = 60; p.rolloffFactor = 0.6; setTimeout(() => p.disconnect(), (n * 2.6 + 8) * 1000);
+  for (let k = 0; k < n; k++) { const t = c.currentTime + 0.5 + k * 2.6; for (const [f, v, d] of [[220, 0.5, 6], [440.8, 0.25, 4], [264, 0.2, 5], [596, 0.12, 2.5], [878, 0.08, 1.6], [110, 0.3, 7]]) Audio2.tone(p, t, f * (k === 12 ? 0.94 : 1), d, v * (k === 12 ? 1.2 : 1), 'sine', 0.008); } }
+function distantCry() { if (!Audio2.ok) return; const c = Audio2.ctx, t = c.currentTime; const a = Math.random() * TAU; const p = Audio2.panner(PL.x + Math.cos(a) * 120, PL.y + 5, PL.z + Math.sin(a) * 120); p.refDistance = 40; setTimeout(() => p.disconnect(), 6000);
+  const o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(520, t); o.frequency.linearRampToValueAtTime(760, t + 0.5); o.frequency.exponentialRampToValueAtTime(260, t + 2.6); const v = c.createOscillator(), vg = c.createGain(); v.frequency.value = 6.5; vg.gain.value = 18; v.connect(vg); vg.connect(o.frequency);
+  f.type = 'bandpass'; f.frequency.value = 1100; f.Q.value = 2; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.12, t + 0.25); g.gain.linearRampToValueAtTime(0.06, t + 1.8); g.gain.linearRampToValueAtTime(0, t + 2.8); o.connect(f); f.connect(g); g.connect(p); o.start(t); v.start(t); o.stop(t + 2.9); v.stop(t + 2.9); }
+// a figure at the edge of your vision that is gone when you look at it (not a real monster; it cannot hurt you)
+function updatePhantom(dt) {
+  const ph = Dread.phantom;
+  if (ph) { ph.t += dt; const dx = ph.x - R.cam[0], dz = ph.z - R.cam[2], d = Math.hypot(dx, dz); const f = R.camFwd; const c2 = (dx * f[0] + dz * f[2]) / (d * Math.hypot(f[0], f[2]) + 1e-4);
+    if (c2 > 0.93 || ph.t > 7 || d < 12 || Dread.level > 0.4) { const i = ACTORS.indexOf(ph.actor); if (i >= 0) ACTORS.splice(i, 1); freeMesh(ph.rig.g); Dread.phantom = null; if (c2 > 0.93 && Audio2.ok) Audio2.noise(Audio2.sfxBus, Audio2.ctx.currentTime, 0.9, 0.05, 'bandpass', 1500, 2.5, 0.2); }
+    return; }
+  Dread.phantomT -= dt; if (Dread.phantomT > 0 || Dread.level > 0.15 || PL.hidden || Game.night > 7) return; Dread.phantomT = 70 + Math.random() * 90;
+  const f = R.camFwd, base = Math.atan2(f[0], f[2]); for (let tries = 0; tries < 8; tries++) { const off = (Math.random() < 0.5 ? -1 : 1) * (0.7 + Math.random() * 0.35), r = 22 + Math.random() * 14; const a = base + off; const x = PL.x + Math.sin(a) * r, z = PL.z + Math.cos(a) * r; const n = navNode(x, groundH(x, z), z); if (n < 0) continue; const p = navPos(n); if (!lineOfSight(R.cam[0], R.cam[1], R.cam[2], p[0], p[1] + 1.8, p[2])) continue;
+    const kinds = ['priest', 'chancellor', 'king']; const rig = courtRig(kinds[Math.floor(Math.random() * kinds.length)]); poseHumanoid(rig, { phase: 0, speed: 0, crouch: 0 }, rig.P); rig.set('head', 0.15, 0, 0.35);
+    const yaw = Math.atan2(PL.x - p[0], PL.z - p[2]); M4.trs(rig.model, p[0], p[1], p[2], yaw, 0, 0, 1); rig.solve(); const actor = { rig, x: p[0], z: p[2], visible: true }; ACTORS.push(actor); Dread.phantom = { rig, actor, x: p[0], z: p[2], t: 0 }; break; }
+}
+function resetDread() { if (Dread.phantom) { const i = ACTORS.indexOf(Dread.phantom.actor); if (i >= 0) ACTORS.splice(i, 1); Dread.phantom = null; } Dread.level = 0; Dread.gutter = 1; Dread.bellT = -1; Dread.bellRang = false; Dread.phantomT = 60 + Math.random() * 60; Dread.screamT = 90 + Math.random() * 90; }
 
 </script>
 </body></html>
