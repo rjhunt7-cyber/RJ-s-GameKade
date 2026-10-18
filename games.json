@@ -1,6 +1,14 @@
 {
   "games": [
     {
+      "id": "8-bit-tag",
+      "title": "8 Bit Tag",
+      "path": "games/8-bit-tag.html",
+      "kind": "file",
+      "added": "2026-10-18T20:00:37.588Z",
+      "thumbnail": "games/8-bit-tag.jpg?v=mve92tor"
+    },
+    {
       "id": "8bit-chess",
       "title": "8bit Chess",
       "path": "games/8bit-chess.html",
@@ -73,6 +81,6 @@
       "thumbnail": "games/toad-room-server.jpg?v=mvcmjduj"
     }
   ],
-  "count": 9,
-  "updated": "2026-10-18T19:41:20.444Z"
+  "count": 10,
+  "updated": "2026-10-18T20:00:37.588Z"
 }
