@@ -25,6 +25,14 @@
       "thumbnail": "games/ballistic.jpg?v=mvby38xh"
     },
     {
+      "id": "dead-scope",
+      "title": "Dead Scope",
+      "path": "games/dead-scope.html",
+      "kind": "file",
+      "added": "2026-10-18T19:24:55.160Z",
+      "thumbnail": "games/dead-scope.jpg?v=mve7swnn"
+    },
+    {
       "id": "grave-rush",
       "title": "Grave Rush",
       "path": "games/grave-rush.html",
@@ -65,6 +73,6 @@
       "thumbnail": "games/toad-room-server.jpg?v=mvcmjduj"
     }
   ],
-  "count": 8,
-  "updated": "2026-10-18T19:24:10.026Z"
+  "count": 9,
+  "updated": "2026-10-18T19:24:55.161Z"
 }
