@@ -49,6 +49,14 @@
       "thumbnail": "games/knightmares.jpg?v=mvbvx3yh"
     },
     {
+      "id": "pantheon-clash",
+      "title": "Pantheon Clash",
+      "path": "games/pantheon-clash.html",
+      "kind": "file",
+      "added": "2026-10-18T19:41:20.444Z",
+      "thumbnail": "games/pantheon-clash.jpg?v=mve8e0wt"
+    },
+    {
       "id": "rjs-nutty-adventure",
       "title": "Rjs Nutty Adventure",
       "path": "games/rjs-nutty-adventure.html",
@@ -65,6 +73,6 @@
       "thumbnail": "games/toad-room-server.jpg?v=mvcmjduj"
     }
   ],
-  "count": 8,
-  "updated": "2026-10-18T19:40:15.229Z"
+  "count": 9,
+  "updated": "2026-10-18T19:41:20.444Z"
 }
