@@ -42,7 +42,7 @@
     },
     {
       "id": "ghost-road-proto-3",
-      "title": "Ghost Road Proto 3",
+      "title": "Ghost Road",
       "path": "games/ghost-road-proto-3.html",
       "kind": "file",
       "added": "2026-10-18T23:27:07.598Z",
@@ -90,5 +90,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-18T23:27:07.598Z"
+  "updated": "2026-10-18T23:27:14.520Z"
 }
