@@ -1,20 +1,20 @@
 {
   "games": [
     {
+      "id": "8bit-chess",
+      "title": "8 bit Chess",
+      "path": "games/8bit-chess.html",
+      "kind": "file",
+      "added": "2026-10-16T20:48:55.757Z",
+      "thumbnail": "games/8bit-chess.jpg?v=mvbfxh65"
+    },
+    {
       "id": "8-bit-tag",
       "title": "8 Bit Tag",
       "path": "games/8-bit-tag.html",
       "kind": "file",
       "added": "2026-10-18T20:00:37.588Z",
       "thumbnail": "games/8-bit-tag.jpg?v=mve92tor"
-    },
-    {
-      "id": "8bit-chess",
-      "title": "8bit Chess",
-      "path": "games/8bit-chess.html",
-      "kind": "file",
-      "added": "2026-10-16T20:48:55.757Z",
-      "thumbnail": "games/8bit-chess.jpg?v=mvbfxh65"
     },
     {
       "id": "aces-arcade",
@@ -82,5 +82,5 @@
     }
   ],
   "count": 10,
-  "updated": "2026-10-18T20:00:37.588Z"
+  "updated": "2026-10-18T20:00:45.676Z"
 }
