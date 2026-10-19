@@ -41,14 +41,6 @@
       "thumbnail": "games/dead-scope.jpg?v=mve7swnn"
     },
     {
-      "id": "ghost-road-proto-3",
-      "title": "Ghost Road",
-      "path": "games/ghost-road-proto-3.html",
-      "kind": "file",
-      "added": "2026-10-18T23:27:07.598Z",
-      "thumbnail": "games/ghost-road-proto-3.jpg?v=mveggdx3"
-    },
-    {
       "id": "grave-rush",
       "title": "Grave Rush",
       "path": "games/grave-rush.html",
@@ -89,6 +81,6 @@
       "thumbnail": "games/toad-room-server.jpg?v=mvcmjduj"
     }
   ],
-  "count": 11,
-  "updated": "2026-10-18T23:27:14.520Z"
+  "count": 10,
+  "updated": "2026-10-19T00:54:55.180Z"
 }
