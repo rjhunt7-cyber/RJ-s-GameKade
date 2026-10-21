@@ -62,7 +62,8 @@
       "path": "games/knightmares.html",
       "kind": "file",
       "added": "2026-10-17T04:16:43.489Z",
-      "thumbnail": "games/knightmares.jpg?v=mvbvx3yh"
+      "thumbnail": "games/knightmares.jpg?v=mvbvx3yh",
+      "players": "1p"
     },
     {
       "id": "pantheon-clash",
@@ -93,5 +94,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:15:08.769Z"
+  "updated": "2026-10-21T13:15:17.275Z"
 }
