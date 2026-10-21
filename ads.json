@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "headCode": "google.com, pub-8948943457943464, DIRECT, f08c47fec0942fa0",
+  "headCode": "<script async src=\"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8948943457943464\"\n     crossorigin=\"anonymous\"></script>",
   "slots": {
     "play-left": {
       "code": ""
