@@ -86,9 +86,10 @@
       "path": "games/toad-room-server.html",
       "kind": "file",
       "added": "2026-10-17T16:41:52.775Z",
-      "thumbnail": "games/toad-room-server.jpg?v=mvcmjduj"
+      "thumbnail": "games/toad-room-server.jpg?v=mvcmjduj",
+      "players": "1p"
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:14:52.439Z"
+  "updated": "2026-10-21T13:14:59.101Z"
 }
