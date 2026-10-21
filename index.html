@@ -771,6 +771,9 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
 }
 .owner-card details > .owner-steps { margin-top: 16px; }
 
+.footer a { margin-left: 12px; color: var(--electric); }
+.footer a:hover { color: var(--coin); }
+
 </style>
 </head>
 <body>
@@ -870,7 +873,7 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
   <main class="owner" id="owner"></main>
 </div>
 
-<footer class="footer"><p>RJ's Gamekade. No tracking, no accounts, just games.</p></footer>
+<footer class="footer"><p>RJ's Gamekade. No accounts, no sign-ups, just games. <a href="privacy.html">Privacy Policy</a></p></footer>
 
 <script>
 /*
@@ -1552,6 +1555,16 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
       if (rail) rail.hidden = yes;
       window.dispatchEvent(new Event('gamekade:layout'));
     }
+    // The arcade is for kids, so every AdSense unit is marked child-directed
+    // (Google then turns off interest-based ads and remarketing for it).
+    function kidTreatment(el) {
+      var list = el.matches && el.matches('ins.adsbygoogle') ? [el] : [];
+      if (el.querySelectorAll) list = list.concat(Array.prototype.slice.call(el.querySelectorAll('ins.adsbygoogle')));
+      list.forEach(function (ins) {
+        ins.setAttribute('data-tag-for-age-treatment', '1');
+        ins.setAttribute('data-tag-for-child-directed-treatment', '1');
+      });
+    }
     function runCode(target, html) {
       var tpl = document.createElement('template');
       tpl.innerHTML = html;
@@ -1570,6 +1583,7 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
           if (s.src && !s.hasAttribute('async')) { s.onload = s.onerror = next; target.appendChild(s); return; }
           target.appendChild(s); next(); return;
         }
+        if (node.nodeType === 1) kidTreatment(node);
         if (node.nodeType === 1) Array.prototype.forEach.call(node.querySelectorAll('script'), function (o) { o.replaceWith(revive(o)); });
         target.appendChild(node);
         next();
@@ -1887,6 +1901,18 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
   }
 
   // ---- the game list (games.json) ---------------------------------------------------
+  // site.json holds the small public settings: counterUrl and contactEmail
+  async function readSite() {
+    var f = await getFile('site.json');
+    if (f && !Array.isArray(f)) { try { return JSON.parse(b64ToText(f.content) || '{}') || {}; } catch (e) { /* start fresh */ } }
+    return {};
+  }
+  async function saveSite(patch, message) {
+    var cur = await readSite();
+    Object.keys(patch).forEach(function (k) { cur[k] = patch[k]; });
+    await putFile('site.json', textToB64(JSON.stringify(cur, null, 2) + '\n'), message);
+    return cur;
+  }
   async function readList() {
     var f = await getFile('games.json'), data = null;
     if (f && !Array.isArray(f)) { try { data = JSON.parse(b64ToText(f.content)); } catch (e) { data = null; } }
@@ -2080,6 +2106,15 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
         '<input type="file" id="o-swap-file" accept=".html,.htm,text/html" hidden>' +
       '</section>' +
 
+      '<section class="owner-card px" id="o-privacy-card">' +
+        '<h2>Privacy policy</h2>' +
+        '<p>Your arcade has a privacy policy page at <a href="privacy.html" target="_blank" rel="noopener">privacy.html</a>, made to match what AdSense asks for. It shows a contact email so visitors and parents can reach you. Use an email you don’t mind being public, such as a free one made just for the arcade.</p>' +
+        '<p id="o-email-state">Checking…</p>' +
+        '<label class="field">Contact email<input type="text" id="o-email" spellcheck="false" placeholder="name@example.com"></label>' +
+        '<div class="owner-row"><button class="btn px" type="button" id="o-email-save">Save email</button></div>' +
+        '<p class="owner-msg" id="o-email-msg" role="status"></p>' +
+      '</section>' +
+
       '<section class="owner-card px" id="o-counter-card">' +
         '<h2>Visitor counter</h2>' +
         '<p>Shows “N online” in a box at the top left of the home page. It counts open browser tabs and nothing else: no names, no cookies, nothing kept on anyone’s device, and each number disappears from the database about two minutes after the tab closes.</p>' +
@@ -2115,8 +2150,9 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
       games = data.games;
       renderList();
       try {
-        var site = await getFile('site.json'), url = '';
-        if (site && !Array.isArray(site)) url = (JSON.parse(b64ToText(site.content) || '{}').counterUrl) || '';
+        var site = await readSite(), url = site.counterUrl || '';
+        $('o-email').value = site.contactEmail || '';
+        $('o-email-state').textContent = site.contactEmail ? 'The privacy policy shows ' + site.contactEmail + ' as the contact.' : 'No contact email yet. Add one below before you apply to AdSense.';
         $('o-counter-url').value = url;
         $('o-counter-state').textContent = url ? 'On. The box shows at the top left of the home page.' : 'Off. Follow the steps below to turn it on.';
       } catch (e) { $('o-counter-state').textContent = 'Off. Follow the steps below to turn it on.'; }
@@ -2340,6 +2376,18 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
       });
     });
 
+    // privacy policy contact
+    $('o-email-save').addEventListener('click', function () {
+      var msg = $('o-email-msg'), email = $('o-email').value.trim();
+      if (!/^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(email)) { say(msg, 'That doesn’t look like an email address. It should look like name@example.com.', true); return; }
+      work(msg, async function () {
+        say(msg, 'Saving…');
+        await saveSite({ contactEmail: email }, 'Set the privacy policy contact email');
+        $('o-email-state').textContent = 'The privacy policy shows ' + email + ' as the contact.';
+        say(msg, 'Saved. The privacy page shows it in about a minute.');
+      });
+    });
+
     // visitor counter
     $('o-copy-rules').addEventListener('click', function () {
       var text = $('o-rules').textContent, msg = $('o-counter-msg');
@@ -2352,7 +2400,7 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
         say(msg, 'Testing the connection…');
         var r = await G.presenceTest($('o-counter-url').value);
         if (!r.ok) { say(msg, r.message, true); return; }
-        await putFile('site.json', textToB64(JSON.stringify({ counterUrl: r.url }, null, 2) + '\n'), 'Turn on the visitor counter');
+        await saveSite({ counterUrl: r.url }, 'Turn on the visitor counter');
         $('o-counter-url').value = r.url;
         $('o-counter-state').textContent = 'On. The box shows at the top left of the home page.';
         say(msg, r.message + ' Saved. The box appears on the home page in about a minute.', !r.indexed);
@@ -2362,7 +2410,7 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
       var msg = $('o-counter-msg');
       work(msg, async function () {
         say(msg, 'Turning it off…');
-        await putFile('site.json', textToB64(JSON.stringify({ counterUrl: '' }, null, 2) + '\n'), 'Turn off the visitor counter');
+        await saveSite({ counterUrl: '' }, 'Turn off the visitor counter');
         $('o-counter-url').value = '';
         $('o-counter-state').textContent = 'Off. Follow the steps below to turn it on.';
         say(msg, 'Counter turned off. The box disappears in about a minute.');
