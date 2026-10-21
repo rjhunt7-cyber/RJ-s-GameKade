@@ -78,7 +78,8 @@
       "path": "games/rjs-nutty-adventure.html",
       "kind": "file",
       "added": "2026-10-16T21:59:27.621Z",
-      "thumbnail": "games/rjs-nutty-adventure.jpg?v=mvbifxzo"
+      "thumbnail": "games/rjs-nutty-adventure.jpg?v=mvbifxzo",
+      "players": "1p"
     },
     {
       "id": "toad-room-server",
@@ -91,5 +92,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:14:59.101Z"
+  "updated": "2026-10-21T13:15:03.442Z"
 }
