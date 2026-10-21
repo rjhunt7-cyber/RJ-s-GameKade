@@ -64,6 +64,15 @@
       "players": "1p"
     },
     {
+      "id": "keystone-drift",
+      "title": "Keystone Drift",
+      "path": "games/keystone-drift.html",
+      "kind": "file",
+      "added": "2026-10-21T23:30:45.011Z",
+      "players": "multi",
+      "thumbnail": "games/keystone-drift.jpg?v=mviqwlu6"
+    },
+    {
       "id": "knightmares",
       "title": "Knightmares",
       "path": "games/knightmares.html",
@@ -100,6 +109,6 @@
       "players": "1p"
     }
   ],
-  "count": 11,
-  "updated": "2026-10-21T13:15:54.731Z"
+  "count": 12,
+  "updated": "2026-10-21T23:30:45.011Z"
 }
