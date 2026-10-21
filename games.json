@@ -30,7 +30,8 @@
       "path": "games/ballistic.html",
       "kind": "file",
       "added": "2026-10-17T05:17:29.141Z",
-      "thumbnail": "games/ballistic.jpg?v=mvby38xh"
+      "thumbnail": "games/ballistic.jpg?v=mvby38xh",
+      "players": "2p"
     },
     {
       "id": "dead-scope",
@@ -97,5 +98,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:15:33.759Z"
+  "updated": "2026-10-21T13:15:39.347Z"
 }
