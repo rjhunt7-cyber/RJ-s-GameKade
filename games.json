@@ -22,7 +22,8 @@
       "path": "games/aces-arcade.html",
       "kind": "file",
       "added": "2026-10-17T04:59:28.614Z",
-      "thumbnail": "games/aces-arcade.jpg?v=mvbxg363"
+      "thumbnail": "games/aces-arcade.jpg?v=mvbxg363",
+      "players": "multi"
     },
     {
       "id": "ballistic",
@@ -98,5 +99,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:15:39.347Z"
+  "updated": "2026-10-21T13:15:43.614Z"
 }
