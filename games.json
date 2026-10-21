@@ -46,7 +46,8 @@
       "path": "games/ghost-road.html",
       "kind": "file",
       "added": "2026-10-19T01:42:10.916Z",
-      "thumbnail": "games/ghost-road.jpg?v=mvela2ir"
+      "thumbnail": "games/ghost-road.jpg?v=mvela2ir",
+      "players": "multi"
     },
     {
       "id": "grave-rush",
@@ -95,5 +96,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:15:22.860Z"
+  "updated": "2026-10-21T13:15:29.080Z"
 }
