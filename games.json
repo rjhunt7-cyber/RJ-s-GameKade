@@ -70,7 +70,8 @@
       "path": "games/pantheon-clash.html",
       "kind": "file",
       "added": "2026-10-18T19:41:20.444Z",
-      "thumbnail": "games/pantheon-clash.jpg?v=mve8e0wt"
+      "thumbnail": "games/pantheon-clash.jpg?v=mve8e0wt",
+      "players": "multi"
     },
     {
       "id": "rjs-nutty-adventure",
@@ -92,5 +93,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:15:03.442Z"
+  "updated": "2026-10-21T13:15:08.769Z"
 }
