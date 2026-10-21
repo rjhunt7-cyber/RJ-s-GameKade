@@ -6,7 +6,8 @@
       "path": "games/8bit-chess.html",
       "kind": "file",
       "added": "2026-10-16T20:48:55.757Z",
-      "thumbnail": "games/8bit-chess.jpg?v=mvbfxh65"
+      "thumbnail": "games/8bit-chess.jpg?v=mvbfxh65",
+      "players": "2p"
     },
     {
       "id": "8-bit-tag",
@@ -100,5 +101,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:15:48.216Z"
+  "updated": "2026-10-21T13:15:54.731Z"
 }
