@@ -14,7 +14,8 @@
       "path": "games/8-bit-tag.html",
       "kind": "file",
       "added": "2026-10-18T20:00:37.588Z",
-      "thumbnail": "games/8-bit-tag.jpg?v=mve92tor"
+      "thumbnail": "games/8-bit-tag.jpg?v=mve92tor",
+      "players": "multi"
     },
     {
       "id": "aces-arcade",
@@ -99,5 +100,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:15:43.614Z"
+  "updated": "2026-10-21T13:15:48.216Z"
 }
