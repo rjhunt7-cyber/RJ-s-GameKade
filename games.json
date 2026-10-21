@@ -54,7 +54,8 @@
       "path": "games/grave-rush.html",
       "kind": "file",
       "added": "2026-10-16T15:16:43.961Z",
-      "thumbnail": "games/grave-rush.jpg?v=mvb48g1l"
+      "thumbnail": "games/grave-rush.jpg?v=mvb48g1l",
+      "players": "1p"
     },
     {
       "id": "knightmares",
@@ -94,5 +95,5 @@
     }
   ],
   "count": 11,
-  "updated": "2026-10-21T13:15:17.275Z"
+  "updated": "2026-10-21T13:15:22.860Z"
 }
