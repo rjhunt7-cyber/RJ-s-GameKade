@@ -100,6 +100,15 @@
       "players": "1p"
     },
     {
+      "id": "monsters-vs-androids",
+      "title": "Monsters vs Androids",
+      "path": "games/monsters-vs-androids.html",
+      "kind": "file",
+      "added": "2026-10-22T01:55:36.814Z",
+      "players": "1p",
+      "thumbnail": "games/monsters-vs-androids.jpg?v=mviw2wby"
+    },
+    {
       "id": "pantheon-clash",
       "title": "Pantheon Clash",
       "path": "games/pantheon-clash.html",
@@ -154,6 +163,6 @@
       "players": "1p"
     }
   ],
-  "count": 17,
-  "updated": "2026-10-22T01:54:10.242Z"
+  "count": 18,
+  "updated": "2026-10-22T01:55:36.814Z"
 }
