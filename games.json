@@ -73,6 +73,15 @@
       "players": "1p"
     },
     {
+      "id": "grave-rush-3d",
+      "title": "Grave Rush 3D",
+      "path": "games/grave-rush-3d.html",
+      "kind": "file",
+      "added": "2026-10-22T01:19:09.830Z",
+      "players": "multi",
+      "thumbnail": "games/grave-rush-3d.jpg?v=mvius0tz"
+    },
+    {
       "id": "keystone-drift",
       "title": "Keystone Drift",
       "path": "games/keystone-drift.html",
@@ -136,6 +145,6 @@
       "players": "1p"
     }
   ],
-  "count": 15,
-  "updated": "2026-10-22T01:08:23.720Z"
+  "count": 16,
+  "updated": "2026-10-22T01:19:09.830Z"
 }
