@@ -91,6 +91,15 @@
       "players": "multi"
     },
     {
+      "id": "pong",
+      "title": "Pong",
+      "path": "games/pong.html",
+      "kind": "file",
+      "added": "2026-10-22T00:55:49.474Z",
+      "players": "multi",
+      "thumbnail": "games/pong.jpg?v=mvity0b8"
+    },
+    {
       "id": "rjs-nutty-adventure",
       "title": "Rjs Nutty Adventure",
       "path": "games/rjs-nutty-adventure.html",
@@ -118,6 +127,6 @@
       "players": "1p"
     }
   ],
-  "count": 13,
-  "updated": "2026-10-22T00:18:57.055Z"
+  "count": 14,
+  "updated": "2026-10-22T00:55:49.474Z"
 }
