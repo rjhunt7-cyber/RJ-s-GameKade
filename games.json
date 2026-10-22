@@ -118,6 +118,15 @@
       "thumbnail": "games/rj-s-ping-pong.jpg?v=mviue6a6"
     },
     {
+      "id": "rjs-frozen-kitchen",
+      "title": "Rjs Frozen Kitchen",
+      "path": "games/rjs-frozen-kitchen.html",
+      "kind": "file",
+      "added": "2026-10-22T01:54:10.242Z",
+      "players": "1p",
+      "thumbnail": "games/rjs-frozen-kitchen.jpg?v=mviw11id"
+    },
+    {
       "id": "rjs-nutty-adventure",
       "title": "Rjs Nutty Adventure",
       "path": "games/rjs-nutty-adventure.html",
@@ -145,6 +154,6 @@
       "players": "1p"
     }
   ],
-  "count": 16,
-  "updated": "2026-10-22T01:19:09.830Z"
+  "count": 17,
+  "updated": "2026-10-22T01:54:10.242Z"
 }
