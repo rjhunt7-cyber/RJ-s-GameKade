@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RJ's Frozen Kitchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c1b4a; --ink2:#2c2b6e; --frost:#8fe3ff; --mint:#c5f6e8;
+  --berry:#ff6f9f; --berry2:#ffc2d6; --cream:#fff3cf; --butter:#ffd84a;
+  --panel:#f6fcff; --good:#39c46d; --warn:#ffb020; --bad:#ff4d5e;
+}
+*{box-sizing:border-box}
+html{background:#15143a}
+body{
+  margin:0;min-height:100vh;color:var(--ink);
+  font:20px/1.15 'VT323',ui-monospace,Menlo,Consolas,monospace;
+  background:radial-gradient(#26256b 1.5px,transparent 1.5px) 0 0/28px 28px,#15143a;
+  -webkit-tap-highlight-color:transparent;
+}
+button{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;font-family:'Press Start 2P',ui-monospace,monospace;font-weight:400;line-height:1.4}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+:focus-visible{outline:4px solid var(--berry);outline-offset:2px}
+
+#app{max-width:1120px;margin:0 auto;padding:10px;display:flex;flex-direction:column;gap:10px}
+
+/* ---------- HUD ---------- */
+#hud{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;background:var(--ink2);border:4px solid var(--ink);
+  padding:8px 12px;color:#fff;font-family:'Press Start 2P',monospace;font-size:11px;box-shadow:0 4px 0 #0b0a26}
+#hud .brand{flex:1 1 210px;color:var(--butter);font-size:13px;line-height:1.4}
+#hud b{color:var(--frost);font-weight:400}
+.prog{display:flex;align-items:center;gap:8px}
+.bar{width:110px;height:14px;background:var(--ink);border:3px solid #0b0a26;padding:1px}
+.bar i{display:block;height:100%;width:0;background:var(--mint)}
+.mini{font-family:'Press Start 2P',monospace;font-size:10px;background:var(--cream);color:var(--ink);border:3px solid var(--ink);
+  padding:7px 9px;cursor:pointer;box-shadow:0 3px 0 #0b0a26}
+.mini:active{transform:translateY(3px);box-shadow:none}
+
+/* ---------- Counter ---------- */
+#counter{border:4px solid var(--ink);box-shadow:0 4px 0 #0b0a26;overflow:hidden;
+  background:repeating-linear-gradient(90deg,#cbf8eb 0 56px,#bff3e3 56px 112px)}
+.awning{height:46px;
+  background:
+    radial-gradient(circle at 20px 0,#ff6f9f 19px,transparent 20px) 0 26px/80px 20px repeat-x,
+    radial-gradient(circle at 60px 0,#fff3cf 19px,transparent 20px) 0 26px/80px 20px repeat-x,
+    repeating-linear-gradient(90deg,#ff6f9f 0 40px,#fff3cf 40px 80px) 0 0/100% 26px no-repeat;
+  border-bottom:0}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:8px 12px 0;align-items:end}
+.slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;border:0;background:none;
+  padding:0;cursor:pointer;min-height:146px;text-align:left}
+.slot.empty,.slot:disabled{cursor:default}
+.slot .cust{width:88px;height:110px;position:relative;margin-bottom:-12px}
+.slot.leaving .cust,.slot.served .cust{opacity:.95}
+.ledge{position:relative;width:100%;background:var(--berry);border:4px solid var(--ink);border-bottom:0;padding:7px 9px 9px;
+  display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 5px 0 #ff9fbd;min-height:52px}
+.ledge .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.slot.active .ledge{background:var(--butter);box-shadow:inset 0 5px 0 #fff0a0}
+.slot.waiting .ledge{animation:ping 1s steps(2,end) infinite}
+@keyframes ping{50%{background:#ff9bbd}}
+.ledge .nm{font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.3;color:var(--ink);min-height:13px}
+.ledge .st{font-size:20px;color:var(--ink);min-height:20px;text-align:right}
+.pat{height:12px;background:var(--ink);padding:2px}
+.pat i{display:block;height:100%;width:100%;background:var(--good)}
+.pat i.y{background:var(--warn)}.pat i.r{background:var(--bad)}
+.slot.empty .pat{visibility:hidden}
+
+#speech{background:#fff;border:4px solid var(--ink);padding:8px 14px;min-height:46px;font-size:21px;box-shadow:0 4px 0 #0b0a26}
+#speech b{font-family:'Press Start 2P',monospace;font-weight:400;font-size:11px;margin-right:6px}
+
+/* ---------- Work area ---------- */
+#work{background:var(--panel);border:4px solid var(--ink);box-shadow:0 4px 0 #0b0a26}
+#tabs{display:flex;background:var(--ink2)}
+#tabs button{flex:1;font-family:'Press Start 2P',monospace;font-size:11px;padding:13px 4px;background:var(--ink2);color:#b9bdff;
+  border:0;border-right:4px solid var(--ink);cursor:pointer}
+#tabs button:last-child{border-right:0}
+#tabs button.on{background:var(--butter);color:var(--ink)}
+#tabs button:disabled{opacity:.38;cursor:not-allowed}
+.workgrid{display:grid;grid-template-columns:240px minmax(260px,1fr) 340px}
+#ticket{border-right:4px solid var(--ink);padding:12px;background:#fffdf3}
+#stageWrap{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;min-height:440px;
+  background:conic-gradient(#fff3cf 25%,#ffd6e5 0 50%,#fff3cf 0 75%,#ffd6e5 0) 0 0/56px 56px}
+#itemCv{width:288px;height:408px;max-width:100%;background:transparent}
+#stageMsg{margin-top:6px;background:#fff;border:3px solid var(--ink);padding:4px 10px;font-size:21px;text-align:center}
+#stageMsg:empty{display:none}
+#picker{border-left:4px solid var(--ink);padding:12px;background:#eefaff;max-height:560px;overflow:auto}
+#foot{display:flex;justify-content:flex-end;gap:10px;padding:10px 12px;border-top:4px solid var(--ink);background:#dff4ff}
+
+.btn{font-family:'Press Start 2P',monospace;font-size:12px;line-height:1.3;padding:12px 16px;background:var(--butter);color:var(--ink);
+  border:4px solid var(--ink);box-shadow:0 4px 0 var(--ink);cursor:pointer}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:none}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.alt{background:#fff}
+.btn.pink{background:var(--berry);color:#fff;text-shadow:2px 2px 0 var(--ink)}
+.btn.sm{font-size:10px;padding:9px 10px}
+.btn.big{font-size:15px;padding:16px 22px}
+
+/* ticket */
+.tk{font-size:21px}
+.tkh{display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-family:'Press Start 2P',monospace;font-size:11px}
+.tkh b{font-weight:400;background:var(--ink);color:#fff;padding:4px 6px}
+.tkt{font-family:'Press Start 2P',monospace;font-size:12px;margin:10px 0 8px;padding-bottom:8px;border-bottom:3px dashed var(--ink);line-height:1.5}
+.tk ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.tk li em{display:block;font-style:normal;font-size:18px;color:#6a68b0}
+.vi{display:flex;align-items:center;gap:7px}
+.vi.none{color:#8a88c0}
+.chip{display:inline-block;width:16px;height:16px;border:3px solid var(--ink);background:var(--c);flex:none}
+.tray{margin-top:14px;padding:8px;border:3px dashed #9aa0e8;font-size:19px;color:#4a489a;background:#f4f5ff}
+.tray h4{font-size:10px;margin-bottom:6px;color:var(--ink)}
+.emptyTicket{color:#6a68b0;font-size:21px}
+
+/* picker */
+.grp{margin-bottom:14px}
+.grp h3{font-size:11px;margin-bottom:8px}
+.note{margin:-2px 0 8px;color:#5a58a8;font-size:19px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.opt .lb{min-width:0;overflow-wrap:anywhere}
+.opt{display:flex;align-items:center;gap:8px;text-align:left;line-height:1;font-size:21px;padding:8px;background:#fff;
+  border:3px solid var(--ink);box-shadow:0 3px 0 var(--ink);cursor:pointer;color:var(--ink);min-height:44px}
+.opt:active:not(:disabled){transform:translateY(3px);box-shadow:none}
+.opt:disabled{opacity:.38;cursor:not-allowed}
+.opt.sel{background:var(--butter)}
+.opt .sw{width:22px;height:22px;border:3px solid var(--ink);background:var(--c);flex:none}
+.opt .ct{margin-left:auto;background:var(--ink);color:#fff;font:400 11px 'Press Start 2P',monospace;padding:4px 5px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+
+.meter{position:relative;display:flex;height:46px;border:4px solid var(--ink);margin:14px 0 6px;background:#fff}
+.zone{flex:1;display:flex;align-items:center;justify-content:center;font-size:21px}
+.zone.z1{background:#d9f4ff}.zone.z2{background:#b3e6ff}.zone.z3{background:#8fd3ff}
+.meter i{position:absolute;top:-10px;bottom:-10px;width:8px;margin-left:-4px;background:var(--berry);border:3px solid var(--ink);left:0}
+#holdBlend{width:100%;margin-top:14px;padding:24px 10px;font-size:14px;touch-action:none;user-select:none;-webkit-user-select:none}
+#holdBlend.down{transform:translateY(4px);box-shadow:none;background:var(--berry);color:#fff}
+.servebox{display:flex;flex-direction:column;gap:12px}
+.servebox p{margin:0}
+
+/* ---------- overlays ---------- */
+#overlay{position:fixed;inset:0;background:rgba(14,13,44,.86);display:none;align-items:center;justify-content:center;padding:14px;z-index:50;overflow:auto}
+.card{background:var(--panel);border:4px solid var(--ink);box-shadow:0 8px 0 #0b0a26;max-width:600px;width:100%;padding:20px;margin:auto}
+.card h2{font-size:17px;margin-bottom:12px}
+.card p{margin:0 0 12px;font-size:23px}
+.card .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.card.title{background:linear-gradient(#2c2b6e,#1c1b4a);color:#fff;text-align:center;border-color:#0b0a26}
+.title h1{font-size:28px;color:var(--butter);text-shadow:3px 3px 0 var(--berry),6px 6px 0 #0b0a26;margin:10px 0 14px}
+.title p{color:#d5d9ff}
+.title #rjCv{width:240px;height:280px}
+.title .btns{justify-content:center}
+.title small{display:block;margin-top:14px;color:#9fa4ee;font-size:19px}
+.howto{margin:0 0 6px;padding-left:26px;font-size:23px}
+.howto li{margin-bottom:8px}
+.stars{font-size:34px;letter-spacing:4px;color:var(--butter);text-shadow:2px 2px 0 var(--ink);margin:2px 0 6px}
+.stars .off{color:#c4c9f0}
+.parts{list-style:none;margin:0 0 12px;padding:0;font-size:22px}
+.parts li{display:flex;justify-content:space-between;border-bottom:2px dotted #9aa0e8;padding:3px 0}
+.money{display:grid;grid-template-columns:1fr auto;gap:2px 16px;font-size:24px;margin-bottom:6px}
+.money .tot{font-weight:700;border-top:3px solid var(--ink);padding-top:4px;margin-top:4px}
+.shopgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-bottom:16px}
+.shopgrid .opt{justify-content:space-between}
+.shopgrid .price{font:400 11px 'Press Start 2P',monospace}
+.cardscroll{max-height:62vh;overflow:auto;padding-right:4px}
+
+#toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:var(--ink);color:#fff;border:4px solid #0b0a26;padding:10px 16px;
+  font-size:22px;z-index:70;display:none;max-width:90vw;text-align:center}
+
+@media (max-width:900px){
+  .workgrid{grid-template-columns:1fr}
+  #ticket{border-right:0;border-bottom:4px solid var(--ink)}
+  #picker{border-left:0;border-top:4px solid var(--ink);max-height:none}
+  #itemCv{width:216px;height:306px}
+  #stageWrap{min-height:350px}
+  .slot .cust{width:64px;height:80px;margin-bottom:-8px}
+  .slot{min-height:116px}
+  .ledge .top{flex-direction:column;gap:2px}
+  .slots{gap:6px;padding:6px 6px 0}
+  .ledge{padding:5px 6px 7px}
+  .ledge .nm{font-size:8px}
+  .ledge .st{font-size:18px}
+  .title h1{font-size:21px}
+  #hud{font-size:9px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hud">
+    <div class="brand">RJ's Frozen Kitchen</div>
+    <div>Day <b id="hDay">1</b></div>
+    <div>Cash <b id="hCash">$0.00</b></div>
+    <div class="prog"><span>Customers</span><div class="bar"><i id="hProg"></i></div><b id="hCount">0/0</b></div>
+    <button class="mini" id="bSound" type="button">Sound: on</button>
+    <button class="mini" id="bPause" type="button">Pause</button>
+  </header>
+
+  <section id="counter" aria-label="Customer counter">
+    <div class="awning"></div>
+    <div class="slots" id="slots"></div>
+  </section>
+  <div id="speech" role="status" aria-live="polite"></div>
+
+  <section id="work" aria-label="Kitchen">
+    <nav id="tabs" aria-label="Stations">
+      <button type="button" data-st="build">Build</button>
+      <button type="button" data-st="blend">Blend</button>
+      <button type="button" data-st="top">Top</button>
+      <button type="button" data-st="serve">Serve</button>
+    </nav>
+    <div class="workgrid">
+      <aside id="ticket" aria-label="Order ticket"></aside>
+      <div id="stageWrap">
+        <canvas id="itemCv" width="96" height="136" aria-label="Your treat"></canvas>
+        <div id="stageMsg"></div>
+      </div>
+      <div id="picker"></div>
+    </div>
+    <div id="foot"><button class="btn" id="bNext" type="button">Next station</button></div>
+  </section>
+</div>
+<div id="overlay" role="dialog" aria-modal="true"></div>
+<div id="toast" role="status"></div>
+
+<script>
+(()=>{
+'use strict';
+
+/* =====================================================================
+   Helpers
+===================================================================== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const round2=n=>Math.round(n*100)/100;
+const money=n=>'$'+round2(n).toFixed(2);
+const sum=o=>Object.values(o).reduce((a,b)=>a+b,0);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const hrnd=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x);};
+const countOf=(l,id)=>l.filter(x=>x===id).length;
+const joinAnd=a=>a.length<=1?(a[0]||''):a.length===2?a[0]+' and '+a[1]:a.slice(0,-1).join(', ')+', and '+a[a.length-1];
+
+/* =====================================================================
+   Menu catalog
+===================================================================== */
+const FLAVORS={
+  vanilla:{n:'Vanilla',c:'#fff0c2',d:'#e6cf94'},
+  choc:{n:'Chocolate',c:'#8a5030',d:'#5e341d'},
+  straw:{n:'Strawberry',c:'#ff9fbd',d:'#e7709b'},
+  mint:{n:'Mint Chip',c:'#a2f2d2',d:'#6fd2ab',fleck:'#4a2e26',cost:60},
+  cookie:{n:'Cookie Dough',c:'#f3e0b2',d:'#d5ba7a',fleck:'#8a5530',cost:90},
+  blue:{n:'Blueberry',c:'#97a4ff',d:'#6c78e8',cost:110},
+  mango:{n:'Mango',c:'#ffcb5c',d:'#ec9f2f',cost:130},
+  cotton:{n:'Cotton Candy',c:'#ffb8f0',d:'#d98cdc',fleck:'#8fdcff',cost:160}
+};
+const CONES={
+  cake:{n:'Cake Cone',c:'#e8c98c'},
+  waffle:{n:'Waffle Cone',c:'#d9913d'},
+  sugar:{n:'Sugar Cone',c:'#e8b86a'}
+};
+const TOPS={
+  whip:{n:'Whipped Cream',c:'#ffffff',max:2,grp:'dessert'},
+  cherry:{n:'Cherry',c:'#e0223d',max:3,grp:'both'},
+  sprinkles:{n:'Sprinkles',c:'#ff6fb5',max:2,grp:'dessert'},
+  fudge:{n:'Fudge Drizzle',c:'#4a2514',sauce:1,max:1,grp:'dessert'},
+  strsauce:{n:'Strawberry Drizzle',c:'#e0356c',sauce:1,max:1,grp:'dessert'},
+  caramel:{n:'Caramel Drizzle',c:'#dc8c24',sauce:1,max:1,grp:'dessert',cost:50},
+  marshcream:{n:'Marshmallow Drizzle',c:'#f4f4ff',sauce:1,max:1,grp:'dessert',cost:80},
+  razz:{n:'Blue Razz Drizzle',c:'#2e7bff',sauce:1,max:1,grp:'dessert',cost:100},
+  nuts:{n:'Chopped Nuts',c:'#a8693a',max:2,grp:'dessert',cost:40},
+  crumbs:{n:'Cookie Crumbs',c:'#5b3a2c',max:2,grp:'dessert',cost:60},
+  gummy:{n:'Gummy Bear',c:'#5ee06b',max:3,grp:'both',cost:80},
+  minimarsh:{n:'Mini Marshmallows',c:'#ffffff',max:2,grp:'dessert',cost:80},
+  lemon:{n:'Lemon Wedge',c:'#ffe14a',max:1,grp:'slush'},
+  umbrella:{n:'Paper Umbrella',c:'#ff5470',max:1,grp:'slush'}
+};
+const MIX={
+  cookie:{n:'Cookie Bits',c:'#3d2b2a'},
+  brownie:{n:'Brownie Chunks',c:'#6b3a1e'},
+  strbits:{n:'Strawberry Bits',c:'#ff4d6d',cost:70},
+  candy:{n:'Candy Bits',c:'#4dd0ff',cost:90},
+  pbcup:{n:'Peanut Butter Cups',c:'#c98a3e',cost:110}
+};
+const SYRUP={
+  cherry:{n:'Cherry',c:'#ff3d5a'},
+  razz:{n:'Blue Raspberry',c:'#3da5ff'},
+  lemon:{n:'Lemon',c:'#ffe14a'},
+  lime:{n:'Lime',c:'#7ae04a',cost:50},
+  grape:{n:'Grape',c:'#a05cff',cost:70},
+  orange:{n:'Orange',c:'#ff9a2e',cost:90}
+};
+const SODA={
+  cola:{n:'Cola',c:'#3a1f14',foam:'#d9b89a'},
+  root:{n:'Root Beer',c:'#6b3a1d',foam:'#f3e1c4'},
+  lime:{n:'Lime Fizz',c:'#b9f56a',foam:'#f0ffd0'},
+  orange:{n:'Orange Pop',c:'#ffa63a',foam:'#fff0cf',cost:60},
+  cream:{n:'Cream Soda',c:'#f2d083',foam:'#fffbe8',cost:90}
+};
+const TYPES={
+  cone:{n:'Ice Cream Cone',plural:'Ice cream cones',day:1,base:2.5},
+  sundae:{n:'Sundae',plural:'Sundaes',day:1,base:3.5},
+  shake:{n:'Milkshake',plural:'Milkshakes',day:2,base:4},
+  slush:{n:'Slushie',plural:'Slushies',day:3,base:3},
+  float:{n:'Soda Float',plural:'Soda floats',day:4,base:4.5}
+};
+const SIZES={S:'Small',M:'Medium',L:'Large'};
+const BLENDNAME={shake:{low:'Chunky',mid:'Medium',high:'Smooth'},slush:{low:'Icy',mid:'Slushy',high:'Smooth'}};
+const BLENDC={low:15,mid:50,high:85};
+const MAXSCOOP={cone:3,sundae:3,shake:2,float:2};
+const CAT={flavor:FLAVORS,top:TOPS,mix:MIX,syrup:SYRUP,soda:SODA};
+const UPS={
+  comfy:{n:'Comfy Bench',d:'Customers wait 15% longer.',costs:[100,220,380]},
+  tipjar:{n:'Big Tip Jar',d:'Tips are 20% bigger.',costs:[80,180,320]}
+};
+const NAMES=['Maple','Jules','Dex','Poppy','Tank','Ivy','Moe','Luna','Gus','Rosie','Finn','Pearl','Ozzy','Wren','Bo','Cleo','Hank','Dot','Sage','Remy','Birdie','Cash','Juno','Milo'];
+const SKIN=['#ffdbb4','#f1c27d','#e0ac69','#c68642','#8d5524','#5c3a1e'];
+const HAIRC=['#2b1a12','#5a3a1e','#a0522d','#e6c27a','#d94f4f','#4a6cff','#2fb59a','#8a8a8a'];
+const SHIRT=['#ff6f9f','#4dd0ff','#ffd84a','#7ae04a','#a05cff','#ff9a2e','#ffffff','#3d5afe'];
+
+/* =====================================================================
+   State
+===================================================================== */
+const SAVE='rjsFrozenKitchen.v1';
+const S={day:1,cash:0,owned:new Set(),up:{comfy:0,tipjar:0},sound:true,lifetime:0};
+let D=null;
+const ui={mode:'title',station:'build',activeId:null,paused:false,holdBlend:false,stageDirty:true,last:null,confirmNew:false};
+let uid=0;
+
+function save(){try{localStorage.setItem(SAVE,JSON.stringify({day:S.day,cash:S.cash,owned:[...S.owned],up:S.up,sound:S.sound,lifetime:S.lifetime}));}catch(e){}}
+function load(){
+  try{
+    const j=JSON.parse(localStorage.getItem(SAVE)||'null');
+    if(!j||!j.day)return false;
+    S.day=j.day;S.cash=j.cash||0;S.owned=new Set(j.owned||[]);
+    S.up=Object.assign({comfy:0,tipjar:0},j.up||{});S.sound=j.sound!==false;S.lifetime=j.lifetime||0;
+    return true;
+  }catch(e){return false;}
+}
+function wipe(){
+  try{localStorage.removeItem(SAVE);}catch(e){}
+  S.day=1;S.cash=0;S.owned=new Set();S.up={comfy:0,tipjar:0};S.lifetime=0;
+}
+
+const owns=(cat,id)=>!CAT[cat][id].cost||S.owned.has(cat+':'+id);
+const avail=cat=>Object.keys(CAT[cat]).filter(id=>owns(cat,id));
+const topOK=(id,type)=>{const gp=TOPS[id].grp;return type==='slush'?(gp==='slush'||gp==='both'):(gp==='dessert'||gp==='both');};
+const availTypes=()=>Object.keys(TYPES).filter(k=>TYPES[k].day<=S.day);
+const hasBlend=o=>o&&(o.type==='shake'||o.type==='slush');
+
+/* =====================================================================
+   Sound
+===================================================================== */
+let AC=null,blendNode=null;
+function ac(){
+  if(!S.sound)return null;
+  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
+  if(AC.state==='suspended')AC.resume();
+  return AC;
+}
+function tone(f,d=.08,type='square',v=.05,when=0,slide=0){
+  const a=ac();if(!a)return;
+  const t=a.currentTime+when,o=a.createOscillator(),gn=a.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);
+  if(slide)o.frequency.linearRampToValueAtTime(f+slide,t+d);
+  gn.gain.setValueAtTime(v,t);gn.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(gn);gn.connect(a.destination);o.start(t);o.stop(t+d+.03);
+}
+const sfx={
+  click:()=>tone(700,.05),
+  add:()=>tone(520,.08,'triangle',.08,0,180),
+  ding:()=>{tone(880,.12,'triangle',.08);tone(1320,.25,'triangle',.08,.1);},
+  buzz:()=>tone(140,.32,'sawtooth',.06),
+  coin:()=>{tone(988,.07,'square',.05);tone(1319,.2,'square',.05,.07);},
+  order:()=>{tone(660,.08,'triangle',.07);tone(990,.14,'triangle',.07,.08);}
+};
+function blendOn(){
+  const a=ac();if(!a||blendNode)return;
+  const o=a.createOscillator(),gn=a.createGain(),lfo=a.createOscillator(),lg=a.createGain();
+  o.type='sawtooth';o.frequency.value=70;lfo.frequency.value=14;lg.gain.value=18;
+  lfo.connect(lg);lg.connect(o.frequency);gn.gain.value=.035;o.connect(gn);gn.connect(a.destination);
+  o.start();lfo.start();blendNode={o,lfo};
+}
+function blendOff(){if(!blendNode)return;try{blendNode.o.stop();blendNode.lfo.stop();}catch(e){}blendNode=null;}
+
+/* =====================================================================
+   Pixel drawing helpers (everything is drawn on tiny canvases and scaled up)
+===================================================================== */
+let g=null;
+const OL='#2b2150';
+function useCtx(cv){const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;g=ctx;return ctx;}
+const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
+const E=(cx,cy,rx,ry,c)=>{
+  g.fillStyle=c;cx=Math.round(cx);cy=Math.round(cy);rx=Math.round(rx);ry=Math.max(1,Math.round(ry));
+  for(let y=-ry;y<=ry;y++){const w=Math.round(rx*Math.sqrt(Math.max(0,1-(y*y)/(ry*ry+.01))));g.fillRect(cx-w,cy+y,w*2+1,1);}
+};
+const EO=(cx,cy,rx,ry,c)=>{E(cx,cy,rx+1,ry+1,OL);E(cx,cy,rx,ry,c);};
+function hex2rgb(h){const n=parseInt(h.slice(1),16);return[n>>16,(n>>8)&255,n&255];}
+function rgb2hex(r,gg,b){return '#'+[r,gg,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join('');}
+function shade(h,p){const [r,gg,b]=hex2rgb(h);const t=p<0?0:255,k=Math.abs(p);return rgb2hex(r+(t-r)*k,gg+(t-gg)*k,b+(t-b)*k);}
+function avgColor(list){
+  const a=list.map(hex2rgb),n=a.length;
+  return rgb2hex(a.reduce((s,x)=>s+x[0],0)/n,a.reduce((s,x)=>s+x[1],0)/n,a.reduce((s,x)=>s+x[2],0)/n);
+}
+
+/* ---------- ingredients ---------- */
+function scoop(cx,cy,id,r){
+  const F=FLAVORS[id];
+  const k=Math.round(r/2.3),br=Math.round(r/3.3)+1;
+  for(let i=-2;i<=2;i++)EO(cx+i*k,cy+r-3,br,3,F.d);
+  EO(cx,cy,r,r-2,F.c);
+  E(cx,cy+3,r-3,r-6,shade(F.c,-.07));
+  E(cx-1,cy-2,r-4,r-6,F.c);
+  R(cx-r+4,cy-r+4,5,2,shade(F.c,.55));
+  R(cx-r+3,cy-r+6,2,3,shade(F.c,.55));
+  if(F.fleck){
+    for(let i=0;i<10;i++){
+      const a=hrnd(i*3.1+cx)*6.283,d=hrnd(i*7.7+cy)*(r-4);
+      R(cx+Math.cos(a)*d,cy+Math.sin(a)*d*.8,2,2,F.fleck);
+    }
+  }
+}
+function cherry(x,y){
+  EO(x,y,3,3,'#e0223d');R(x-2,y-2,1,1,'#ff9aa8');
+  R(x,y-7,1,5,'#2f6b2a');R(x+1,y-8,2,1,'#2f6b2a');
+}
+function bear(x,y,c){
+  x=Math.round(x);y=Math.round(y);
+  R(x-3,y-6,2,2,c);R(x+2,y-6,2,2,c);R(x-2,y-5,5,3,c);R(x-2,y-2,5,4,c);R(x-3,y-1,1,2,c);R(x+3,y-1,1,2,c);
+  R(x-1,y-4,1,1,OL);R(x+1,y-4,1,1,OL);
+}
+function lemon(x,y){
+  for(let i=0;i<=9;i++){const w=Math.round(10*Math.sqrt(Math.max(0,1-(i/10)*(i/10))));R(x-w,y+i,w*2+1,1,OL);}
+  for(let i=0;i<=8;i++){const w=Math.round(9*Math.sqrt(Math.max(0,1-(i/9)*(i/9))));R(x-w,y+i,w*2+1,1,'#f2c200');}
+  for(let i=0;i<=6;i++){const w=Math.round(7*Math.sqrt(Math.max(0,1-(i/7)*(i/7))));R(x-w,y+i,w*2+1,1,'#fff08a');}
+  R(x,y,1,6,'#f2c200');R(x-4,y,1,4,'#f2c200');R(x+4,y,1,4,'#f2c200');
+}
+function umbrella(x,y){
+  R(x,y,1,18,'#8a5a2a');
+  for(let r=0;r<6;r++){
+    const w=r*2+2;
+    for(let i=-w;i<=w;i++){R(x+i,y-6+r,1,1,(Math.floor((i+20)/3)%2)?'#ff5470':'#ffffff');}
+  }
+  R(x-12,y,25,1,OL);
+}
+function straw(x,y,len,c1,c2,w){
+  for(let i=0;i<len;i++)R(x+Math.round(i*.35),y-i,w,1,(i>>2)%2?c1:c2);
+  for(let i=0;i<len;i+=1){R(x+Math.round(i*.35)-1,y-i,1,1,OL);R(x+Math.round(i*.35)+w,y-i,1,1,OL);}
+}
+
+/* ---------- vessels ---------- */
+function coneBody(kind){
+  const cx=48;
+  if(kind==='cake'){
+    const top=86,bot=122,hwAt=y=>Math.round(15-5*((y-top)/(bot-top)));
+    for(let y=top-1;y<=bot+1;y++){const hw=hwAt(Math.min(y,bot));R(cx-hw-1,y,2*hw+3,1,OL);}
+    for(let y=top;y<=bot;y++){const hw=hwAt(y);R(cx-hw,y,2*hw+1,1,'#e8c98c');}
+    for(let x=-12;x<=12;x+=4){for(let y=top+3;y<=bot-1;y++){const hw=hwAt(y);const xx=Math.round(x*hw/15);if(Math.abs(xx)<hw)R(cx+xx,y,1,1,'#c9a35f');}}
+    R(cx-17,top-2,35,5,OL);R(cx-16,top-1,33,3,'#f6e3b4');
+    R(cx-14,bot-2,29,2,'#c9a35f');
+  }else{
+    const top=84,bot=132;
+    const pal=kind==='waffle'?['#d9913d','#a8641f','#f0b765']:['#e8b86a','#c08a3a','#f8d9a0'];
+    const k=kind==='waffle'?5:7;
+    for(let y=top-1;y<=bot+1;y++){const t=clamp((y-top)/(bot-top),0,1);const hw=Math.round(16*(1-t))+1;R(cx-hw-1,y,2*hw+3,1,OL);}
+    for(let y=top;y<=bot;y++){
+      const t=(y-top)/(bot-top),hw=Math.round(16*(1-t))+1;
+      R(cx-hw,y,2*hw+1,1,pal[0]);
+      for(let x=cx-hw;x<=cx+hw;x++){if(((x+y)%k===0)||(((x-y)%k+k)%k===0))R(x,y,1,1,pal[1]);}
+    }
+    R(cx-18,top-3,37,5,OL);R(cx-17,top-2,35,3,pal[2]);
+  }
+}
+function glass(cx,top,bot,hwT,hwB,fill){
+  const hwAt=y=>Math.round(hwT-(hwT-hwB)*((y-top)/(bot-top)));
+  for(let y=top;y<=bot;y++){const hw=hwAt(y);R(cx-hw,y,2*hw+1,1,fill);R(cx-hw-1,y,1,1,OL);R(cx+hw+1,y,1,1,OL);}
+  const hb=hwAt(bot);R(cx-hb-1,bot+1,2*hb+3,1,OL);
+  return hwAt;
+}
+function rimLine(cx,top,hwT){R(cx-hwT-1,top,2*hwT+3,1,OL);R(cx-hwT,top+1,2*hwT+1,1,'#ffffff');}
+
+function drawCone(b){
+  if(!b.container)return null;
+  coneBody(b.container);
+  const ys=[78,64,50],n=b.scoops.length;
+  b.scoops.forEach((id,i)=>scoop(48,ys[i],id,12));
+  return{x:48,y:n?ys[n-1]-12+3:82,hw:n?9:10,rimY:84,rimHW:16};
+}
+function drawSundae(b){
+  const n=b.scoops.length;
+  const pos=n===1?[[48,90]]:n===2?[[35,92],[61,92]]:[[35,92],[61,92],[48,76]];
+  b.scoops.forEach((id,i)=>scoop(pos[i][0],pos[i][1],id,12));
+  const cx=48,y0=96,y1=120;
+  const hwAt=y=>Math.round(32-16*Math.pow((y-y0)/(y1-y0),1.6));
+  for(let y=y0;y<=y1;y++){const hw=hwAt(y);R(cx-hw,y,2*hw+1,1,'rgba(205,238,255,.9)');R(cx-hw-1,y,1,1,OL);R(cx+hw+1,y,1,1,OL);}
+  const hb=hwAt(y1);R(cx-hb-1,y1+1,2*hb+3,1,OL);
+  R(cx-33,y0-1,67,1,OL);R(cx-32,y0,65,2,'#ffffff');
+  R(cx-26,y0+4,2,12,'rgba(255,255,255,.8)');
+  R(cx-4,y1+2,9,7,OL);R(cx-3,y1+2,7,7,'#cdeeff');
+  EO(cx,130,15,2,'#cdeeff');
+  const A=n===0?{y:92,hw:14}:n===1?{y:80,hw:9}:n===2?{y:84,hw:20}:{y:67,hw:10};
+  return{x:48,y:A.y,hw:A.hw,rimY:96,rimHW:32};
+}
+function drawShake(b){
+  if(!b.size)return null;
+  const H={S:46,M:58,L:70}[b.size],bot=127,top=bot-H,cx=48,hwT=19,hwB=14;
+  const hwAt=glass(cx,top,bot,hwT,hwB,'#e6f7ff');
+  const n=b.scoops.length,blended=b.blend>=2;
+  const inner=(y0,y1,col)=>{for(let y=y0;y<=y1;y++){const hw=hwAt(y)-1;R(cx-hw,y,2*hw+1,1,col);}};
+  const fillTop=top+8,fillBot=bot-2;
+  let mix=null;
+  if(n){
+    mix=avgColor(b.scoops.map(id=>FLAVORS[id].c));
+    if(!blended){
+      const bh=(fillBot-fillTop)/n;
+      b.scoops.forEach((id,j)=>{
+        const y1=Math.round(fillBot-j*bh),y0=Math.round(fillBot-(j+1)*bh);
+        inner(y0,y1,FLAVORS[id].c);inner(y1-1,y1,FLAVORS[id].d);
+      });
+    }else{
+      inner(top+3,fillBot,mix);
+      inner(fillBot-1,fillBot,shade(mix,-.1));
+      const lumps=Math.round(18*(1-b.blend/100)),ls=1+Math.round(3*(1-b.blend/100));
+      for(let i=0;i<lumps;i++){
+        const y=top+6+hrnd(i*3.3)*(H-14),hw=hwAt(Math.round(y))-3;
+        R(cx-hw+hrnd(i*1.9+7)*hw*2,y,ls,ls,shade(mix,.38));
+      }
+    }
+  }
+  const mixes=Object.keys(b.mixins);
+  mixes.forEach((id,k)=>{
+    let idx=0;
+    const col=MIX[id].c,cnt=b.mixins[id];
+    const sz=blended?Math.max(1,Math.round(3*(1-b.blend/100)+.6)):3;
+    for(let i=0;i<cnt*6;i++){
+      idx++;
+      const seed=k*40+idx*2.3;
+      if(blended){
+        const y=top+6+hrnd(seed)*(H-14),hw=hwAt(Math.round(y))-3;
+        R(cx-hw+hrnd(seed+9.1)*hw*2,y,sz,sz,id==='candy'?pick2(seed):col);
+      }else if(i<cnt*3){
+        R(cx-11+hrnd(seed+4.4)*22,top-7+hrnd(seed)*8,3,3,id==='candy'?pick2(seed):col);
+      }
+    }
+  });
+  if(n&&!blended){
+    if(n===1)scoop(cx,top-3,b.scoops[0],10);
+    else{scoop(cx-8,top-2,b.scoops[0],9);scoop(cx+8,top-2,b.scoops[1],9);}
+  }else if(n&&blended){
+    E(cx,top+1,hwT-2,4,shade(mix,.25));E(cx-2,top,hwT-6,2,shade(mix,.45));
+  }
+  rimLine(cx,top,hwT);
+  R(cx-hwT+3,top+6,2,Math.max(6,H-16),'rgba(255,255,255,.6)');
+  straw(cx+3,top+10,Math.round(H*.55)+14,'#ffffff','#ff4d6d',2);
+  return{x:cx,y:blended||!n?top-1:top-9,hw:11,rimY:top,rimHW:hwT};
+}
+function pick2(seed){return ['#ff4d6d','#ffd84a','#4dd0ff','#7dff7d','#ff9a2e','#ffffff'][Math.floor(hrnd(seed*1.7)*6)];}
+function drawSlush(b){
+  if(!b.size)return null;
+  const H={S:48,M:60,L:72}[b.size],bot=127,top=bot-H,cx=48,hwT=21,hwB=15;
+  const hwAt=glass(cx,top,bot,hwT,hwB,'#e9f8ff');
+  const m=b.syrups.length,blended=b.blend>=2;
+  const fillTop=top+5,fillBot=bot-2;
+  if(m){
+    for(let y=fillTop;y<=fillBot;y++){
+      const mid=(fillTop+fillBot)/2+Math.round(Math.sin(y*.9)*1.2);
+      const idx=m===1?0:(y>mid?0:1);
+      const hw=hwAt(y)-1;R(cx-hw,y,2*hw+1,1,SYRUP[b.syrups[idx]].c);
+    }
+  }
+  const sz=Math.max(1,Math.round(6-5*b.blend/100)),cnt=Math.round(10+b.blend*.35+(6-sz)*3);
+  for(let i=0;i<cnt;i++){
+    const y=fillTop+hrnd(i*2.7)*(fillBot-fillTop-sz),hw=hwAt(Math.round(y))-1-sz;
+    const x=cx-hw+hrnd(i*5.9+3)*hw*2;
+    R(x,y,sz,sz,'rgba(255,255,255,.55)');R(x,y+sz-1,sz,1,'rgba(170,220,255,.8)');
+  }
+  const topCol=m?SYRUP[b.syrups[m-1]].c:'#d9f3ff';
+  if(blended){
+    E(cx,top+1,hwT-2,5,shade(topCol,.28));E(cx-2,top-1,hwT-6,3,shade(topCol,.5));
+    for(let i=0;i<7;i++)R(cx-hwT+5+hrnd(i*4.4)*(2*hwT-10),top-3+hrnd(i*1.3)*6,1,1,'#ffffff');
+  }else{
+    for(let i=0;i<5;i++){const s=5;R(cx-14+i*6+hrnd(i)*3,top-5+hrnd(i*2.1)*4,s,s,'rgba(255,255,255,.85)');R(cx-14+i*6+hrnd(i)*3,top-1+hrnd(i*2.1)*4,s,1,'rgba(170,220,255,.9)');}
+  }
+  rimLine(cx,top,hwT);
+  R(cx-hwT+3,top+6,2,Math.max(6,H-16),'rgba(255,255,255,.6)');
+  straw(cx+4,top+12,Math.round(H*.55)+16,'#ffffff','#3da5ff',3);
+  return{x:cx,y:blended?top-4:top-5,hw:12,rimY:top,rimHW:hwT};
+}
+function drawFloat(b){
+  if(!b.soda)return null;
+  const F=SODA[b.soda],cx=44,top=72,bot=127,hw=21;
+  // handle
+  R(cx+hw+1,82,17,31,OL);R(cx+hw+3,84,13,27,'#dff3ff');R(cx+hw+6,87,9,22,OL);g.clearRect(cx+hw+7,88,7,20);
+  // mug
+  R(cx-hw-1,top,2*hw+3,bot-top+2,OL);R(cx-hw,top,2*hw+1,bot-top+1,'#e6f7ff');
+  R(cx-hw+1,top+9,2*hw-1,bot-top-11,F.c);
+  R(cx-hw+1,top+2,2*hw-1,8,F.foam);
+  for(let i=0;i<9;i++)R(cx-hw+4+hrnd(i*3.3)*(2*hw-8),top+13+hrnd(i*1.9+2)*(bot-top-20),2,2,shade(F.c,.35));
+  for(let x=-hw+2;x<=hw-3;x+=5)E(cx+x,top+9,3,2,F.foam);
+  const n=b.scoops.length;
+  if(n===1)scoop(cx,62,b.scoops[0],11);
+  else if(n===2){scoop(cx-9,63,b.scoops[0],10);scoop(cx+9,63,b.scoops[1],10);}
+  rimLine(cx,top,hw);
+  R(cx-hw+3,top+12,2,30,'rgba(255,255,255,.65)');
+  R(cx-hw+1,bot-3,2*hw-1,3,'#bfe3f5');
+  straw(cx+4,top+14,48,'#ffffff','#ff4d6d',2);
+  const A=n===0?{y:top-1,hw:14}:n===1?{y:53,hw:9}:{y:56,hw:17};
+  return{x:cx,y:A.y,hw:A.hw,rimY:top,rimHW:hw};
+}
+
+/* ---------- toppings ---------- */
+function drawToppings(t,A,type){
+  const cx=A.x,y=A.y,wn=t.whip||0,bw=Math.min(2*A.hw,26);
+  let surf=y;
+  if(wn){
+    const tiers=2+wn;
+    for(let i=0;i<tiers;i++){
+      const w=Math.max(4,Math.round(bw*(1-i*.2))),yy=y-5*i;
+      EO(cx,yy,Math.round(w/2),3,'#ffffff');R(cx-Math.round(w/2)+2,yy+2,Math.max(2,w-3),1,'#dbe4ff');
+    }
+    const topC=y-5*(tiers-1);
+    R(cx-1,topC-5,3,3,OL);R(cx,topC-5,1,2,'#ffffff');R(cx-1,topC-4,3,2,'#ffffff');
+    surf=topC-5;
+  }
+  let k=0;
+  Object.keys(t).forEach(id=>{
+    const T=TOPS[id];if(!T.sauce)return;
+    const sy=(wn?y-6:y+3)+k*3,L=wn?Math.round(bw*.42):Math.round(A.hw*.85);
+    for(let x=-L;x<=L;x++){
+      const yy=sy+Math.round(Math.sin((x+k*4)*.55)*1.5);
+      R(cx+x,yy,1,2,T.c);
+      if(T.c==='#f4f4ff')R(cx+x,yy+2,1,1,'#c9cbe6');
+    }
+    if(!wn){R(cx-Math.round(L*.6),sy+2,2,6+k*2,T.c);R(cx+Math.round(L*.5),sy+2,2,4+k*3,T.c);}
+    k++;
+  });
+  const half=wn?bw*.3:A.hw;
+  const reg={x0:cx-half,x1:cx+half,y0:wn?surf+4:y,y1:wn?y-3:y+7};
+  const sc=(n,seed,fn)=>{for(let i=0;i<n;i++)fn(reg.x0+hrnd(seed+i*3.7)*(reg.x1-reg.x0),reg.y0+hrnd(seed+i*5.3+1)*(reg.y1-reg.y0),i);};
+  const SP=['#ff4d6d','#ffd84a','#4dd0ff','#7dff7d','#ff9a2e','#ffffff'];
+  if(t.sprinkles)sc(12*t.sprinkles,11,(x,yy,i)=>{if(i%2)R(x,yy,2,1,SP[i%6]);else R(x,yy,1,2,SP[i%6]);});
+  if(t.nuts)sc(7*t.nuts,31,(x,yy)=>{R(x,yy,2,2,'#a8693a');R(x,yy,1,1,'#c78a52');});
+  if(t.crumbs)sc(12*t.crumbs,51,(x,yy)=>{R(x,yy,2,1,'#4a2f26');R(x+1,yy+1,1,1,'#6b4636');});
+  if(t.minimarsh)sc(3*t.minimarsh,71,(x,yy)=>{R(x,yy,3,3,'#ffffff');R(x+2,yy+2,1,1,'#d8d8f0');R(x,yy,3,1,OL);});
+  if(t.gummy){
+    const BC=['#ff4d6d','#ffd84a','#5ee06b','#ff9a2e'];
+    for(let i=0;i<t.gummy;i++)bear(cx+(i-(t.gummy-1)/2)*9,(wn?y-1:y+2)-(i===1&&t.gummy===3?4:0),BC[i%4]);
+  }
+  if(t.cherry){
+    const n=t.cherry,by=surf-1;
+    const P=n===1?[[0,0]]:n===2?[[-4,0],[4,0]]:[[-5,0],[5,0],[0,-5]];
+    P.forEach(p=>cherry(cx+p[0],by+p[1]-1));
+  }
+  if(t.lemon&&A.rimY!=null)lemon(cx+A.rimHW-4,A.rimY-3);
+  if(t.umbrella&&A.rimY!=null)umbrella(cx-A.rimHW+8,A.rimY-18);
+}
+
+/* ---------- stage ---------- */
+const stageCv=$('#itemCv');
+function drawStage(){
+  useCtx(stageCv);
+  g.clearRect(0,0,96,136);
+  const c=activeCust();
+  if(!c){E(48,131,34,3,'rgba(28,27,74,.18)');drawRJ(2,0,6);return;}
+  E(48,133,32,3,'rgba(28,27,74,.2)');
+  const b=c.build,o=c.order;
+  let A=null;
+  if(o.type==='cone')A=drawCone(b);
+  else if(o.type==='sundae')A=drawSundae(b);
+  else if(o.type==='shake')A=drawShake(b);
+  else if(o.type==='slush')A=drawSlush(b);
+  else if(o.type==='float')A=drawFloat(b);
+  if(A)drawToppings(b.tops,A,o.type);
+}
+
+/* ---------- RJ the squirrel ---------- */
+function drawRJ(scale,ox,oy){
+  g.save();g.translate(ox,oy);g.scale(scale,scale);
+  const fur='#b9763b',furD='#8c5427',furL='#e0a064',belly='#f3d8a8',ink='#2a1a14',fl='#c0392b',fld='#7a1d17';
+  // tail
+  EO(39,30,8,18,fur);E(40,32,4,13,furL);
+  for(const yy of [18,24,30,36,42])R(33,yy,12,2,furD);
+  // torso (flannel)
+  R(10,33,24,23,OL);R(11,34,22,22,fl);
+  for(const yy of [38,45,52])R(11,yy,22,2,fld);
+  for(const xx of [16,28])R(xx,34,2,22,fld);
+  R(21,36,2,20,'#f0d0a0');R(18,34,8,3,'#f0d0a0');
+  // head
+  EO(22,20,11,10,fur);
+  EO(13,8,4,5,fur);E(13,9,2,3,'#e7a47a');
+  EO(31,8,4,5,fur);E(31,9,2,3,'#e7a47a');
+  EO(22,20,11,10,fur);
+  E(22,25,6,4,belly);
+  R(21,23,3,2,ink);R(22,25,1,2,ink);R(21,27,3,3,'#ffffff');R(22,27,1,3,'#d8d8e8');
+  R(15,17,4,5,'#ffffff');R(16,18,3,4,ink);R(26,17,4,5,'#ffffff');R(27,18,3,4,ink);
+  R(14,15,5,1,ink);R(26,15,5,1,ink);R(15,14,3,1,ink);R(27,14,3,1,ink);
+  R(11,23,2,2,furD);R(32,23,2,2,furD);
+  // arm + cone
+  R(8,38,6,5,furD);
+  for(let yy=34;yy<=46;yy++){const hw=Math.round(4*(1-(yy-34)/13));R(3-hw+3,yy,2*hw+1,1,'#d9913d');}
+  EO(6,31,5,5,'#ff9fbd');R(4,29,2,1,'#ffd1e0');
+  g.restore();
+}
+
+/* ---------- customers ---------- */
+function drawCustomer(cv,L,mood){
+  const ctx=useCtx(cv);ctx.clearRect(0,0,32,40);
+  const y0=L.kid?6:0,hx=L.kid?7:8,hy=L.kid?8:9,M='#7a2a2a';
+  // body
+  R(4,25+y0,24,16,OL);R(5,26+y0,22,15,L.shirt);
+  if(L.stripe)for(let i=0;i<4;i++)R(5,29+y0+i*4,22,1,shade(L.shirt,L.shirt==='#ffffff'?-.15:.3));
+  R(13,23+y0,6,4,OL);R(14,23+y0,4,4,L.skin);
+  // back hair
+  if(L.style===1)EO(16,16+y0,hx+2,hy+3,L.hair);
+  if(L.style===2)EO(16,11+y0,hx+3,hy,L.hair);
+  if(L.style===3)EO(16,3+y0,4,4,L.hair);
+  // head
+  EO(16,15+y0,hx,hy,L.skin);
+  // front hair
+  if(L.style===0||L.style===1||L.style===3){R(16-hx+1,8+y0,hx*2-1,3,L.hair);R(16-hx,10+y0,2,4,L.hair);R(16+hx-1,10+y0,2,4,L.hair);}
+  if(L.style===2)R(16-hx+1,7+y0,hx*2-1,3,L.hair);
+  if(L.style===4){R(16-hx-1,6+y0,hx*2+3,4,OL);R(16-hx,7+y0,hx*2+1,3,L.cap);R(16-hx-2,10+y0,hx*2+6,2,OL);R(16-hx-1,10+y0,hx*2+4,1,shade(L.cap,-.25));}
+  // eyes
+  R(12,14+y0,2,3,OL);R(19,14+y0,2,3,OL);
+  if(L.glasses){
+    for(const x of [10,17]){R(x,13+y0,6,1,OL);R(x,17+y0,6,1,OL);R(x,13+y0,1,5,OL);R(x+5,13+y0,1,5,OL);}
+    R(16,14+y0,1,1,OL);
+  }
+  // mood
+  if(mood==='happy'){R(13,21+y0,6,1,M);R(12,20+y0,1,1,M);R(19,20+y0,1,1,M);}
+  else if(mood==='neutral'){R(14,21+y0,4,1,M);}
+  else if(mood==='angry'){R(11,12+y0,4,1,OL);R(18,12+y0,4,1,OL);R(12,13+y0,2,1,OL);R(19,13+y0,2,1,OL);R(13,21+y0,6,1,M);R(12,22+y0,1,1,M);R(19,22+y0,1,1,M);}
+  else if(mood==='delight'){R(13,20+y0,6,3,M);R(14,20+y0,4,1,'#ffffff');R(14,22+y0,4,1,'#ff7a8a');R(9,18+y0,2,2,'#ff9aa8');R(21,18+y0,2,2,'#ff9aa8');}
+  else if(mood==='sad'){R(13,21+y0,6,1,M);R(12,22+y0,1,1,M);R(19,22+y0,1,1,M);R(11,17+y0,1,3,'#7ad0ff');}
+}
+function genLook(){
+  const kid=Math.random()<.25;let style=rand(0,5);
+  if(kid&&style===5)style=0;
+  return{skin:pick(SKIN),hair:pick(HAIRC),style,shirt:pick(SHIRT),cap:pick(SHIRT),glasses:Math.random()<.25,kid,stripe:Math.random()<.4};
+}
+
+/* =====================================================================
+   Orders
+===================================================================== */
+function distinct(pool,n){return shuffle(pool).slice(0,Math.min(n,pool.length));}
+function genTops(type,m){
+  const pool=shuffle(avail('top').filter(id=>topOK(id,type)));
+  const n=Math.min(pool.length,rand(Math.max(0,m-1),m)),out={};
+  for(let i=0;i<n;i++){const id=pool[i],mx=TOPS[id].max;out[id]=(mx>1&&S.day>=2&&Math.random()<.35)?rand(2,mx):1;}
+  return out;
+}
+function genOrder(){
+  const pool=[];
+  availTypes().forEach(t=>{const w=(TYPES[t].day===S.day&&S.day>1)?3:1;for(let i=0;i<w;i++)pool.push(t);});
+  const type=pick(pool),m=Math.min(4,1+Math.floor((S.day+1)/2)),fl=avail('flavor');
+  const o={type,tops:genTops(type,m)};
+  const scoops=n=>Array.from({length:n},()=>pick(fl));
+  if(type==='cone'){o.container=pick(Object.keys(CONES));o.scoops=scoops(rand(1,S.day<2?2:3));}
+  else if(type==='sundae'){o.scoops=scoops(S.day<2?2:rand(2,3));}
+  else if(type==='shake'){
+    o.size=pick(['S','M','L']);o.scoops=distinct(fl,(S.day>=4&&Math.random()<.4)?2:1);
+    o.mixins={};distinct(avail('mix'),rand(0,Math.min(2,1+Math.floor(S.day/3)))).forEach(id=>{o.mixins[id]=(S.day>=4&&Math.random()<.3)?2:1;});
+    o.blend=pick(['low','mid','high']);
+  }else if(type==='slush'){
+    o.size=pick(['S','M','L']);o.syrups=distinct(avail('syrup'),(S.day>=4&&Math.random()<.45)?2:1);o.blend=pick(['low','mid','high']);
+  }else if(type==='float'){o.soda=pick(avail('soda'));o.scoops=scoops(rand(1,2));}
+  return o;
+}
+function complexity(o){
+  let c=1;
+  if(o.scoops)c+=o.scoops.length;
+  if(o.mixins)c+=sum(o.mixins);
+  if(o.syrups)c+=o.syrups.length;
+  if(o.blend)c+=1;
+  return c+sum(o.tops);
+}
+function price(o){
+  let p=TYPES[o.type].base;
+  p+=(o.scoops?o.scoops.length:0)*.75+(o.mixins?sum(o.mixins):0)*.5+(o.syrups?o.syrups.length:0)*.5+sum(o.tops)*.4;
+  if(o.size)p+={S:-.5,M:0,L:.75}[o.size];
+  return Math.round(p*4)/4;
+}
+const lc=s=>s.toLowerCase();
+function topsPhrase(t){
+  const ids=Object.keys(t);if(!ids.length)return '';
+  return joinAnd(ids.map(id=>{const n=lc(TOPS[id].n),k=t[id];return k===1?n:k===2?'double '+n:'triple '+n;}));
+}
+function speak(o){
+  const tp=topsPhrase(o.tops),sc=o.scoops?o.scoops.map(i=>lc(FLAVORS[i].n)):[];
+  switch(o.type){
+    case 'cone':return `Hi! One ${lc(CONES[o.container].n)} with ${sc.join(', then ')}${tp?', topped with '+tp:''}, please!`;
+    case 'sundae':return `A sundae please: ${sc.join(', then ')}${tp?', with '+tp:''}.`;
+    case 'shake':{
+      const mx=Object.keys(o.mixins).map(id=>{const k=o.mixins[id];return (k>1?'double ':'')+lc(MIX[id].n);});
+      return `A ${lc(SIZES[o.size])} ${joinAnd(sc)} shake${mx.length?' with '+joinAnd(mx):''}, blended ${lc(BLENDNAME.shake[o.blend])}${tp?', topped with '+tp:''}.`;
+    }
+    case 'slush':return `Can I get a ${lc(SIZES[o.size])} ${joinAnd(o.syrups.map(i=>lc(SYRUP[i].n)))} slushie? Blended ${lc(BLENDNAME.slush[o.blend])}${tp?', with '+tp:''}.`;
+    case 'float':return `${lc(SODA[o.soda].n)} float with ${sc.length===1?'one scoop':'two scoops'} of ${joinAnd(sc)}${tp?', and '+tp:''}, please!`.replace(/^./,x=>x.toUpperCase());
+  }
+  return '';
+}
+
+/* =====================================================================
+   Build state + grading
+===================================================================== */
+const newBuild=()=>({container:null,size:null,soda:null,scoops:[],mixins:{},syrups:[],blend:0,tops:{},hist:[]});
+function hasVessel(o,b){
+  if(o.type==='cone')return !!b.container;
+  if(o.type==='sundae')return true;
+  if(o.type==='float')return !!b.soda;
+  return !!b.size;
+}
+function trayEmpty(b){return !b.container&&!b.size&&!b.soda&&!b.scoops.length&&!sum(b.mixins)&&!b.syrups.length&&!sum(b.tops);}
+function msim(a,b){
+  const ks=new Set([...Object.keys(a),...Object.keys(b)]);let mn=0,mx=0;
+  ks.forEach(k=>{const x=a[k]||0,y=b[k]||0;mn+=Math.min(x,y);mx+=Math.max(x,y);});
+  return mx?mn/mx:1;
+}
+function lsim(a,b){
+  const L=Math.max(a.length,b.length);if(!L)return 1;
+  let ex=0;const ra={},rb={};
+  for(let i=0;i<L;i++){
+    if(a[i]!==undefined&&a[i]===b[i])ex++;
+    else{if(a[i]!==undefined)ra[a[i]]=(ra[a[i]]||0)+1;if(b[i]!==undefined)rb[b[i]]=(rb[b[i]]||0)+1;}
+  }
+  let part=0;Object.keys(ra).forEach(k=>{part+=Math.min(ra[k],rb[k]||0);});
+  return (ex+part*.5)/L;
+}
+const toMap=l=>{const m={};l.forEach(x=>{m[x]=(m[x]||0)+1;});return m;};
+function blendScore(want,val){
+  if(val<2)return 0;
+  const d=Math.abs(val-BLENDC[want]);
+  return d<=12?1:clamp(1-(d-12)/33,0,1);
+}
+function grade(o,b){
+  const P=[],add=(k,w,v)=>P.push({k,w,v});
+  if(o.type==='cone'){add('Cone',.15,b.container===o.container?1:0);add('Scoops',.5,lsim(o.scoops,b.scoops));add('Toppings',.35,msim(o.tops,b.tops));}
+  else if(o.type==='sundae'){add('Scoops',.5,lsim(o.scoops,b.scoops));add('Toppings',.5,msim(o.tops,b.tops));}
+  else if(o.type==='shake'){
+    add('Size',.1,b.size===o.size?1:0);add('Ice cream',.3,msim(toMap(o.scoops),toMap(b.scoops)));
+    add('Mix-ins',.2,msim(o.mixins,b.mixins));add('Blend',.2,blendScore(o.blend,b.blend));add('Toppings',.2,msim(o.tops,b.tops));
+  }else if(o.type==='slush'){
+    add('Size',.15,b.size===o.size?1:0);add('Syrups',.45,lsim(o.syrups,b.syrups));add('Blend',.2,blendScore(o.blend,b.blend));add('Toppings',.2,msim(o.tops,b.tops));
+  }else{
+    add('Soda',.25,b.soda===o.soda?1:0);add('Scoops',.35,msim(toMap(o.scoops),toMap(b.scoops)));add('Toppings',.4,msim(o.tops,b.tops));
+  }
+  const W=P.reduce((a,p)=>a+p.w,0);
+  return{parts:P,acc:P.reduce((a,p)=>a+p.w*p.v,0)/W};
+}
+
+/* =====================================================================
+   Day flow
+===================================================================== */
+function activeCust(){
+  if(!D)return null;
+  return D.slots.find(c=>c&&c.id===ui.activeId&&c.state==='ordered')||null;
+}
+function startDay(){
+  D={total:Math.min(12,3+S.day+(S.day>3?1:0)),spawned:0,num:0,served:0,left:0,accSum:0,earned:0,tips:0,slots:[null,null,null],spawnT:1.2};
+  ui.activeId=null;ui.station='build';ui.paused=false;ui.mode='intro';
+  const fresh=Object.keys(TYPES).filter(k=>TYPES[k].day===S.day&&S.day>1);
+  showOverlay(`<h2>Day ${S.day}</h2>
+    <p>${D.total} customers are lining up today.</p>
+    ${fresh.length?`<p><b>New on the menu:</b> ${joinAnd(fresh.map(k=>TYPES[k].plural.toLowerCase()))}!</p>`:''}
+    <p>Menu today: ${joinAnd(availTypes().map(k=>TYPES[k].plural.toLowerCase()))}.</p>
+    <div class="btns"><button class="btn big" id="bOpen" type="button">Open the shop</button></div>`);
+  refreshAll();
+}
+function beginDay(){hideOverlay();ui.mode='play';ui.paused=false;sfx.order();refreshAll();}
+
+function spawnCustomer(){
+  const i=D.slots.findIndex(x=>!x);if(i<0)return;
+  const o=genOrder();
+  const used=D.slots.filter(Boolean).map(c=>c.name);
+  const name=pick(NAMES.filter(n=>!used.includes(n)));
+  const patMax=(55+13*complexity(o))*(1+.15*S.up.comfy)*Math.max(.65,1-.03*(S.day-1));
+  D.slots[i]={id:++uid,num:++D.num,name,look:genLook(),order:o,speech:speak(o),state:'waiting',patMax,patience:patMax,build:newBuild(),leaveT:0,reaction:null,left:false};
+  D.spawned++;
+  sfx.order();
+  paintSlot(i);refreshSpeech();refreshHUD();
+}
+function moodOf(c){
+  if(c.reaction)return c.reaction;
+  const f=c.patience/c.patMax;
+  return f>.55?'happy':f>.25?'neutral':'angry';
+}
+function onSlot(i){
+  if(ui.mode!=='play'||ui.paused)return;
+  const c=D.slots[i];if(!c)return;
+  sfx.click();
+  if(c.state==='waiting'){c.state='ordered';sfx.order();selectCust(c);}
+  else if(c.state==='ordered')selectCust(c);
+}
+function selectCust(c){
+  ui.activeId=c.id;ui.station='build';
+  paintAllSlots();refreshSpeech();refreshWork();
+}
+function autoSelect(){
+  const cand=D.slots.filter(c=>c&&c.state==='ordered').sort((a,b)=>a.patience/a.patMax-b.patience/b.patMax);
+  ui.activeId=cand.length?cand[0].id:null;ui.station='build';
+}
+function leaveAngry(c){
+  c.state='leaving';c.leaveT=1.6;c.reaction='angry';c.left=true;D.left++;sfx.buzz();
+  toast(`${c.name} got tired of waiting and left!`);
+  if(ui.activeId===c.id){autoSelect();}
+  paintAllSlots();refreshSpeech();refreshWork();refreshHUD();
+}
+function update(dt){
+  if(ui.mode!=='play'||ui.paused||!D)return;
+  const live=D.slots.filter(Boolean).length;
+  if(D.spawned<D.total){
+    D.spawnT-=dt;
+    if(live===0&&D.spawnT>2.5)D.spawnT=2.5;
+    if(D.spawnT<=0){
+      if(live<3){spawnCustomer();D.spawnT=Math.max(8,19-S.day)+Math.random()*4;}
+      else D.spawnT=0;
+    }
+  }
+  D.slots.forEach((c,i)=>{
+    if(!c)return;
+    if(c.state==='waiting'||c.state==='ordered'){
+      c.patience-=dt;
+      if(c.patience<=0)leaveAngry(c);
+    }else if(c.state==='leaving'){
+      c.leaveT-=dt;
+      if(c.leaveT<=0){D.slots[i]=null;paintSlot(i);refreshHUD();}
+    }
+  });
+  if(ui.holdBlend){
+    const c=activeCust();
+    if(c&&hasBlend(c.order)&&ui.station==='blend')c.build.blend=Math.min(100,c.build.blend+34*dt);
+    else stopHold();
+  }
+  if(D.spawned>=D.total&&D.slots.every(x=>!x))endDay();
+}
+
+/* ---------- serving ---------- */
+function serve(c){
+  const o=c.order,r=grade(o,c.build),base=price(o);
+  const patF=clamp(c.patience/c.patMax,0,1);
+  const sale=round2(base*r.acc);
+  const tip=round2(base*.6*Math.pow(r.acc,3)*(.35+.65*patF)*(1+.2*S.up.tipjar));
+  const stars=r.acc>=.97?5:r.acc>=.88?4:r.acc>=.72?3:r.acc>=.5?2:1;
+  c.state='served';c.reaction=stars>=4?'delight':stars===3?'happy':stars===2?'neutral':'sad';
+  D.served++;D.accSum+=r.acc;D.earned+=sale;D.tips+=tip;S.cash=round2(S.cash+sale+tip);S.lifetime++;
+  ui.paused=true;stopHold();
+  paintAllSlots();refreshHUD();
+  const word=['','Yuck!','Meh…','Not bad!','Delicious!','Perfect!'][stars];
+  sfx[stars>=3?'coin':'buzz']();
+  showOverlay(`<h2>${c.name}: ${word}</h2>
+    <div class="stars" aria-label="${stars} out of 5 stars">${'★'.repeat(stars)}<span class="off">${'★'.repeat(5-stars)}</span></div>
+    <p>Order accuracy: <b>${Math.round(r.acc*100)}%</b></p>
+    <ul class="parts">${r.parts.map(p=>`<li><span>${p.k}</span><b>${Math.round(p.v*100)}%</b></li>`).join('')}</ul>
+    <div class="money"><span>Sale</span><span>${money(sale)}</span><span>Tip</span><span>${money(tip)}</span><span class="tot">Total</span><span class="tot">${money(sale+tip)}</span></div>
+    <div class="btns"><button class="btn big" id="bResultOk" type="button">Next customer</button></div>`);
+  $('#bResultOk').focus();
+  $('#bResultOk').onclick=()=>{
+    c.state='leaving';c.leaveT=1.5;ui.paused=false;hideOverlay();
+    autoSelect();paintAllSlots();refreshAll();
+  };
+}
+
+function endDay(){
+  ui.mode='results';
+  const dn=S.day,avg=D.served?D.accSum/D.served:0;
+  const st=D.served?Math.round(clamp(avg*5-D.left*.6,1,5)):0;
+  S.day++;save();
+  ui.last={dn,avg,st,served:D.served,left:D.left,earned:D.earned,tips:D.tips};
+  showResults();
+}
+function showResults(){
+  const L=ui.last;
+  const fresh=Object.keys(TYPES).filter(k=>TYPES[k].day===S.day);
+  showOverlay(`<h2>Day ${L.dn} complete</h2>
+    <div class="stars" aria-label="${L.st} out of 5 stars">${'★'.repeat(L.st)}<span class="off">${'★'.repeat(5-L.st)}</span></div>
+    <div class="money">
+      <span>Customers served</span><span>${L.served}</span>
+      <span>Walked out</span><span>${L.left}</span>
+      <span>Average accuracy</span><span>${Math.round(L.avg*100)}%</span>
+      <span>Sales</span><span>${money(L.earned)}</span>
+      <span>Tips</span><span>${money(L.tips)}</span>
+      <span class="tot">Cash on hand</span><span class="tot">${money(S.cash)}</span>
+    </div>
+    ${fresh.length?`<p><b>Tomorrow:</b> ${joinAnd(fresh.map(k=>TYPES[k].plural.toLowerCase()))} join the menu.</p>`:''}
+    <div class="btns"><button class="btn alt" id="bShop" type="button">Pantry shop</button><button class="btn big" id="bNextDay" type="button">Start day ${S.day}</button></div>`);
+}
+
+/* =====================================================================
+   Shop
+===================================================================== */
+function showShop(){
+  const groups=[['flavor','Ice cream flavors'],['top','Toppings and drizzles'],['mix','Milkshake mix-ins'],['syrup','Slushie syrups'],['soda','Float sodas']];
+  let h=`<h2>Pantry shop</h2><p>Cash: <b>${money(S.cash)}</b></p><div class="cardscroll">`;
+  h+=`<section class="grp"><h3>Upgrades</h3><div class="shopgrid">`;
+  Object.entries(UPS).forEach(([id,u])=>{
+    const lvl=S.up[id],max=u.costs.length,cost=u.costs[lvl];
+    h+=lvl>=max?`<button class="opt" disabled><span class="lb">${u.n}<br><small>Maxed out</small></span></button>`
+      :`<button class="opt" data-buy="up:${id}" ${S.cash<cost?'disabled':''}><span class="lb">${u.n} ${lvl+1}/${max}<br><small>${u.d}</small></span><span class="price">${money(cost)}</span></button>`;
+  });
+  h+=`</div></section>`;
+  groups.forEach(([cat,title])=>{
+    const items=Object.entries(CAT[cat]).filter(([id,v])=>v.cost&&!owns(cat,id));
+    h+=`<section class="grp"><h3>${title}</h3>`;
+    if(!items.length)h+=`<p class="note">Everything unlocked.</p>`;
+    else{
+      h+=`<div class="shopgrid">`;
+      items.forEach(([id,v])=>{
+        const sw=v.c?`<span class="sw" style="--c:${v.c}"></span>`:'';
+        h+=`<button class="opt" data-buy="${cat}:${id}" ${S.cash<v.cost?'disabled':''}>${sw}<span class="lb">${v.n}</span><span class="price">${money(v.cost)}</span></button>`;
+      });
+      h+=`</div>`;
+    }
+    h+=`</section>`;
+  });
+  h+=`</div><div class="btns"><button class="btn big" id="bShopBack" type="button">Back</button></div>`;
+  const sc=$('.cardscroll',$('#overlay'));const keep=sc?sc.scrollTop:0;
+  showOverlay(h);
+  const ns=$('.cardscroll');if(ns)ns.scrollTop=keep;
+}
+function buy(key){
+  const [cat,id]=key.split(':');
+  if(cat==='up'){
+    const u=UPS[id],cost=u.costs[S.up[id]];
+    if(cost===undefined||S.cash<cost)return;
+    S.cash=round2(S.cash-cost);S.up[id]++;
+  }else{
+    const v=CAT[cat][id];if(!v||!v.cost||owns(cat,id)||S.cash<v.cost)return;
+    S.cash=round2(S.cash-v.cost);S.owned.add(cat+':'+id);
+  }
+  sfx.coin();save();refreshHUD();showShop();
+}
+
+/* =====================================================================
+   Overlays / HUD / toast
+===================================================================== */
+const overlay=$('#overlay');
+function showOverlay(html,cls=''){overlay.innerHTML=`<div class="card ${cls}">${html}</div>`;overlay.style.display='flex';}
+function hideOverlay(){overlay.style.display='none';overlay.innerHTML='';}
+let toastT=0;
+function toast(t){const el=$('#toast');el.textContent=t;el.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>{el.style.display='none';},2600);}
+
+function showTitle(){
+  ui.mode='title';ui.confirmNew=false;
+  const saved=load()&&(S.day>1||S.cash>0||S.lifetime>0);
+  showOverlay(`<canvas id="rjCv" width="48" height="56" aria-label="RJ the squirrel"></canvas>
+    <h1>RJ's<br>Frozen Kitchen</h1>
+    <p>Take orders, build the treat, and keep the line happy.</p>
+    <div class="btns">
+      <button class="btn big" id="bPlay" type="button">${saved?'Continue day '+S.day:'Play'}</button>
+      <button class="btn alt" id="bHow" type="button">How to play</button>
+      ${saved?'<button class="btn alt sm" id="bNew" type="button">New game</button>':''}
+    </div>
+    <small>Made for RJ's Gamekade</small>`,'title');
+  useCtx($('#rjCv'));drawRJ(1,0,0);
+}
+function showHow(){
+  showOverlay(`<h2>How to play</h2>
+    <ol class="howto">
+      <li>Click a customer at the counter to take their order. The ticket shows exactly what they want.</li>
+      <li>Build: pick the cone, cup, or soda first, then add scoops, mix-ins, or syrups.</li>
+      <li>Blend: hold the button to blend shakes and slushies, and let go in the zone on the ticket.</li>
+      <li>Top it off, then serve it. The closer to the ticket, the bigger your tip.</li>
+    </ol>
+    <p>Watch the bar under each customer. When it runs out, they leave.</p>
+    <p>Spend your cash in the pantry shop between days to unlock new flavors and toppings.</p>
+    <div class="btns"><button class="btn big" id="bHowBack" type="button">Got it</button></div>`);
+}
+
+function refreshHUD(){
+  $('#hDay').textContent=S.day;
+  $('#hCash').textContent=money(S.cash);
+  const done=D?D.served+D.left:0,tot=D?D.total:0;
+  $('#hCount').textContent=done+'/'+tot;
+  $('#hProg').style.width=(tot?done/tot*100:0)+'%';
+  $('#bSound').textContent='Sound: '+(S.sound?'on':'off');
+}
+function refreshSpeech(){
+  const el=$('#speech'),c=activeCust();
+  if(c)el.innerHTML=`<b>${c.name}:</b> “${c.speech}”`;
+  else if(D&&D.slots.some(x=>x&&x.state==='waiting'))el.textContent='A customer is ready to order. Click them at the counter!';
+  else if(D&&D.slots.some(x=>x&&x.state==='ordered'))el.textContent='Click a customer to work on their order.';
+  else el.textContent='Waiting for the next customer…';
+}
+
+/* ---------- counter slots ---------- */
+const slotEls=[];
+function buildSlots(){
+  const wrap=$('#slots');wrap.innerHTML='';
+  for(let i=0;i<3;i++){
+    const b=document.createElement('button');b.type='button';b.className='slot empty';
+    b.innerHTML=`<canvas class="cust" width="32" height="40"></canvas><div class="ledge"><div class="top"><span class="nm"></span><span class="st"></span></div><div class="pat"><i></i></div></div>`;
+    wrap.appendChild(b);
+    slotEls.push({root:b,cv:$('.cust',b),nm:$('.nm',b),st:$('.st',b),bar:$('.pat i',b),drawn:null});
+    b.addEventListener('click',()=>onSlot(i));
+  }
+}
+function paintSlot(i){
+  const e=slotEls[i],c=D&&D.slots[i];
+  if(!c){e.root.className='slot empty';e.root.disabled=true;e.nm.textContent='';e.st.textContent=i===0&&D&&D.spawned===0?'':'';e.cv.style.visibility='hidden';e.drawn=null;return;}
+  e.cv.style.visibility='visible';
+  const mood=moodOf(c),key=c.id+':'+mood;
+  if(e.drawn!==key){drawCustomer(e.cv,c.look,mood);e.drawn=key;}
+  e.nm.textContent=c.name;
+  e.st.textContent=c.state==='waiting'?'Take order!':c.state==='ordered'?'Order #'+c.num:c.state==='served'?'Enjoying it…':(c.left?'Left angry':'Thanks!');
+  e.root.className='slot '+c.state+(ui.activeId===c.id?' active':'');
+  e.root.disabled=!(c.state==='waiting'||c.state==='ordered');
+}
+function paintAllSlots(){for(let i=0;i<3;i++)paintSlot(i);}
+function tickBars(){
+  if(!D)return;
+  D.slots.forEach((c,i)=>{
+    if(!c)return;
+    const e=slotEls[i],f=clamp(c.patience/c.patMax,0,1);
+    e.bar.style.width=(f*100)+'%';e.bar.className=f>.5?'':f>.25?'y':'r';
+    if(e.drawn!==c.id+':'+moodOf(c))paintSlot(i);
+  });
+  if(ui.holdBlend||ui.station==='blend'){
+    const c=activeCust(),mk=$('#mk');
+    if(c&&mk){mk.style.left=c.build.blend+'%';const t=$('#blendTxt');if(t)t.textContent=blendLabel(c);}
+  }
+}
+function blendLabel(c){
+  const v=c.build.blend;if(v<2)return 'Not blended yet';
+  const nm=BLENDNAME[c.order.type];
+  return 'Right now: '+(v<33?nm.low:v<67?nm.mid:nm.high);
+}
+
+/* ---------- work panel ---------- */
+const chip=col=>`<i class="chip" style="--c:${col}"></i>`;
+function ticketHTML(c){
+  const o=c.order,b=c.build;
+  const li=(k,v)=>`<li><em>${k}</em>${v}</li>`;
+  const vi=(col,t)=>`<div class="vi">${chip(col)}${t}</div>`;
+  const none='<div class="vi none">none</div>';
+  const tops=()=>{const ids=Object.keys(o.tops);return li('Toppings',ids.length?ids.map(id=>vi(TOPS[id].c,(o.tops[id]>1?o.tops[id]+'× ':'')+TOPS[id].n)).join(''):none);};
+  const scoops=lab=>li(lab,o.scoops.map((id,i)=>vi(FLAVORS[id].c,(o.scoops.length>1&&o.type!=='shake'&&o.type!=='float'?(i+1)+'. ':'')+FLAVORS[id].n)).join(''));
+  let rows='';
+  if(o.type==='cone'){rows+=li('Cone',vi(CONES[o.container].c,CONES[o.container].n));rows+=scoops(o.scoops.length>1?'Scoops, bottom first':'Scoop');rows+=tops();}
+  else if(o.type==='sundae'){rows+=scoops('Scoops, bottom first');rows+=tops();}
+  else if(o.type==='shake'){
+    rows+=li('Size',SIZES[o.size]);rows+=scoops('Ice cream');
+    const mx=Object.keys(o.mixins);rows+=li('Mix-ins',mx.length?mx.map(id=>vi(MIX[id].c,(o.mixins[id]>1?o.mixins[id]+'× ':'')+MIX[id].n)).join(''):none);
+    rows+=li('Blend',BLENDNAME.shake[o.blend]);rows+=tops();
+  }else if(o.type==='slush'){
+    rows+=li('Size',SIZES[o.size]);
+    rows+=li(o.syrups.length>1?'Syrups, bottom first':'Syrup',o.syrups.map((id,i)=>vi(SYRUP[id].c,(o.syrups.length>1?(i+1)+'. ':'')+SYRUP[id].n)).join(''));
+    rows+=li('Blend',BLENDNAME.slush[o.blend]);rows+=tops();
+  }else{
+    rows+=li('Soda',vi(SODA[o.soda].c,SODA[o.soda].n));rows+=scoops('Scoops');rows+=tops();
+  }
+  return `<div class="tk"><div class="tkh"><b>#${c.num}</b><span>${c.name}</span></div><div class="tkt">${TYPES[o.type].n}</div><ul>${rows}</ul></div>${trayHTML(c)}`;
+}
+function trayHTML(c){
+  const o=c.order,b=c.build,p=[];
+  if(b.container)p.push(CONES[b.container].n);
+  if(b.size)p.push(SIZES[b.size]+' cup');
+  if(b.soda)p.push(SODA[b.soda].n);
+  if(b.scoops.length)p.push(b.scoops.map(id=>FLAVORS[id].n).join(', '));
+  if(b.syrups.length)p.push(b.syrups.map(id=>SYRUP[id].n).join(' + '));
+  const mx=Object.keys(b.mixins);if(mx.length)p.push(mx.map(id=>MIX[id].n+(b.mixins[id]>1?' ×'+b.mixins[id]:'')).join(', '));
+  if(hasBlend(o)&&b.blend>=2)p.push(blendLabel(c).replace('Right now: ','Blend: '));
+  const tp=Object.keys(b.tops);if(tp.length)p.push(tp.map(id=>TOPS[id].n+(b.tops[id]>1?' ×'+b.tops[id]:'')).join(', '));
+  return `<div class="tray"><h4>On your tray</h4>${p.length?p.join('<br>'):'Nothing yet'}</div>`;
+}
+const opt=(act,id,label,col,o={})=>`<button class="opt${o.sel?' sel':''}" type="button" data-act="${act}" data-id="${id}"${o.dis?' disabled':''}>${col?`<span class="sw" style="--c:${col}"></span>`:''}<span class="lb">${label}</span>${o.n?`<b class="ct">${o.n}</b>`:''}</button>`;
+const sec=(title,inner,note)=>`<section class="grp"><h3>${title}</h3>${note?`<p class="note">${note}</p>`:''}<div class="opts">${inner}</div></section>`;
+const undoRow=`<div class="row"><button class="btn sm" type="button" data-act="undo">Undo</button><button class="btn sm alt" type="button" data-act="reset">Dump and restart</button></div>`;
+
+function buildPicker(o,b){
+  const fl=avail('flavor');
+  const scoopOpts=(max,need)=>sec('Add scoops',fl.map(id=>opt('scoop',id,FLAVORS[id].n,FLAVORS[id].c,{dis:!need||b.scoops.length>=max,n:countOf(b.scoops,id)})).join(''),need?`${b.scoops.length} of ${max} scoops`:null);
+  let h='';
+  if(o.type==='cone'){
+    h+=sec('Pick a cone',Object.entries(CONES).map(([id,v])=>opt('container',id,v.n,v.c,{sel:b.container===id})).join(''));
+    h+=scoopOpts(3,!!b.container);if(!b.container)h=h.replace('<h3>Add scoops</h3>','<h3>Add scoops</h3><p class="note">Pick a cone first.</p>');
+  }else if(o.type==='sundae'){
+    h+=scoopOpts(3,true);
+  }else if(o.type==='shake'){
+    h+=sec('Cup size',Object.entries(SIZES).map(([id,n])=>opt('size',id,n,null,{sel:b.size===id})).join(''));
+    h+=sec('Ice cream base',fl.map(id=>opt('scoop',id,FLAVORS[id].n,FLAVORS[id].c,{dis:!b.size||b.scoops.length>=2,n:countOf(b.scoops,id)})).join(''),b.size?`${b.scoops.length} of 2 flavors`:'Pick a cup size first.');
+    h+=sec('Mix-ins',avail('mix').map(id=>opt('mix',id,MIX[id].n,MIX[id].c,{dis:!b.size||sum(b.mixins)>=4||(b.mixins[id]||0)>=3,n:b.mixins[id]||0})).join(''));
+  }else if(o.type==='slush'){
+    h+=sec('Cup size',Object.entries(SIZES).map(([id,n])=>opt('size',id,n,null,{sel:b.size===id})).join(''));
+    h+=sec('Syrups',avail('syrup').map(id=>opt('syrup',id,SYRUP[id].n,SYRUP[id].c,{dis:!b.size||b.syrups.length>=2,n:countOf(b.syrups,id)})).join(''),b.size?`${b.syrups.length} of 2 syrups, bottom layer first`:'Pick a cup size first.');
+  }else{
+    h+=sec('Soda',avail('soda').map(id=>opt('soda',id,SODA[id].n,SODA[id].c,{sel:b.soda===id})).join(''));
+    h+=sec('Ice cream scoops',fl.map(id=>opt('scoop',id,FLAVORS[id].n,FLAVORS[id].c,{dis:!b.soda||b.scoops.length>=2,n:countOf(b.scoops,id)})).join(''),b.soda?`${b.scoops.length} of 2 scoops`:'Pick a soda first.');
+  }
+  return h+undoRow;
+}
+function blendPicker(c){
+  const o=c.order,nm=BLENDNAME[o.type];
+  return `<section class="grp"><h3>${o.type==='shake'?'Blend the shake':'Churn the slush'}</h3>
+    <p class="note">Hold the button. Let go when the marker is in the zone from your ticket.</p>
+    <div class="meter"><div class="zone z1">${nm.low}</div><div class="zone z2">${nm.mid}</div><div class="zone z3">${nm.high}</div><i id="mk" style="left:${c.build.blend}%"></i></div>
+    <p id="blendTxt">${blendLabel(c)}</p>
+    <button class="btn pink" id="holdBlend" type="button">Hold to blend</button>
+    <p class="note" style="margin-top:12px">Adding or removing ingredients empties the blender, so build first.</p></section>${undoRow}`;
+}
+function topPicker(o,b){
+  const ids=avail('top').filter(id=>topOK(id,o.type)),ok=hasVessel(o,b);
+  return sec(o.type==='slush'?'Finishing touches':'Toppings',ids.map(id=>opt('top',id,TOPS[id].n,TOPS[id].c,{dis:!ok||(b.tops[id]||0)>=TOPS[id].max,n:b.tops[id]||0})).join(''),ok?null:'Build the base first.')
+    +`<div class="row"><button class="btn sm" type="button" data-act="undo">Undo</button><button class="btn sm alt" type="button" data-act="cleartops">Clear toppings</button></div>`;
+}
+function servePicker(c){
+  const e=trayEmpty(c.build);
+  return `<section class="grp servebox"><h3>Ready to serve?</h3><p>Check your tray against the ticket one more time. Every detail counts toward the tip.</p>
+    <button class="btn pink big" type="button" data-act="serve"${e?' disabled':''}>Serve!</button>${e?'<p class="note">Your tray is empty.</p>':''}</section>`;
+}
+function emptyPicker(){
+  let msg='Waiting for customers…';
+  if(D&&D.slots.some(x=>x&&x.state==='waiting'))msg='Click a customer at the counter to take their order.';
+  else if(D&&D.slots.some(x=>x&&x.state==='ordered'))msg='Click a customer to work on their order.';
+  return `<p class="emptyTicket">${msg}</p>`;
+}
+function refreshWork(){
+  stopHold();
+  const c=activeCust(),o=c&&c.order,blendable=hasBlend(o);
+  if(c&&ui.station==='blend'&&!blendable)ui.station='top';
+  $$('#tabs button').forEach(b=>{const st=b.dataset.st;b.classList.toggle('on',!!c&&st===ui.station);b.disabled=!c||(st==='blend'&&!blendable);});
+  $('#ticket').innerHTML=c?ticketHTML(c):`<p class="emptyTicket">No ticket yet. Take an order from the counter.</p>`;
+  let p;
+  if(!c)p=emptyPicker();
+  else if(ui.station==='build')p=buildPicker(o,c.build);
+  else if(ui.station==='blend')p=blendPicker(c);
+  else if(ui.station==='top')p=topPicker(o,c.build);
+  else p=servePicker(c);
+  const keep=$('#picker').scrollTop;
+  $('#picker').innerHTML=p;$('#picker').scrollTop=keep;
+  const order=blendable?['build','blend','top','serve']:['build','top','serve'];
+  const idx=order.indexOf(ui.station),nx=order[idx+1],nb=$('#bNext');
+  nb.style.visibility=(c&&nx)?'visible':'hidden';
+  nb.textContent=nx?'Next: '+({blend:'Blend',top:'Top',serve:'Serve'})[nx]:'';
+  nb.dataset.go=nx||'';
+  $('#stageMsg').textContent=c?'':(D&&D.slots.some(x=>x&&x.state==='waiting')?'Take an order to start':'RJ is waiting for customers');
+  ui.stageDirty=true;
+}
+function refreshAll(){refreshHUD();paintAllSlots();refreshSpeech();refreshWork();}
+
+/* ---------- picker actions ---------- */
+function onAct(act,id){
+  if(act==='serve'){const c=activeCust();if(c&&!trayEmpty(c.build))serve(c);return;}
+  const c=activeCust();if(!c||ui.paused)return;
+  const b=c.build,o=c.order;
+  let snd='add';
+  const resetBlend=()=>{b.blend=0;};
+  if(act==='container')b.container=id;
+  else if(act==='size'){b.size=id;resetBlend();}
+  else if(act==='soda')b.soda=id;
+  else if(act==='scoop'){if(b.scoops.length<(MAXSCOOP[o.type]||3)){b.scoops.push(id);b.hist.push(['scoop',id]);resetBlend();}}
+  else if(act==='mix'){if(sum(b.mixins)<4&&(b.mixins[id]||0)<3){b.mixins[id]=(b.mixins[id]||0)+1;b.hist.push(['mix',id]);resetBlend();}}
+  else if(act==='syrup'){if(b.syrups.length<2){b.syrups.push(id);b.hist.push(['syrup',id]);resetBlend();}}
+  else if(act==='top'){if((b.tops[id]||0)<TOPS[id].max){b.tops[id]=(b.tops[id]||0)+1;b.hist.push(['top',id]);}}
+  else if(act==='undo'){
+    snd='click';
+    let k=-1;
+    for(let i=b.hist.length-1;i>=0;i--){const isTop=b.hist[i][0]==='top';if((ui.station==='top')===isTop){k=i;break;}}
+    if(k>=0){
+      const [kind,what]=b.hist.splice(k,1)[0];
+      if(kind==='scoop'){const j=b.scoops.lastIndexOf(what);if(j>=0)b.scoops.splice(j,1);resetBlend();}
+      else if(kind==='syrup'){const j=b.syrups.lastIndexOf(what);if(j>=0)b.syrups.splice(j,1);resetBlend();}
+      else if(kind==='mix'){b.mixins[what]--;if(!b.mixins[what])delete b.mixins[what];resetBlend();}
+      else if(kind==='top'){b.tops[what]--;if(!b.tops[what])delete b.tops[what];}
+    }
+  }
+  else if(act==='cleartops'){snd='click';b.tops={};b.hist=b.hist.filter(h=>h[0]!=='top');}
+  else if(act==='reset'){snd='click';c.build=newBuild();}
+  sfx[snd]();
+  refreshWork();
+}
+
+/* ---------- blending hold ---------- */
+function startHold(){
+  const c=activeCust();
+  if(!c||ui.paused||ui.mode!=='play'||ui.station!=='blend'||!hasBlend(c.order))return;
+  ui.holdBlend=true;blendOn();
+  const h=$('#holdBlend');if(h)h.classList.add('down');
+}
+function stopHold(){
+  if(!ui.holdBlend&&!blendNode)return;
+  ui.holdBlend=false;blendOff();
+  const h=$('#holdBlend');if(h)h.classList.remove('down');
+  const c=activeCust();if(c){const t=$('#blendTxt');if(t)t.textContent=blendLabel(c);}
+  ui.stageDirty=true;
+}
+
+/* =====================================================================
+   Wiring
+===================================================================== */
+$('#picker').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.disabled)return;
+  onAct(b.dataset.act,b.dataset.id);
+});
+$('#picker').addEventListener('pointerdown',e=>{
+  const h=e.target.closest('#holdBlend');if(!h)return;
+  e.preventDefault();startHold();
+});
+$('#picker').addEventListener('keydown',e=>{
+  if((e.key===' '||e.key==='Enter')&&e.target.id==='holdBlend'&&!e.repeat){e.preventDefault();startHold();}
+});
+$('#picker').addEventListener('keyup',e=>{if((e.key===' '||e.key==='Enter')&&e.target.id==='holdBlend')stopHold();});
+$('#picker').addEventListener('contextmenu',e=>{if(e.target.closest('#holdBlend'))e.preventDefault();});
+window.addEventListener('pointerup',stopHold);
+window.addEventListener('pointercancel',stopHold);
+window.addEventListener('blur',stopHold);
+$('#tabs').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||b.disabled)return;
+  ui.station=b.dataset.st;sfx.click();refreshWork();
+});
+$('#bNext').addEventListener('click',()=>{
+  const go=$('#bNext').dataset.go;if(!go)return;
+  ui.station=go;sfx.click();refreshWork();
+});
+$('#bSound').addEventListener('click',()=>{S.sound=!S.sound;if(!S.sound)blendOff();else sfx.click();refreshHUD();save();});
+function pauseGame(){
+  if(ui.mode!=='play'||ui.paused)return;
+  ui.paused=true;stopHold();
+  showOverlay(`<h2>Paused</h2><p>Your customers will wait for you.</p>
+    <div class="btns"><button class="btn big" id="bResume" type="button">Resume</button><button class="btn alt" id="bQuit" type="button">Quit to title</button></div>`);
+}
+$('#bPause').addEventListener('click',pauseGame);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame();});
+
+overlay.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.buy){buy(t.dataset.buy);return;}
+  switch(t.id){
+    case 'bPlay':
+      sfx.click();
+      if(!(S.day>1||S.cash>0||S.lifetime>0)){wipe();}
+      startDay();break;
+    case 'bHow':showHow();break;
+    case 'bHowBack':if(ui.mode==='title')showTitle();else hideOverlay();break;
+    case 'bNew':
+      if(!ui.confirmNew){ui.confirmNew=true;t.textContent='Tap again to erase save';}
+      else{wipe();showTitle();}
+      break;
+    case 'bOpen':beginDay();break;
+    case 'bResume':ui.paused=false;hideOverlay();break;
+    case 'bQuit':ui.paused=false;D=null;ui.activeId=null;save();refreshAll();showTitle();break;
+    case 'bShop':ui.mode='shop';showShop();break;
+    case 'bShopBack':ui.mode='results';showResults();break;
+    case 'bNextDay':startDay();break;
+  }
+});
+
+/* =====================================================================
+   Main loop
+===================================================================== */
+let lastT=performance.now();
+function frame(t){
+  const dt=Math.min(.1,(t-lastT)/1000);lastT=t;
+  try{
+    update(dt);tickBars();
+    if(ui.stageDirty||ui.holdBlend){if(ui.mode==='play'||ui.mode==='intro'||ui.mode==='title'||ui.mode==='results'||ui.mode==='shop'){drawStage();}ui.stageDirty=false;}
+  }catch(err){console.error(err);}
+  requestAnimationFrame(frame);
+}
+buildSlots();
+refreshHUD();
+paintAllSlots();
+showTitle();
+drawStage();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
