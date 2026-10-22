@@ -100,6 +100,15 @@
       "players": "1p"
     },
     {
+      "id": "sparrows-ward",
+      "title": "Sparrows Ward",
+      "path": "games/sparrows-ward.html",
+      "kind": "file",
+      "added": "2026-10-22T00:18:57.055Z",
+      "players": "1p",
+      "thumbnail": "games/sparrows-ward.jpg?v=mvisml6r"
+    },
+    {
       "id": "toad-room-server",
       "title": "Toad Room Server",
       "path": "games/toad-room-server.html",
@@ -109,6 +118,6 @@
       "players": "1p"
     }
   ],
-  "count": 12,
-  "updated": "2026-10-21T23:30:45.011Z"
+  "count": 13,
+  "updated": "2026-10-22T00:18:57.055Z"
 }
