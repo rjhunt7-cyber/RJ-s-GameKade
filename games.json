@@ -100,6 +100,15 @@
       "players": "multi"
     },
     {
+      "id": "rj-s-ping-pong",
+      "title": "RJ's Ping Pong",
+      "path": "games/rj-s-ping-pong.html",
+      "kind": "file",
+      "added": "2026-10-22T01:08:23.720Z",
+      "players": "2p",
+      "thumbnail": "games/rj-s-ping-pong.jpg?v=mviue6a6"
+    },
+    {
       "id": "rjs-nutty-adventure",
       "title": "Rjs Nutty Adventure",
       "path": "games/rjs-nutty-adventure.html",
@@ -127,6 +136,6 @@
       "players": "1p"
     }
   ],
-  "count": 14,
-  "updated": "2026-10-22T01:07:19.864Z"
+  "count": 15,
+  "updated": "2026-10-22T01:08:23.720Z"
 }
