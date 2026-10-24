@@ -100,6 +100,15 @@
       "players": "1p"
     },
     {
+      "id": "meme-fighter",
+      "title": "Meme Fighter",
+      "path": "games/meme-fighter.html",
+      "kind": "file",
+      "added": "2026-10-24T14:02:26.488Z",
+      "players": "2p",
+      "thumbnail": "games/meme-fighter.jpg?v=mvmgxb90"
+    },
+    {
       "id": "monsters-vs-androids",
       "title": "Monsters vs Androids",
       "path": "games/monsters-vs-androids.html",
@@ -163,6 +172,6 @@
       "players": "1p"
     }
   ],
-  "count": 18,
-  "updated": "2026-10-22T01:55:36.814Z"
+  "count": 19,
+  "updated": "2026-10-24T14:02:26.488Z"
 }
