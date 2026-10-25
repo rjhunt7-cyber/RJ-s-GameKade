@@ -136,6 +136,15 @@
       "thumbnail": "games/rj-s-ping-pong.jpg?v=mviue6a6"
     },
     {
+      "id": "rj-s-rubber-hose-rally",
+      "title": "RJ's Rubber Hose Rally",
+      "path": "games/rj-s-rubber-hose-rally.html",
+      "kind": "file",
+      "added": "2026-10-25T23:18:20.430Z",
+      "players": "multi",
+      "thumbnail": "games/rj-s-rubber-hose-rally.jpg?v=mvog81t9"
+    },
+    {
       "id": "rjs-frozen-kitchen",
       "title": "Rjs Frozen Kitchen",
       "path": "games/rjs-frozen-kitchen.html",
@@ -172,6 +181,6 @@
       "players": "1p"
     }
   ],
-  "count": 19,
-  "updated": "2026-10-24T14:02:26.488Z"
+  "count": 20,
+  "updated": "2026-10-25T23:18:20.430Z"
 }
