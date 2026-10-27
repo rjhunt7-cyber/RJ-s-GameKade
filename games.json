@@ -136,6 +136,15 @@
       "players": "multi"
     },
     {
+      "id": "rj-s-8bit-tic-tac-toe",
+      "title": "RJ's 8bit Tic Tac Toe",
+      "path": "games/rj-s-8bit-tic-tac-toe.html",
+      "kind": "file",
+      "added": "2026-10-27T03:22:39.481Z",
+      "players": "2p",
+      "thumbnail": "games/rj-s-8bit-tic-tac-toe.jpg?v=mvq4e3ht"
+    },
+    {
       "id": "rj-s-ping-pong",
       "title": "RJ's Ping Pong",
       "path": "games/rj-s-ping-pong.html",
@@ -190,6 +199,6 @@
       "players": "1p"
     }
   ],
-  "count": 21,
-  "updated": "2026-10-27T02:58:24.854Z"
+  "count": 22,
+  "updated": "2026-10-27T03:22:39.481Z"
 }
