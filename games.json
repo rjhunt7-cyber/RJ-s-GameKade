@@ -151,7 +151,7 @@
       "kind": "file",
       "added": "2026-10-27T03:22:39.481Z",
       "players": "2p",
-      "thumbnail": "games/rj-s-8bit-tic-tac-toe.jpg?v=mvqup803"
+      "thumbnail": "games/rj-s-8bit-tic-tac-toe.jpg?v=mvqv8lzf"
     },
     {
       "id": "rj-s-ping-pong",
@@ -209,5 +209,5 @@
     }
   ],
   "count": 23,
-  "updated": "2026-10-27T15:54:04.237Z"
+  "updated": "2026-10-27T15:54:12.939Z"
 }
