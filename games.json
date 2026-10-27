@@ -136,6 +136,15 @@
       "players": "multi"
     },
     {
+      "id": "rj-s-8bit-4-in-a-row",
+      "title": "RJ's 8bit 4 in a Row",
+      "path": "games/rj-s-8bit-4-in-a-row.html",
+      "kind": "file",
+      "added": "2026-10-27T03:28:18.325Z",
+      "players": "2p",
+      "thumbnail": "games/rj-s-8bit-4-in-a-row.jpg?v=mvq4lcya"
+    },
+    {
       "id": "rj-s-8bit-tic-tac-toe",
       "title": "RJ's 8bit Tic Tac Toe",
       "path": "games/rj-s-8bit-tic-tac-toe.html",
@@ -199,6 +208,6 @@
       "players": "1p"
     }
   ],
-  "count": 22,
-  "updated": "2026-10-27T03:22:39.481Z"
+  "count": 23,
+  "updated": "2026-10-27T03:28:18.325Z"
 }
