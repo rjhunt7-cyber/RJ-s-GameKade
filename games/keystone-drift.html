@@ -1298,127 +1298,69 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
       if (arms.length < 3) continue;
       for (const a of arms) { const q = a.o + a.dir; a.ang = Math.atan2(R.y[q] - cy, R.x[q] - cx); a.hw = R.hw[a.r]; }
       arms.sort((a, b) => a.ang - b.ang);
-      let dj = 0;
-      for (let k = 0; k < arms.length; k++) {
-        const a = arms[k], b = arms[(k + 1) % arms.length]; let gap = b.ang - a.ang; if (k === arms.length - 1) gap += Math.PI * 2;
-        const need = (Math.max(a.hw, b.hw) + 0.6) / Math.tan(Math.max(0.18, Math.min(gap, Math.PI - 0.01)) / 2);
-        dj = Math.max(dj, need);
+      for (const a of arms) { a.ux = Math.cos(a.ang); a.uy = Math.sin(a.ang); a.nx = -a.uy; a.ny = a.ux; a.need = a.hw * 0.6; a.cornerL = null; }
+      const A = arms.length;
+      for (let k = 0; k < A; k++) {                      // corner between arm k's LEFT edge and the next arm's RIGHT edge
+        const a = arms[k], b = arms[(k + 1) % A];
+        const crs = a.ux * b.uy - a.uy * b.ux; if (Math.abs(crs) < 0.06) continue;      // (nearly) straight across: no corner
+        const rx = (-b.nx * b.hw) - (a.nx * a.hw), ry = (-b.ny * b.hw) - (a.ny * a.hw);
+        const t = (rx * (-b.uy) - ry * (-b.ux)) / (a.ux * (-b.uy) - a.uy * (-b.ux)), s2 = (a.ux * ry - a.uy * rx) / (a.ux * (-b.uy) - a.uy * (-b.ux));
+        if (!(t > 0 && s2 > 0) || t > 30 || s2 > 30) continue;
+        a.need = Math.max(a.need, t); b.need = Math.max(b.need, s2);
+        a.cornerL = { x: cx + a.nx * a.hw + a.ux * t, y: cy + a.ny * a.hw + a.uy * t, t, s: s2 };
       }
-      const maxhw = Math.max(...arms.map(a => a.hw)); dj = Math.min(28, Math.max(maxhw + 1.0, dj));
-      // every arm must be long enough: shrink the junction to fit the shortest arm
-      for (const a of arms) { let i = a.o, d = 0; const r = a.r; while (d < dj) { const j2 = i + a.dir; if (j2 < R.start[r] || j2 > endOf(r)) break; d += Math.hypot(R.x[j2] - R.x[i], R.y[j2] - R.y[i]); i = j2; } a.avail = d; }
-      dj = Math.min(dj, Math.min(...arms.map(a => a.avail)) * 0.92);
-      if (dj < maxhw * 0.75) continue;                              // too cramped for a surface: leave the plain overlap
-      // walk each arm out to dj and record where its ribbon now starts
+      // every arm must be long enough for its own cut
+      for (const a of arms) { let i = a.o, d = 0; const r = a.r; while (d < 32) { const j2 = i + a.dir; if (j2 < R.start[r] || j2 > endOf(r)) break; d += Math.hypot(R.x[j2] - R.x[i], R.y[j2] - R.y[i]); i = j2; } a.avail = d; a.dj = Math.min(a.need + 0.5, 30); }
+      if (arms.some(a => a.dj > a.avail * 0.92)) continue;                            // cramped: keep the plain overlap (drawn in layers)
+      const maxhw = Math.max(...arms.map(a => a.hw));
       const rim = [];
       let ok = true;
       for (const a of arms) {
         let i = a.o, d = 0; const r = a.r; a.full = [];
         while (true) { const j2 = i + a.dir; if (j2 < R.start[r] || j2 > endOf(r)) { ok = false; break; }
           const L = Math.hypot(R.x[j2] - R.x[i], R.y[j2] - R.y[i]) || 0.01;
-          if (d + L >= dj) { const f = (dj - d) / L; a.cutI = i; a.cutJ = j2; a.f = f; break; }
+          if (d + L >= a.dj) { a.cutI = i; a.cutJ = j2; a.f = (a.dj - d) / L; break; }
           a.full.push(a.dir > 0 ? i : j2); d += L; i = j2; }
         if (!ok) break;
       }
       if (!ok) continue;
       for (const a of arms) {
         const r = a.r;
-        for (const sg2 of a.full) { CUTA[sg2] = 1; CUTB[sg2] = 1; }
-        const seg = a.dir > 0 ? a.cutI : a.cutJ;
-        if (a.dir > 0) CUTA[seg] = Math.max(CUTA[seg], a.f); else CUTB[seg] = Math.max(CUTB[seg], a.f);
         const px = R.x[a.cutI] + (R.x[a.cutJ] - R.x[a.cutI]) * a.f, py = R.y[a.cutI] + (R.y[a.cutJ] - R.y[a.cutI]) * a.f;
-        const ph = R.h[a.cutI] + (R.h[a.cutJ] - R.h[a.cutI]) * a.f + roadLift(r);
+        a.ph = R.h[a.cutI] + (R.h[a.cutJ] - R.h[a.cutI]) * a.f + roadLift(r);
         const hx = (R.x[a.cutJ] - R.x[a.cutI]), hy = (R.y[a.cutJ] - R.y[a.cutI]), hl = Math.hypot(hx, hy) || 1, nx = -hy / hl, ny = hx / hl;
-        const w = a.hw;
-        rim.push({ x: px + nx * w, y: py + ny * w, h: ph, arm: a }, { x: px - nx * w, y: py - ny * w, h: ph, arm: a });
+        a.R = { x: px - nx * a.hw, y: py - ny * a.hw, h: a.ph, arm: a, edge: 'R' }; a.L = { x: px + nx * a.hw, y: py + ny * a.hw, h: a.ph, arm: a, edge: 'L' };
       }
-      for (const p0 of rim) p0.ang = Math.atan2(p0.y - cy, p0.x - cx);
-      rim.sort((a, b) => a.ang - b.ang);
+      for (let k = 0; k < A; k++) {
+        const a = arms[k], b = arms[(k + 1) % A];
+        rim.push(a.R, a.L);
+        if (a.cornerL) rim.push({ x: a.cornerL.x, y: a.cornerL.y, h: (a.ph + b.ph) / 2, arm: null, edge: 'C' });
+      }
       const top = arms.reduce((b, a) => (R.cls[a.r] < R.cls[b.r] ? a : b), arms[0]);
-      const ch = R.h[v0] + Math.max(...arms.map(a => roadLift(a.r)));
+      const ch = arms.reduce((t2, a) => t2 + a.ph, 0) / arms.length;
       const ck = chunkKeyOf(cx, cy); let lst = JPOLY.get(ck); if (!lst) JPOLY.set(ck, lst = []);
       lst.push({ cx, cy, ch, rim, r: top.r }); nPoly++;
     }
     FIXLOG.junctionSurfaces = nPoly;
-    // trim the exact part of a road that runs inside a winning road at the same level (stems ending on a road, sharp joins, close twins)
-    let trimmed = 0;
-    for (let r = 0; r < R.n; r++) {
-      if (R.flags[r] & 2) continue;
-      const s0 = R.start[r], e0 = endOf(r), Ltot = R.s[e0] - R.s[s0];
-      for (let i = s0; i < e0; i++) {
-        if (ELEV[i] || CUTA[i] + CUTB[i] >= 0.999) continue;
-        if (Math.min(R.s[i] - R.s[s0], R.s[e0] - R.s[i + 1]) > 40) continue;
-        const N2 = 8, inside = [];
-        for (let k = 0; k <= N2; k++) { const t = CUTA[i] + (1 - CUTB[i] - CUTA[i]) * k / N2; inside.push([t, insideWinner(R.x[i] + (R.x[i + 1] - R.x[i]) * t, R.y[i] + (R.y[i + 1] - R.y[i]) * t, R.h[i] + (R.h[i + 1] - R.h[i]) * t, r)]); }
-        if (inside.every(q => q[1])) { CUTA[i] = 1; CUTB[i] = 1; trimmed++; continue; }
-        let k = 0; while (k <= N2 && inside[k][1]) k++;
-        if (k > 0) { CUTA[i] = inside[Math.min(N2, k)][0] - (1 - CUTB[i] - CUTA[i]) / N2 * 0.5; trimmed++; }
-        let m = N2; while (m >= 0 && inside[m][1]) m--;
-        if (m < N2) { CUTB[i] = 1 - (inside[Math.max(0, m)][0] + (1 - CUTB[i] - CUTA[i]) / N2 * 0.5); trimmed++; }
-      }
-    }
-    FIXLOG.overlapTrims = trimmed;
-    // remaining partial side-by-side overlaps: different roads get separate draw levels; pieces of the same road get trimmed
-    roadLift(0);
-    const sameId = (a, b) => (R.ref[a] > 0 && R.ref[a] === R.ref[b]) || (R.name[a] > 0 && R.name[a] === R.name[b]);
-    let relevel = 0, trim2 = 0;
-    for (let pass = 0; pass < 3; pass++) for (let r = 0; r < R.n; r++) {
-      if (R.flags[r] & 2) continue;
-      const s0 = R.start[r], e0 = endOf(r);
-      for (let i = s0; i < e0; i++) {
-        if (ELEV[i] || CUTA[i] + CUTB[i] >= 0.999) continue;
-        const L = Math.hypot(R.x[i + 1] - R.x[i], R.y[i + 1] - R.y[i]) || 0.01, nx = -(R.y[i + 1] - R.y[i]) / L, ny = (R.x[i + 1] - R.x[i]) / L;
-        for (const t of [CUTA[i] + 0.03, (CUTA[i] + 1 - CUTB[i]) / 2, 1 - CUTB[i] - 0.03]) for (const f of [-0.7, 0, 0.7]) {
-          const x = R.x[i] + (R.x[i + 1] - R.x[i]) * t + nx * f * R.hw[r], y = R.y[i] + (R.y[i + 1] - R.y[i]) * t + ny * f * R.hw[r], h = R.h[i] + (R.h[i + 1] - R.h[i]) * t;
-          const list = segHash.get(Math.floor((y - Y0) / SC) * SHX + Math.floor((x - X0) / SC)); if (!list) continue;
-          for (const j of list) { const r2 = R.of[j]; if (r2 === r || ELEV[j] || CUTA[j] + CUTB[j] >= 0.999) continue;
-            const ax = R.x[j], ay = R.y[j], ex = R.x[j + 1] - ax, ey = R.y[j + 1] - ay, L2 = ex * ex + ey * ey || 1, tt = ((x - ax) * ex + (y - ay) * ey) / L2;
-            if (tt < CUTA[j] || tt > 1 - CUTB[j]) continue;
-            const d = Math.hypot(ax + ex * tt - x, ay + ey * tt - y), hh = R.h[j] + (R.h[j + 1] - R.h[j]) * tt;
-            if (d >= R.hw[r2] - 0.3 || Math.abs((hh + LIFT_ID[r2]) - (h + LIFT_ID[r])) >= 0.008) continue;
-            if (!sameId(r, r2)) { const lo = wins(r2, r) ? r : r2; LIFT_ID[lo] -= 0.009 + 0.004 * pass; relevel++; }
-            else if (wins(r2, r) || pass === 2) { if (t < 0.5) CUTA[i] = Math.max(CUTA[i], Math.min(1, t + 0.06)); else CUTB[i] = Math.max(CUTB[i], Math.min(1, 1 - t + 0.06)); trim2++; }
-          }
+    // overlaps are never removed: a road lying inside / alongside a winning road ON THE SAME LAYER drops one layer (repeat until stable)
+    UNDER = new Uint8Array(n); let nUnder = 0;
+    for (let pass = 0; pass < 4; pass++) {
+      let changed = 0;
+      for (let r = 0; r < R.n; r++) {
+        if (R.flags[r] & 2) continue;
+        for (let i = R.start[r]; i < endOf(r); i++) {
+          if (ELEV[i] || UNDER[i] >= 3) continue;
+          const L = Math.hypot(R.x[i + 1] - R.x[i], R.y[i + 1] - R.y[i]) || 0.01, nx = -(R.y[i + 1] - R.y[i]) / L, ny = (R.x[i + 1] - R.x[i]) / L;
+          let hit = false;
+          for (let q = 0; q <= 8 && !hit; q++) for (const f of [-0.85, -0.45, 0, 0.45, 0.85]) { if (hit) break;
+            const tt = q / 8, x = R.x[i] + (R.x[i + 1] - R.x[i]) * tt + nx * f * R.hw[r], y = R.y[i] + (R.y[i + 1] - R.y[i]) * tt + ny * f * R.hw[r], h = R.h[i] + (R.h[i + 1] - R.h[i]) * tt;
+            if (overlapsWinner(x, y, h, r, UNDER[i])) hit = true; }
+          if (hit) { UNDER[i]++; changed++; }
         }
       }
+      nUnder += changed; if (!changed) break;
     }
-    FIXLOG.relevelled = relevel; FIXLOG.sameRoadTrims = trim2;
-    // duplicates: a way lying on top of another along most of its length (e.g. a misspelled copy) is hidden entirely
-    let dups = 0;
-    for (let r = 0; r < R.n; r++) {
-      if (R.flags[r] & 2) continue; const s0 = R.start[r], e0 = endOf(r); let on = 0, tot = 0;
-      for (let i = s0; i <= e0; i++) { tot++; const list = segHash.get(Math.floor((R.y[i] - Y0) / SC) * SHX + Math.floor((R.x[i] - X0) / SC)); if (!list) continue;
-        for (const j of list) { const r2 = R.of[j]; if (r2 === r || !wins(r2, r) || ELEV[j]) continue; const ax = R.x[j], ay = R.y[j], ex = R.x[j + 1] - ax, ey = R.y[j + 1] - ay, L2 = ex * ex + ey * ey || 1;
-          let t = ((R.x[i] - ax) * ex + (R.y[i] - ay) * ey) / L2; t = t < 0 ? 0 : t > 1 ? 1 : t; if (Math.hypot(ax + ex * t - R.x[i], ay + ey * t - R.y[i]) < 1.5) { on++; break; } } }
-      if (tot >= 2 && on / tot > 0.8) { for (let i = s0; i < e0; i++) { CUTA[i] = 1; CUTB[i] = 1; } dups++; }
-    }
-    // last resort, using exactly the audit's detection: any two visible surfaces at the same draw level -> trim the loser there
-    let trim3 = 0;
-    const HS = 60, HH = new Map();
-    for (let i = 0; i < n - 1; i++) { if (R.of[i] !== R.of[i + 1]) continue; const k = Math.floor((R.x[i] + R.x[i + 1]) / 2 / HS) * 100000 + Math.floor((R.y[i] + R.y[i + 1]) / 2 / HS); let q = HH.get(k); if (!q) HH.set(k, q = []); q.push(i); }
-    const vis = (j, t) => t >= CUTA[j] - 1e-3 && t <= 1 - CUTB[j] + 1e-3 && CUTA[j] + CUTB[j] < 0.999;
-    const cutAt = (seg, t) => { if (t < 0.5) CUTA[seg] = Math.max(CUTA[seg], Math.min(1, t + 0.08)); else CUTB[seg] = Math.max(CUTB[seg], Math.min(1, 1 - t + 0.08)); trim3++; };
-    for (let pass = 0; pass < 3; pass++) for (let r = 0; r < R.n; r++) {
-      if (R.flags[r] & 2) continue;
-      for (let i = R.start[r]; i < endOf(r); i++) {
-        if (ELEV[i] || CUTA[i] + CUTB[i] >= 0.999) continue;
-        const L = Math.hypot(R.x[i + 1] - R.x[i], R.y[i + 1] - R.y[i]) || 0.01, nx = -(R.y[i + 1] - R.y[i]) / L, ny = (R.x[i + 1] - R.x[i]) / L;
-        let done = false;
-        for (const t of [CUTA[i] + 0.02, (CUTA[i] + 1 - CUTB[i]) / 2, 1 - CUTB[i] - 0.02]) for (const f of [-0.7, 0, 0.7]) {
-          if (done) break;
-          const x = R.x[i] + (R.x[i + 1] - R.x[i]) * t + nx * f * R.hw[r], y = R.y[i] + (R.y[i + 1] - R.y[i]) * t + ny * f * R.hw[r], h = R.h[i] + (R.h[i + 1] - R.h[i]) * t;
-          const gx = Math.floor(x / HS), gy = Math.floor(y / HS);
-          for (let dx = -1; dx <= 1 && !done; dx++) for (let dy = -1; dy <= 1 && !done; dy++) for (const j of (HH.get((gx + dx) * 100000 + gy + dy) || [])) {
-            const r2 = R.of[j]; if (r2 === r || (R.flags[r2] & 2)) continue;
-            const ax = R.x[j], ay = R.y[j], ex = R.x[j + 1] - ax, ey = R.y[j + 1] - ay, L2 = ex * ex + ey * ey || 1, tt = ((x - ax) * ex + (y - ay) * ey) / L2;
-            if (tt < 0 || tt > 1 || !vis(j, tt)) continue;
-            const d = Math.hypot(ax + ex * tt - x, ay + ey * tt - y), hh = R.h[j] + (R.h[j + 1] - R.h[j]) * tt;
-            if (d < R.hw[r2] - 0.3 && Math.abs((hh + LIFT_ID[r2]) - (h + LIFT_ID[r])) < 0.008) { if (wins(r2, r)) cutAt(i, t); else cutAt(j, tt); done = true; break; }
-          }
-        }
-      }
-    }
-    FIXLOG.duplicatesHidden = dups; FIXLOG.finalTrims = trim3;
+    FIXLOG.underLayerSegments = nUnder;
     // 45 m approaches to every (non-covered) bridge get guardrail
     BRAPP = new Uint8Array(n);
     for (let r = 0; r < R.n; r++) { if ((R.flags[r] & 2) && !(R.flags[r] & 8)) for (const e of [R.start[r], endOf(r)]) for (const o of groups.get(key(e))) {
@@ -1436,27 +1378,24 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
       if (d < R.hw[r2] - 0.4 && R.hw[r] <= R.hw[r2] + 0.6 && Math.abs(hh - h) < 0.6) return true; }
     return false;
   }
+  function overlapsWinner(x, y, h, r, layer) {
+    const list = segHash.get(Math.floor((y - Y0) / SC) * SHX + Math.floor((x - X0) / SC)); if (!list) return false;
+    for (const j of list) { const r2 = R.of[j]; if (r2 === r || ELEV[j] || !wins(r2, r)) continue;
+      if (UNDER[j] !== layer) continue;                         // only a winner on the SAME layer can make this one drop
+      const ax = R.x[j], ay = R.y[j], ex = R.x[j + 1] - ax, ey = R.y[j + 1] - ay, L2 = ex * ex + ey * ey || 1, t = ((x - ax) * ex + (y - ay) * ey) / L2; if (t < 0 || t > 1) continue;
+      if (CUTA && (t < CUTA[j] - 1e-3 || t > 1 - CUTB[j] + 1e-3 || CUTA[j] + CUTB[j] >= 0.999)) continue;
+      const d = Math.hypot(ax + ex * t - x, ay + ey * t - y), hh = R.h[j] + (R.h[j + 1] - R.h[j]) * t;
+      if (d < R.hw[r2] - 0.1 && Math.abs(hh - h) < 0.6) return true; }
+    return false;
+  }
   function segHidden(i) {
     const r = R.of[i]; if (ELEV[i]) return false;
-    const ca = CUTA ? CUTA[i] : 0, cb = CUTB ? CUTB[i] : 0; if (ca + cb >= 0.999) return true;
-    const t = (ca + 1 - cb) / 2, x = R.x[i] + (R.x[i + 1] - R.x[i]) * t, y = R.y[i] + (R.y[i + 1] - R.y[i]) * t, h = R.h[i] + (R.h[i + 1] - R.h[i]) * t;
-    return insideWinner(x, y, h, r);
+    const ca = CUTA ? CUTA[i] : 0, cb = CUTB ? CUTB[i] : 0; return ca + cb >= 0.999;   // only parts covered by an intersection surface
   }
-  let CONT = null, CONTHW = null, JNODES = null, NEARJ = null, BRAPP = null, CUTA = null, CUTB = null, JPOLY = null;
+  let CONT = null, CONTHW = null, JNODES = null, NEARJ = null, BRAPP = null, CUTA = null, CUTB = null, JPOLY = null, UNDER = null;
   // draw order on the ground: bigger roads on top; every way of the same named road shares a level; the two directions of a divided road differ
-  let LIFT_ID = null;
-  function roadLift(r) {
-    if (!LIFT_ID) {
-      LIFT_ID = new Float32Array(R.n);
-      for (let q = 0; q < R.n; q++) {
-        const id = R.ref[q] > 0 ? 'r' + R.ref[q] : R.name[q] > 0 ? 'n' + R.name[q] : 'w' + q; let hsh = 0; for (let c = 0; c < id.length; c++) hsh = (hsh * 31 + id.charCodeAt(c)) >>> 0;
-        const cls = R.cls[q] === 7 ? 3 : Math.min(6, R.cls[q]), s0 = R.start[q], e0 = s0 + R.count[q] - 1;
-        const ddx = R.x[e0] - R.x[s0], ddy = R.y[e0] - R.y[s0], dirB = (R.flags[q] & 1) ? ((Math.abs(ddx) > Math.abs(ddy) ? ddx > 0 : ddy > 0) ? 1 : 0) : 0;
-        LIFT_ID[q] = 0.05 + 0.03 * (6 - cls) + 0.006 * (hsh % 5) + 0.0035 * dirB;
-      }
-    }
-    return LIFT_ID[r];
-  }
+  const roadLift = (r) => 0.05 + 0.002 * (6 - Math.min(6, R.cls[r] === 7 ? 3 : R.cls[r]));
+
   function roadNear(x, y) {      // nearest at-grade road edge + ground bounds from EVERY road nearby
     RN.de = 1e9; RN.r = -1; RN.cap = 1e9; RN.fill = -1e9;
     const list = segHash.get(Math.floor((y - Y0) / SC) * SHX + Math.floor((x - X0) / SC)); if (!list) return RN;
@@ -1591,7 +1530,8 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
   function roadTexture(kind, lanes) {
     const key = kind + lanes; if (T[key]) return T[key];
     const t = canvasTex(128, 512, (g) => {
-      const base = kind === 'plain' ? [74, 75, 78] : kind === 'res' ? [70, 71, 74] : [58, 59, 63];
+      const nocl = kind.endsWith('_nc'); if (nocl) kind = kind.slice(0, -3);
+      const base = kind === 'plain' ? [58, 59, 63] : kind === 'res' ? [70, 71, 74] : [58, 59, 63];
       g.fillStyle = `rgb(${base})`; g.fillRect(0, 0, 128, 512);
       const r = rngOf(lanes * 97 + kind.length);
       for (let k = 0; k < 3000; k++) { const v = base[0] - 14 + r() * 34 | 0; g.fillStyle = `rgba(${v},${v},${v + 2},${0.2 + r() * 0.35})`; g.fillRect(r() * 128, r() * 512, 1 + r() * 1.5, 1 + r() * 2); }
@@ -1602,13 +1542,23 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
       for (let k = 0; k < 5; k++) { g.strokeStyle = 'rgba(20,20,20,0.35)'; g.lineWidth = 1; g.beginPath(); let x = 20 + r() * 90, y = r() * 512; g.moveTo(x, y); for (let s = 0; s < 6; s++) { x += (r() - 0.5) * 18; y += r() * 20; g.lineTo(x, y); } g.stroke(); }
       const line = (u, w, color, dash) => { g.fillStyle = color; if (!dash) g.fillRect(u * 128 - w / 2, 0, w, 512); else for (let v = 0; v < 512; v += 128) g.fillRect(u * 128 - w / 2, v, w, 40); };
       const W = 'rgba(236,235,226,0.92)', Y = 'rgba(226,183,44,0.92)';
-      if (kind === 'two') { line(0.035, 3, W); line(0.965, 3, W); line(0.485, 2.5, Y); line(0.515, 2.5, Y); }
-      else if (kind === 'oneway') { line(0.03, 3, Y); line(0.97, 3, W); for (let l = 1; l < lanes; l++) line(l / lanes, 2.5, W, true); }
-      else if (kind === 'multi') { line(0.03, 3, W); line(0.97, 3, W); line(0.49, 2.2, Y); line(0.51, 2.2, Y); const half = Math.max(1, Math.floor(lanes / 2)); for (let l = 1; l < half; l++) { line(0.5 * l / half, 2.2, W, true); line(0.5 + 0.5 * l / half, 2.2, W, true); } }
-      else if (kind === 'plain') { g.fillStyle = 'rgba(226,183,44,0.5)'; for (let v = 0; v < 512; v += 128) g.fillRect(62, v, 3, 44); }
+      if (kind === 'two') { line(0.035, 3, W); line(0.965, 3, W); if (!nocl) { line(0.485, 2.5, Y); line(0.515, 2.5, Y); } }
+      else if (kind === 'oneway') { line(0.03, 3, Y); line(0.97, 3, W); if (!nocl) for (let l = 1; l < lanes; l++) line(l / lanes, 2.5, W, true); }
+      else if (kind === 'multi') { line(0.03, 3, W); line(0.97, 3, W); if (!nocl) { line(0.49, 2.2, Y); line(0.51, 2.2, Y); } const half = Math.max(1, Math.floor(lanes / 2)); if (!nocl) for (let l = 1; l < half; l++) { line(0.5 * l / half, 2.2, W, true); line(0.5 + 0.5 * l / half, 2.2, W, true); } }
     });
     t.wrapS = THREE.ClampToEdgeWrapping; t.wrapT = THREE.RepeatWrapping;
     return (T[key] = t);
+  }
+  function junctionTexture(res) {                // even asphalt grain in every direction, same colour as the road it belongs to
+    const key = 'junction' + (res ? 'r' : 'm'); if (T[key]) return T[key];
+    const t = canvasTex(256, 256, (g) => {
+      const base = res ? [70, 71, 74] : [58, 59, 63];
+      g.fillStyle = `rgb(${base})`; g.fillRect(0, 0, 256, 256);
+      const r = rngOf(res ? 11 : 7);
+      for (let k = 0; k < 9000; k++) { const v = base[0] - 14 + r() * 34 | 0; g.fillStyle = `rgba(${v},${v},${v + 2},${0.2 + r() * 0.35})`; g.fillRect(r() * 256, r() * 256, 1 + r() * 1.5, 1 + r() * 1.5); }
+      for (let k = 0; k < 6; k++) { g.strokeStyle = 'rgba(20,20,20,0.3)'; g.lineWidth = 1; g.beginPath(); let x = r() * 256, y = r() * 256; g.moveTo(x, y); for (let q = 0; q < 6; q++) { x += (r() - 0.5) * 22; y += (r() - 0.5) * 22; g.lineTo(x, y); } g.stroke(); }
+    });
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; return (T[key] = t);
   }
   function roadKind(r) {
     const cls = R.cls[r], lanes = R.lanes[r] || (cls === 7 ? 1 : 2), ow = R.flags[r] & 1;
@@ -1618,10 +1568,15 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
     if (cls === 5) return ['plain', 2];
     return ['res', 2];
   }
-  function roadMat(r, plainJ) {
-    let [k, l] = roadKind(r); if (plainJ && k !== 'res') k = 'plain';
-    const key = 'road_' + k + l;
-    if (!mats[key]) { mats[key] = new THREE.MeshPhongMaterial({ map: roadTexture(k, l), shininess: 8, specular: 0x151515, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: k === 'plain' ? -4 : -3 - Math.max(0, 6 - R.cls[r]) * 0.25 }); mats.roads.push(mats[key]); }
+  function roadMat(r, plainJ, layer) {
+    let [k, l] = roadKind(r); if (plainJ && k !== 'res' && layer !== 'j') k = k + '_nc';
+    const rank = 6 - Math.min(6, R.cls[r] === 7 ? 3 : R.cls[r]);
+    const key = 'road_' + k + l + '_' + (layer || 'n') + rank;
+    if (!mats[key]) {
+      // draw priority without height steps: under-layer < every road (bigger roads in front) < intersection surfaces
+      const units = layer === 'u3' ? -0.5 : layer === 'u2' ? -1.0 : layer === 'u1' ? -1.8 : layer === 'j' ? -14 : -3 - rank * 1.4;
+      mats[key] = new THREE.MeshPhongMaterial({ map: layer === 'j' ? junctionTexture(k === 'res') : roadTexture(k, l), shininess: 8, specular: 0x151515, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: units }); mats.roads.push(mats[key]);
+    }
     return mats[key];
   }
 
@@ -1853,7 +1808,7 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
     const segs = chunkSegs.get(ck); if (!segs) return;
     segs.sort((a, b) => a - b);
     const byMat = new Map(), skirt = new GB(), deck = new GB(), rails = new GB(), wood = new GB(), roofG = new GB(), guard = new GB();
-    const gposts = [], railSegs = [], mres = near ? CELL / 2 : CELL;
+    const gposts = [], railSegs = [], mres = near ? CELL / 2 : CELL, edgeLines = new GB();
     const insideOther = (v, r) => {           // is this vertex under another road's asphalt at the same level?
       const x = R.x[v], y = R.y[v], list = segHash.get(Math.floor((y - Y0) / SC) * SHX + Math.floor((x - X0) / SC)); if (!list) return false;
       for (const j of list) { const r2 = R.of[j]; if (r2 === r || ELEV[j] || R.cls[r2] > R.cls[r] + 0) continue;
@@ -1862,7 +1817,7 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
         if (d < R.hw[r2] - 0.6 && Math.abs(hh - R.h[v]) < 0.6 && (R.cls[r2] < R.cls[r] || r2 < r)) return true; }
       return false;
     };
-    const getGB = (r, i) => { const m = roadMat(r, i < 0 || (JPLAIN && JPLAIN[i])); let g = byMat.get(m); if (!g) byMat.set(m, g = new GB()); return g; };
+    const getGB = (r, i) => { const m = roadMat(r, i < 0 || (JPLAIN && JPLAIN[i]), i < 0 ? 'j' : (UNDER && UNDER[i]) ? 'u' + UNDER[i] : 'n'); let g = byMat.get(m); if (!g) byMat.set(m, g = new GB()); return g; };
     const ptLR = (i, r) => {
       const st = R.start[r], en = st + R.count[r] - 1;
       const ip = i > st ? i - 1 : (CONT && CONT[r * 2] >= 0 ? CONT[r * 2] : st), inx = i < en ? i + 1 : (CONT && CONT[r * 2 + 1] >= 0 ? CONT[r * 2 + 1] : en);
@@ -1973,14 +1928,20 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
       const G2 = getGB(jp.r, -1), cen = P3(jp.cx, jp.cy, jp.ch), rim = jp.rim, NR = rim.length;
       for (let k = 0; k < NR; k++) {
         const p0 = rim[k], p1 = rim[(k + 1) % NR], A3 = P3(p0.x, p0.y, p0.h), B3 = P3(p1.x, p1.y, p1.h);
-        pushUp(G2, cen, A3, B3, [jp.cx / 12, jp.cy / 12], [p0.x / 12, p0.y / 12], [p1.x / 12, p1.y / 12]);
-        if (p0.arm !== p1.arm) {                                     // corner between two roads: give it a shoulder down to the ground
+        pushUp(G2, cen, A3, B3, [jp.cx / 8, jp.cy / 8], [p0.x / 8, p0.y / 8], [p1.x / 8, p1.y / 8]);
+        if (p0.arm !== p1.arm) {                                     // corner between two roads: edge line + a shoulder down to the ground
+          if (R.cls[jp.r] <= 5) {
+            const ex = p1.x - p0.x, ey = p1.y - p0.y, el = Math.hypot(ex, ey) || 1, ix = -ey / el, iy = ex / el, sgn = ((jp.cx - p0.x) * ix + (jp.cy - p0.y) * iy) > 0 ? 1 : -1;
+            const o1 = 0.22 * sgn, o2 = 0.36 * sgn;
+            edgeLines.quadC(P3(p0.x + ix * o1, p0.y + iy * o1, p0.h + 0.012), P3(p1.x + ix * o1, p1.y + iy * o1, p1.h + 0.012), P3(p1.x + ix * o2, p1.y + iy * o2, p1.h + 0.012), P3(p0.x + ix * o2, p0.y + iy * o2, p0.h + 0.012), [0.92, 0.92, 0.88], P3(jp.cx, jp.cy, jp.ch - 5));
+          }
           const mx = (p0.x + p1.x) / 2 - jp.cx, my = (p0.y + p1.y) / 2 - jp.cy, ml = Math.hypot(mx, my) || 1, ox = mx / ml * 0.9, oy = my / ml * 0.9;
           const g0 = meshHAt(p0.x + ox, p0.y + oy, mres), g1 = meshHAt(p1.x + ox, p1.y + oy, mres);
           skirt.quad(A3, B3, P3(p1.x + ox, p1.y + oy, Math.max(Math.min(p1.h - 1.2, g1 - 0.5), p1.h - 14)), P3(p0.x + ox, p0.y + oy, Math.max(Math.min(p0.h - 1.2, g0 - 0.5), p0.h - 14)));
         }
       }
     }
+    { const geo = edgeLines.build(); if (geo) { const m = mats.edgeLine || (mats.edgeLine = new THREE.MeshLambertMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -16 })); group.add(new THREE.Mesh(geo, m)); } }
     for (const [m, g] of byMat) { const geo = g.build(); if (geo) { const mesh = new THREE.Mesh(geo, m); mesh.receiveShadow = true; group.add(mesh); } }
     const add = (gb, m, cast) => { const geo = gb.build(); if (geo) { const mesh = new THREE.Mesh(geo, m); mesh.receiveShadow = true; if (cast) mesh.castShadow = true; group.add(mesh); } };
     add(skirt, mats.skirt); add(deck, mats.concrete, true); add(rails, mats.rail); add(wood, mats.wood, true); add(roofG, mats.roof, true); add(guard, mats.rail, true);
@@ -2018,12 +1979,36 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
 
   // ---------------------------------------------------------------- real buildings (OSM footprints)
   const signCache = new Map();
+  // sign boards: text always fits (one line, or two balanced lines), printed sharp, never mirrored
+  function fitSignText(g, name, W, H) {
+    const tryLines = (lines, maxFs, minFs) => { for (let fs = maxFs; fs >= minFs; fs -= 2) { g.font = `900 ${fs}px Arial`; if (lines.every(l => g.measureText(l).width <= W * 0.9) && fs * lines.length * 1.12 <= H * 0.78) return fs; } return 0; };
+    let fs = tryLines([name], 110, 46); if (fs) return { lines: [name], fs };
+    const words = name.split(' '); let best = null;
+    for (let k = 1; k < words.length; k++) { const l1 = words.slice(0, k).join(' '), l2 = words.slice(k).join(' '); g.font = '900 60px Arial'; const wmax = Math.max(g.measureText(l1).width, g.measureText(l2).width); if (!best || wmax < best.wmax) best = { l: [l1, l2], wmax }; }
+    if (best) { fs = tryLines(best.l, 74, 20); if (fs) return { lines: best.l, fs }; }
+    for (fs = 46; fs > 12; fs -= 2) { g.font = `900 ${fs}px Arial`; if (g.measureText(name).width <= W * 0.92) break; }
+    return { lines: [name], fs };
+  }
   function signMat(name, kind) {
     const k = name + '|' + kind; if (signCache.has(k)) return signCache.get(k);
     const bg = { grocery: '#c8102e', school: '#123a7a', college: '#ff7a1a', civic: '#1d4f91', church: '#5a3a22', gas: '#1d7a3a', food: '#7a1d1d', shop: '#2b2f3a' }[kind] || '#2b2f3a';
-    const t = canvasTex(512, 96, (g) => { g.fillStyle = bg; g.fillRect(0, 0, 512, 96); g.fillStyle = '#fff'; g.fillRect(6, 6, 500, 4); g.fillRect(6, 86, 500, 4);
-      let fs = 50; g.font = `900 ${fs}px Arial`; while (g.measureText(name).width > 480 && fs > 18) { fs -= 2; g.font = `900 ${fs}px Arial`; } g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(name, 256, 50); });
-    const m = new THREE.MeshBasicMaterial({ map: t, side: THREE.DoubleSide }); signCache.set(k, m); return m;
+    const W = 1024, H = 192;
+    const t = canvasTex(W, H, (g) => {
+      g.fillStyle = bg; g.fillRect(0, 0, W, H); g.fillStyle = '#fff'; g.fillRect(12, 12, W - 24, 7); g.fillRect(12, H - 19, W - 24, 7);
+      const f = fitSignText(g, name, W, H); g.font = `900 ${f.fs}px Arial`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#fff';
+      const lh = f.fs * 1.12, y0 = H / 2 - (f.lines.length - 1) * lh / 2 + f.fs * 0.04;
+      f.lines.forEach((l, i) => g.fillText(l, W / 2, y0 + i * lh));
+    });
+    t.anisotropy = 4;
+    const m = new THREE.MeshBasicMaterial({ map: t }); signCache.set(k, m); return m;    // front face only: never shows mirrored text
+  }
+  const signBackMat = new THREE.MeshLambertMaterial({ color: 0x3a3d42 });
+  function cleanRing(ring) {                     // drop duplicate / collinear points, wind counter-clockwise
+    let P = []; for (const q of ring) { const l = P[P.length - 1]; if (!l || Math.hypot(q[0] - l[0], q[1] - l[1]) > 0.15) P.push([q[0], q[1]]); }
+    if (P.length > 2 && Math.hypot(P[0][0] - P[P.length - 1][0], P[0][1] - P[P.length - 1][1]) < 0.15) P.pop();
+    for (let k = P.length - 1; k >= 0 && P.length > 3; k--) { const a = P[(k - 1 + P.length) % P.length], b = P[k], c2 = P[(k + 1) % P.length]; if (Math.abs((b[0] - a[0]) * (c2[1] - a[1]) - (b[1] - a[1]) * (c2[0] - a[0])) < 0.02) P.splice(k, 1); }
+    let A2 = 0; for (let k = 0; k < P.length; k++) { const a = P[k], b = P[(k + 1) % P.length]; A2 += a[0] * b[1] - b[0] * a[1]; }
+    return A2 < 0 ? P.reverse() : P;
   }
   function buildRealBuildings(ck, group, colliders, mark, lod) {
     const ids = BHASH && BHASH.get(ck); if (!ids) return;
@@ -2034,13 +2019,25 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
     for (const k of ids) {
       const [cx, cy, w, l, ang, h, t, ni, outline] = B[k];
       const c = Math.cos(ang), s2 = Math.sin(ang), hu = w / 2, hv = l / 2;
-      const P = outline || [[-hu, -hv], [hu, -hv], [hu, hv], [-hu, hv]].map(([u, v]) => [cx + u * c - v * s2, cy + u * s2 + v * c]);
-      // never build over a road: OSM footprints that overlap a lane are skipped
-      let onRoad = false;
-      for (const q of P.concat([[cx, cy]])) { const rq = roadQuery(q[0], q[1], null); if (rq.road >= 0 && rq.d < rq.hw + 0.2 && !(R.flags[rq.road] & 2)) { onRoad = true; break; } }
-      if (onRoad) { FIXLOG.buildingsSkipped = (FIXLOG.buildingsSkipped || 0) + 1; continue; }
+      let P = outline ? cleanRing(outline) : [[-hu, -hv], [hu, -hv], [hu, hv], [-hu, hv]].map(([u, v]) => [cx + u * c - v * s2, cy + u * s2 + v * c]);
+      // never build over a road: a footprint that clips a lane is nudged back off it (up to 3 m); only a road running through it drops it
+      let shiftX = 0, shiftY = 0, dropped = false;
+      for (let it = 0; it < 6; it++) {
+        let worst = null;
+        const pts = P.map(q => [q[0] + shiftX, q[1] + shiftY]); pts.push([cx + shiftX, cy + shiftY]);
+        for (let e = 0; e < P.length; e++) { const a2 = pts[e], b2 = pts[(e + 1) % P.length]; pts.push([(a2[0] + b2[0]) / 2, (a2[1] + b2[1]) / 2]); }
+        for (const q of pts) { const rq = roadQuery(q[0], q[1], null); if (rq.road >= 0 && !(R.flags[rq.road] & 2)) { const pen = rq.hw + 0.3 - rq.d; if (pen > 0 && (!worst || pen > worst.pen)) worst = { pen, q, rq }; } }
+        if (!worst) break;
+        const nr = nearestRoadPoint(worst.q[0], worst.q[1]); let vx = worst.q[0] - nr.x, vy = worst.q[1] - nr.y; const vl = Math.hypot(vx, vy);
+        if (vl < 0.05) { vx = cx - nr.x; vy = cy - nr.y; } const vl2 = Math.hypot(vx, vy) || 1;
+        shiftX += vx / vl2 * (worst.pen + 0.1); shiftY += vy / vl2 * (worst.pen + 0.1);
+        if (Math.hypot(shiftX, shiftY) > 3) { dropped = true; break; }
+      }
+      if (dropped) { FIXLOG.buildingsSkipped = (FIXLOG.buildingsSkipped || 0) + 1; continue; }
+      if (shiftX || shiftY) { P = P.map(q => [q[0] + shiftX, q[1] + shiftY]); FIXLOG.buildingsNudged = (FIXLOG.buildingsNudged || 0) + 1; }
+      const bx0 = cx + shiftX, by0 = cy + shiftY;
       const gs = P.map(q => placeH(q[0], q[1])), g0 = Math.min(...gs) - 0.4, gTop = Math.max(...gs);
-      const eave = gTop + h * (t === 0 || t === 2 ? 0.72 : 1), m = wallMat(t, k), G = gb(m), ctr = P3(cx, cy, (g0 + eave) / 2), rctr = P3(cx, cy, g0);
+      const eave = gTop + h * (t === 0 || t === 2 ? 0.72 : 1), m = wallMat(t, k), G = gb(m), ctr = P3(bx0, by0, (g0 + eave) / 2), rctr = P3(bx0, by0, g0);
       const NP = P.length;
       for (let e = 0; e < NP; e++) {
         const a = P[e], b = P[(e + 1) % NP], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
@@ -2053,7 +2050,8 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
       }
       const rc = (t === 2 ? [[0.55, 0.16, 0.12], [0.42, 0.44, 0.47]][k % 2] : ROOFC[k % 4]);
       if (outline) {                                               // real outline: flat roof, triangulated
-        const tris = THREE.ShapeUtils.triangulateShape(P.map(q => new THREE.Vector2(q[0], q[1])), []);
+        let tris = THREE.ShapeUtils.triangulateShape(P.map(q => new THREE.Vector2(q[0], q[1])), []);
+        if (tris.length < P.length - 2) { tris = []; for (let q = 1; q < P.length - 1; q++) tris.push([0, q, q + 1]); }   // fallback: fan (outline is simple after cleaning)
         for (const [i0, i1, i2] of tris) roof.triC(P3(P[i0][0], P[i0][1], eave + 0.05), P3(P[i1][0], P[i1][1], eave + 0.05), P3(P[i2][0], P[i2][1], eave + 0.05), [0.31, 0.32, 0.34], rctr);
         for (let e = 0; e < NP; e++) { const a = P[e], b = P[(e + 1) % NP]; roof.quadC(P3(a[0], a[1], eave), P3(b[0], b[1], eave), P3(b[0], b[1], eave + 0.6), P3(a[0], a[1], eave + 0.6), [0.62, 0.6, 0.56], ctr); }
       } else if (t === 0 || t === 2 || t === 1) {                          // pitched roof along the long side
@@ -2070,9 +2068,9 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
         for (let e = 0; e < 4; e++) { const a = P[e], b = P[(e + 1) % 4]; roof.quadC(P3(a[0], a[1], eave), P3(b[0], b[1], eave), P3(b[0], b[1], eave + 0.6), P3(a[0], a[1], eave + 0.6), [0.62, 0.6, 0.56], ctr); }
       }
       if (outline) for (let e = 0; e < NP; e++) { const a = P[e], b = P[(e + 1) % NP], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; colliders.push({ t: 'box', x: mx, y: my, ux: (b[0] - a[0]) / L, uy: (b[1] - a[1]) / L, hx: L / 2, hy: 0.6 }); }
-      else colliders.push({ t: 'box', x: cx, y: cy, ux: c, uy: s2, hx: hu, hy: hv });
-      mark(cx, cy, Math.max(hu, hv) + 4);
-      if (ni >= 0 && !lod && t !== 0 && t !== 1) signs.push({ k, cx, cy, P, eave, gTop, name: MAP.bnames[ni] });
+      else colliders.push({ t: 'box', x: bx0, y: by0, ux: c, uy: s2, hx: hu, hy: hv });
+      mark(bx0, by0, Math.max(hu, hv) + 4);
+      if (ni >= 0 && !lod && t !== 0 && t !== 1) signs.push({ k, cx: bx0, cy: by0, P, eave, gTop, name: MAP.bnames[ni] });
     }
     for (const [m, g] of byM) { const geo = g.build(); if (geo) { const ms = new THREE.Mesh(geo, m); ms.castShadow = true; ms.receiveShadow = true; group.add(ms); } }
     { const geo = roof.build(); if (geo) { const ms = new THREE.Mesh(geo, mats.rRoof); ms.castShadow = true; group.add(ms); } }
@@ -2086,6 +2084,7 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
       const ox = mx - sg.cx, oy = my - sg.cy, ol = Math.hypot(ox, oy) || 1, bw = Math.min(len * 0.8, 12), bh = bw / 5.3;
       const y = Math.min(sg.eave - bh / 2 - 0.4, sg.gTop + 4.2);
       const pl = new THREE.Mesh(new THREE.PlaneGeometry(bw, bh), signMat(sg.name, kind));
+      const back = new THREE.Mesh(new THREE.PlaneGeometry(bw, bh), signBackMat); back.rotation.y = Math.PI; back.position.z = -0.03; pl.add(back);
       pl.position.set(mx + ox / ol * 0.12, y, -(my + oy / ol * 0.12)); pl.rotation.y = Math.atan2(ox, -oy);   // front faces outward, text reads correctly
       group.add(pl);
     }
@@ -2102,7 +2101,10 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
       if (roadClearance(sx, sy) < 0.6) continue;
       const gz = placeH(sx, sy);
       const pole = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.2, 0.18), post); pole.position.set(sx, gz + 1.6, -sy); group.add(pole);
-      const pl = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.8), signMat(q.n, q.k)); pl.position.set(sx, gz + 3.4, -sy); pl.rotation.y = Math.atan2(-vx, vy); group.add(pl);   // faces the road
+      const brd = new THREE.Group(); brd.position.set(sx, gz + 3.4, -sy); brd.rotation.y = Math.atan2(-vx, vy) + Math.PI / 2;   // board runs along the road, readable from both directions
+      const f1 = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.79), signMat(q.n, q.k)); f1.position.z = 0.04; brd.add(f1);
+      const f2 = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.79), signMat(q.n, q.k)); f2.position.z = -0.04; f2.rotation.y = Math.PI; brd.add(f2);
+      const fr = new THREE.Mesh(new THREE.BoxGeometry(4.3, 0.88, 0.06), signBackMat); brd.add(fr); group.add(brd);
       colliders.push({ t: 'circle', x: sx, y: sy, r: 0.25 });
     }
   }
@@ -2471,7 +2473,7 @@ Next: multiplayer rooms, more cars, races/challenges, economy, tuning.
   }
   function cellSegs(x, y) { return segHash.get(Math.floor((y - Y0) / SC) * SHX + Math.floor((x - X0) / SC)); }
 
-  KD.World = { segHidden, get CUTA() { return CUTA; }, get CUTB() { return CUTB; }, roadClearance, surfaceH, roadLift, terrainMeshH, X0, Y0, CELL, landuseAt, pois: MAP.pois || [], FIXLOG, route, nearestIdx,
+  KD.World = { fitSignText, get UNDER() { return UNDER; }, get JPOLY() { return JPOLY; }, segHidden, get CUTA() { return CUTA; }, get CUTB() { return CUTB; }, roadClearance, surfaceH, roadLift, terrainMeshH, X0, Y0, CELL, landuseAt, pois: MAP.pois || [], FIXLOG, route, nearestIdx,
     load, init, update, terrainH, groundH, baseH, roadQuery, roadNear, creekNear, collidersNear, randomSpawn, nearestRoadPoint, roadLabel, setNightAll, setWet, animate, rebuildAll,
     townFactor, builtUp, places, PLAY, meta: M, R, C, get mapCanvas() { return mapCanvas; }, MAPRES, mats, cellSegs, forestAt, halfWidth, lakes: MAP.lakes,
     chunkCount: () => chunks.size, get water() { return water; }, get far() { return farMesh; }
