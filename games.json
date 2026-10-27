@@ -46,6 +46,15 @@
       "players": "2p"
     },
     {
+      "id": "block-party",
+      "title": "Block Party",
+      "path": "games/block-party.html",
+      "kind": "file",
+      "added": "2026-10-27T22:54:00.099Z",
+      "players": "multi",
+      "thumbnail": "games/block-party.jpg?v=mvra8gdf"
+    },
+    {
       "id": "cob-and-dune",
       "title": "Cob and Dune",
       "path": "games/cob-and-dune.html",
@@ -208,6 +217,6 @@
       "players": "1p"
     }
   ],
-  "count": 23,
-  "updated": "2026-10-27T16:40:55.603Z"
+  "count": 24,
+  "updated": "2026-10-27T22:54:00.099Z"
 }
