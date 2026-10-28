@@ -199,6 +199,15 @@
       "players": "1p"
     },
     {
+      "id": "rowdy-links",
+      "title": "Rowdy Links",
+      "path": "games/rowdy-links.html",
+      "kind": "file",
+      "added": "2026-10-28T02:46:10.598Z",
+      "players": "multi",
+      "thumbnail": "games/rowdy-links.jpg?v=mvrij17r"
+    },
+    {
       "id": "sparrows-ward",
       "title": "Sparrows Ward",
       "path": "games/sparrows-ward.html",
@@ -217,6 +226,6 @@
       "players": "1p"
     }
   ],
-  "count": 24,
-  "updated": "2026-10-27T22:54:00.099Z"
+  "count": 25,
+  "updated": "2026-10-28T02:46:10.598Z"
 }
