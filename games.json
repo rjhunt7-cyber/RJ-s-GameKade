@@ -301,7 +301,12 @@
       "kind": "file",
       "added": "2026-10-22T01:54:10.242Z",
       "players": "1p",
-      "thumbnail": "games/rjs-frozen-kitchen.jpg?v=mvqw113k"
+      "thumbnail": "games/rjs-frozen-kitchen.jpg?v=mvqw113k",
+      "categories": [
+        "puzzles",
+        "arcade",
+        "1p"
+      ]
     },
     {
       "id": "rjs-nutty-adventure",
@@ -341,5 +346,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:07:23.978Z"
+  "updated": "2026-10-29T19:07:38.817Z"
 }
