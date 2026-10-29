@@ -34,7 +34,13 @@
       "kind": "file",
       "added": "2026-10-17T04:59:28.614Z",
       "thumbnail": "games/aces-arcade.jpg?v=mvqv6uln",
-      "players": "multi"
+      "players": "multi",
+      "categories": [
+        "puzzles",
+        "arcade",
+        "classic",
+        "multi"
+      ]
     },
     {
       "id": "ball-parkour",
@@ -245,5 +251,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:01:51.869Z"
+  "updated": "2026-10-29T19:02:03.870Z"
 }
