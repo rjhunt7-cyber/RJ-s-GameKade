@@ -236,6 +236,21 @@
       ]
     },
     {
+      "id": "rj-s-8-bit-pool",
+      "title": "RJ's 8 Bit Pool",
+      "path": "games/rj-s-8-bit-pool.html",
+      "kind": "file",
+      "added": "2026-10-29T19:55:43.297Z",
+      "players": "2p",
+      "categories": [
+        "sports",
+        "arcade",
+        "classic",
+        "2p"
+      ],
+      "thumbnail": "games/rj-s-8-bit-pool.jpg?v=mvtyqvyp"
+    },
+    {
       "id": "rj-s-8bit-4-in-a-row",
       "title": "RJ's 8bit 4 in a Row",
       "path": "games/rj-s-8bit-4-in-a-row.html",
@@ -365,6 +380,6 @@
       ]
     }
   ],
-  "count": 26,
-  "updated": "2026-10-29T19:09:00.662Z"
+  "count": 27,
+  "updated": "2026-10-29T19:55:43.297Z"
 }
