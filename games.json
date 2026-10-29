@@ -272,7 +272,13 @@
       "kind": "file",
       "added": "2026-10-22T01:08:23.720Z",
       "players": "2p",
-      "thumbnail": "games/rj-s-ping-pong.jpg?v=mvqv8wis"
+      "thumbnail": "games/rj-s-ping-pong.jpg?v=mvqv8wis",
+      "categories": [
+        "puzzles",
+        "arcade",
+        "classic",
+        "2p"
+      ]
     },
     {
       "id": "rj-s-rubber-hose-rally",
@@ -330,5 +336,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:07:13.487Z"
+  "updated": "2026-10-29T19:07:18.206Z"
 }
