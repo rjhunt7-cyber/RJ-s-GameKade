@@ -229,7 +229,11 @@
       "kind": "file",
       "added": "2026-10-18T19:41:20.444Z",
       "thumbnail": "games/pantheon-clash.jpg?v=mvqwwoj7",
-      "players": "multi"
+      "players": "multi",
+      "categories": [
+        "arcade",
+        "multi"
+      ]
     },
     {
       "id": "rj-s-8bit-4-in-a-row",
@@ -314,5 +318,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:06:35.087Z"
+  "updated": "2026-10-29T19:06:57.048Z"
 }
