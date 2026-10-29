@@ -749,7 +749,7 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
 }
 .online b { font-weight: normal; color: var(--coin); }
 .online .px-icon { color: var(--electric); }
-@media (max-width: 1100px) { .online__label { display: none; } }
+@media (max-width: 600px) { .online__label { display: none; } }
 
 .seg { border: 0; padding: 0; margin: 20px 0 0; min-width: 0; }
 .seg legend { color: var(--ice); padding: 0; margin-bottom: 8px; }
@@ -785,19 +785,18 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
   --spine: 44px; --gap: 6px; --box-w: 216px; --art-h: 150px; --bar-h: 48px;
   --box-h: calc(10px + var(--art-h) + var(--bar-h));
   --plastic: #888890; --plastic-hi: #b0b0b8; --plastic-lo: #606068; --plastic-dk: #282830;
-  display: grid; grid-template-columns: minmax(0, 1fr); gap: 44px; padding: 0 0 28px;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 0 0 56px;   /* fixed buffer above the ad space */
 }
 .shelf3d[hidden] { display: none; }
-.shelf-row { position: relative; padding: 30px 0 0; overflow-x: clip; overflow-y: visible; }
+.shelf-row { position: relative; padding: 30px 0 28px; contain: paint; }
 .shelf-row__items {
   list-style: none; margin: 0; padding: 0; position: relative; z-index: 1;
   display: flex; gap: var(--gap); width: max-content;
 }
 /* the wooden plank the boxes stand on */
 .shelf-row::after {
-  content: ''; position: absolute; left: -12px; right: -12px; bottom: -20px; height: 20px; z-index: 0;
-  background: linear-gradient(#a06838 0 4px, #784820 4px 12px, #583418 12px 16px, #301c0c 16px);
-  box-shadow: 0 8px 0 0 rgba(0, 0, 0, 0.35);
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 28px; z-index: 0;
+  background: linear-gradient(#a06838 0 4px, #784820 4px 12px, #583418 12px 16px, #301c0c 16px 20px, rgba(0, 0, 0, 0.35) 20px);
 }
 .slot {
   position: relative; z-index: 1; flex: none;
@@ -961,6 +960,36 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
 .owner-game { gap: 28px; padding-bottom: 36px; }
 .owner-list { display: grid; gap: 36px; }
 
+/* the ad space always sits above the library in the stacking order, so nothing can draw over it */
+.library + .ad-band { position: relative; z-index: 5; isolation: isolate; }
+
+/* the "online" box sits in the page's top-left corner, with room between it and RJ/the logo */
+.marquee { position: relative; }
+.online { top: 12px; left: 14px; padding: 4px 12px; }
+.marquee:has(.online:not([hidden])) .marquee__inner { padding-top: 64px; }
+@media (min-width: 601px) { .marquee:has(.online:not([hidden])) .marquee__tools { margin-top: -60px; } }   /* Sound button level with the online box */
+@media (max-width: 600px) { .online { top: 10px; left: 10px; } .marquee:has(.online:not([hidden])) .marquee__inner { padding-top: 54px; } }
+
+/* toolbar: the title gets its own line; search, categories, Display covers and Random share one level */
+.toolbar { align-items: center; gap: 20px 16px; }
+.library__title { flex: 1 0 100%; }
+.toolbar .search { flex: 1 1 220px; max-width: none; min-width: 0; }
+.toolbar .search input { width: 100%; }
+.toolbar__end { margin-left: 0; align-items: center; gap: 16px; flex-wrap: nowrap; }
+.toolbar__end > * { min-height: 48px; }
+.filter, .toggle, #random-game { white-space: nowrap; }
+.toolbar__end .filter { padding: 0 38px 0 14px; }
+.toolbar__end .filter select { width: 196px; text-overflow: ellipsis; }
+@media (max-width: 960px) { .toolbar__end .filter select { width: 100%; } }
+.toolbar__end .toggle { padding: 0 14px; gap: 10px; }
+.toolbar__end #random-game { padding: 12px 16px; gap: 10px; }
+@media (max-width: 960px) {
+  .toolbar .search { flex-basis: 100%; }
+  .toolbar__end { width: 100%; flex-wrap: wrap; }
+  .toolbar__end > * { flex: 1 1 0; justify-content: center; }
+}
+@media (max-width: 600px) { .toolbar__end > * { flex: 1 1 100%; } }
+
 </style>
 </head>
 <body>
@@ -968,14 +997,14 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
 <!-- ============================== HOME ============================== -->
 <div class="view" id="view-home">
   <header class="marquee">
+    <div class="online px" id="online" hidden title="People in the arcade right now">
+        <span data-icon="people" data-icon-scale="2"></span><span><b id="online-num">0</b><span class="online__label"> online</span></span>
+      </div>
     <span class="twinkle" style="left:22%;top:20px" aria-hidden="true"></span>
     <span class="twinkle" style="left:58%;top:44px" aria-hidden="true"></span>
     <span class="twinkle" style="left:83%;top:28px" aria-hidden="true"></span>
     <div class="marquee__city" aria-hidden="true"></div>
     <div class="marquee__inner">
-      <div class="online px" id="online" hidden title="People in the arcade right now">
-        <span data-icon="people" data-icon-scale="2"></span><span><b id="online-num">0</b><span class="online__label"> online</span></span>
-      </div>
       <a class="brand" href="#/" aria-label="RJ's Gamekade home">
         <span class="brand__rj" data-rj="idle" data-rj-scale="3" data-rj-live></span>
         <span class="brand__words">
@@ -1377,7 +1406,8 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
   // HOME
   // ==============================================================================
   // categories: genres plus how many players (a game can have several)
-  var CATS = [['racing', 'Racing'], ['puzzles', 'Puzzles'], ['horror', 'Horror'], ['fps', 'FPS'], ['sports', 'Sports'], ['sidescroller', 'Side scroller'], ['arcade', 'Arcade'], ['classic', 'Classic games'],
+  var CATS = [['racing', 'Racing'], ['puzzles', 'Puzzles'], ['horror', 'Horror'], ['fps', 'FPS'], ['shooter', 'Shooter'], ['pvp', 'PvP'], ['sports', 'Sports'],
+              ['sidescroller', 'Side scroller'], ['arcade', 'Arcade'], ['party', 'Party game'], ['classic', 'Classic games'],
               ['1p', '1 Player'], ['2p', '2 Players'], ['multi', 'Multiplayer']];
   var CAT_NAME = {};
   CATS.forEach(function (c) { CAT_NAME[c[0]] = c[1]; });
