@@ -7,7 +7,12 @@
       "kind": "file",
       "added": "2026-10-16T20:48:55.757Z",
       "thumbnail": "games/8bit-chess.jpg?v=mvqv77q8",
-      "players": "2p"
+      "players": "2p",
+      "categories": [
+        "puzzles",
+        "classic",
+        "2p"
+      ]
     },
     {
       "id": "8-bit-tag",
@@ -236,5 +241,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T15:29:38.708Z"
+  "updated": "2026-10-29T18:21:46.269Z"
 }
