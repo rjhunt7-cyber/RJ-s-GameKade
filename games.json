@@ -358,9 +358,13 @@
       "kind": "file",
       "added": "2026-10-17T16:41:52.775Z",
       "thumbnail": "games/toad-room-server.jpg?v=mvqw1cl2",
-      "players": "1p"
+      "players": "1p",
+      "categories": [
+        "arcade",
+        "1p"
+      ]
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:08:32.132Z"
+  "updated": "2026-10-29T19:09:00.662Z"
 }
