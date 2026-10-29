@@ -1489,21 +1489,45 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
       var gap = parseFloat(cs.getPropertyValue('--gap')) || 6;
       return { D: D, W: W, gap: gap, slot: D + gap };
     }
-    // how wide a box is on the shelf while it turns (t: 0 = end label, 1 = cover)
-    function footprint(t) { var a = (Math.PI / 2) * (1 - t); return M.W * Math.cos(a) + M.D * Math.sin(a) + 10 * t; }
-    // the wave: the box under the mouse turns all the way, its neighbours a little
-    function waveAt(d) { return d < 0.5 ? 1 : 0.34 * Math.exp(-Math.pow((d - 0.5) / 1.1, 2)); }
-    // room each row keeps free so an open box can push its neighbours aside
-    function reserve() {
-      var extra = footprint(1) - M.D;
-      if (canHover) for (var k = 1; k < 5; k++) extra += 2 * (footprint(waveAt(k)) - M.D);
-      return extra + 16;
+    // ---- the wave, as a smooth magnifier ----
+    // One bell curve (spread SIG) sits on the focus point. Each box's share of the bell's area
+    // decides how wide its spot on the shelf gets, and the box turns just far enough to fill
+    // that spot. Every width and position comes from the same smooth curve, so nothing jumps,
+    // snaps or shimmies, and the boxes beside an open one are pushed aside, never covered.
+    var SIG = 0.82, MARGIN = 8, RAMP = 10, EXT = null;
+    function erf(x) {                                       // Abramowitz-Stegun 7.1.26
+      var sgn = x < 0 ? -1 : 1; x = Math.abs(x);
+      var t = 1 / (1 + 0.3275911 * x);
+      return sgn * (1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x));
     }
+    function G(z, sig) { return 0.5 * (1 + erf(z / (sig * Math.SQRT2))); }
+    function extent(t) { var a = (Math.PI / 2) * (1 - t); return M.W * Math.cos(a) + M.D * Math.sin(a); }
+    function buildExtent() {                                // table to turn "spot width" back into an angle
+      var ts = [], ws = [], best = 0, bestT = 1;
+      for (var i = 0; i <= 400; i++) { var t = i / 400, w = extent(t); ts.push(t); ws.push(w); if (w > best) { best = w; bestT = t; } }
+      var sig = canHover ? SIG : 0.28;
+      EXT = { ts: ts, ws: ws, max: best, tMax: bestT, sig: sig };
+      EXT.focus = best + MARGIN + RAMP;
+      EXT.E0 = (EXT.focus - M.D) / (2 * G(0.5, sig) - 1);   // extra shelf room when fully awake
+    }
+    function angleFor(w) {                                  // spot width -> how far the box turns (0..1)
+      var room = w - Math.min(MARGIN, Math.max(0, w - M.D));
+      if (room <= M.D + 0.01) return 0;
+      if (room < EXT.max) {
+        var lo = 0, hi = Math.round(EXT.tMax * 400);
+        while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (EXT.ws[mid] < room) lo = mid; else hi = mid; }
+        var w0 = EXT.ws[lo], w1 = EXT.ws[hi];
+        return EXT.ts[lo] + (EXT.ts[hi] - EXT.ts[lo]) * (w1 > w0 ? (room - w0) / (w1 - w0) : 0);
+      }
+      return EXT.tMax + (1 - EXT.tMax) * Math.min(1, (w - MARGIN - EXT.max) / RAMP);
+    }
+    function reserve() { return EXT.E0 + 16; }
     function layout(force) {
       if (shelf.hidden || !shown.length) return;
       var width = shelf.clientWidth;
       if (!width) return;                                    // home isn't on screen yet
       M = metrics();
+      buildExtent();
       var mode = coversMode ? 'covers' : 'shelf';
       // narrow windows: always fill at least half the width with boxes; the wave just squeezes at the edges
       var n = coversMode ? 0 : Math.max(1, Math.floor((width - reserve() + M.gap) / M.slot), Math.floor(width * 0.5 / M.slot));
@@ -1516,7 +1540,7 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
       for (var i = 0; i < shown.length; i += n) groups.push(shown.slice(i, i + n));
       shelf.innerHTML = groups.map(function (r) { return '<div class="shelf-row"><ul class="shelf-row__items">' + r.map(boxHTML).join('') + '</ul></div>'; }).join('');
       Array.prototype.forEach.call(shelf.children, function (wrap, r) {
-        var R = { wrap: wrap, ul: wrap.firstChild, items: [], u: 0, dirty: true };
+        var R = { wrap: wrap, ul: wrap.firstChild, items: [], u: 0, uT: 0, e: 0, active: false, dirty: true };
         Array.prototype.forEach.call(R.ul.children, function (li, c) {
           var it = { li: li, box: li.firstChild, row: r, col: c, t: 0, target: 0 };
           items.push(it); R.items.push(it);
@@ -1528,54 +1552,57 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
     }
     function restLeft(R) { return Math.max(0, (R.wrap.clientWidth - (R.items.length * M.slot - M.gap)) / 2); }
     function drawRow(R) {
-      var ws = R.items.map(function (it) { return footprint(it.t); }), n = ws.length;
-      var total = M.gap * (n - 1);
-      ws.forEach(function (w) { total += w; });
-      // keep the spot under the mouse under the mouse: boxes on both sides get pushed away
-      var u = Math.max(0, Math.min(n, R.u)), i = Math.min(n - 1, Math.floor(u)), P = 0;
-      for (var k = 0; k < i; k++) P += ws[k] + M.gap;
-      P += (u - i) * (ws[i] + M.gap);
-      var cw = R.wrap.clientWidth, shift = restLeft(R) + u * M.slot - P, hi = cw - total;
+      var n = R.items.length, sig = EXT.sig, E = EXT.E0 * R.e, u = Math.max(0, Math.min(n, R.u));
+      var g0 = G(-u, sig), total = n * M.slot - M.gap + E * (G(n - u, sig) - g0);
+      // keep the point under the mouse under the mouse
+      var cw = R.wrap.clientWidth, shift = restLeft(R) - E * (0.5 - g0), hi = cw - total;
       shift = hi < 0 ? hi / 2 : Math.max(0, Math.min(hi, shift));
-      R.ul.style.transform = 'translateX(' + shift.toFixed(1) + 'px)';
-      R.items.forEach(function (it, j) {
-        var t = it.t;
-        it.li.style.width = ws[j].toFixed(1) + 'px';
-        it.box.style.transform = 'translate3d(0,' + (-8 * t).toFixed(1) + 'px,' + (-M.W / 2 * (1 - t) + 12 * t).toFixed(1) + 'px) rotateY(' + (90 * (1 - t)).toFixed(2) + 'deg)';
+      R.ul.style.transform = 'translateX(' + shift.toFixed(2) + 'px)';
+      var gPrev = g0;
+      R.items.forEach(function (it, k) {
+        var gNext = G(k + 1 - u, sig), w = M.D + E * (gNext - gPrev);
+        gPrev = gNext;
+        var t = angleFor(w);
+        it.t = t;
+        it.li.style.width = w.toFixed(2) + 'px';
+        it.box.style.transform = 'translate3d(0,' + (-8 * t).toFixed(2) + 'px,' + (-M.W / 2 * (1 - t) + 12 * t).toFixed(2) + 'px) rotateY(' + (90 * (1 - t)).toFixed(3) + 'deg)';
         it.li.style.zIndex = String(1 + Math.round(t * 100));
-        it.li.classList.toggle('is-open', t > 0.92);
+        it.li.classList.toggle('is-open', t > 0.88);
       });
     }
-    // smooth motion: each box eases toward its target, so you watch it turn out to its cover
+    // smooth motion: the focus point glides after the cursor, and each box eases toward
+    // its angle, so sweeping the mouse across the shelf flows instead of snapping
     var raf = 0, lastT = 0;
     function kick() { if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(step); } }
     function step(now) {
       var dt = Math.min(64, now - lastT); lastT = now;
-      var k = reduce ? 1 : 1 - Math.pow(1 - 0.1, dt / 16.67), moving = false;
+      var f = dt / 16.67;
+      var ke = reduce ? 1 : 1 - Math.pow(1 - 0.12, f), ku = reduce ? 1 : 1 - Math.pow(1 - 0.18, f), moving = false;
       rows.forEach(function (R) {
         var changed = R.dirty; R.dirty = false;
-        R.items.forEach(function (it) {
-          var d = it.target - it.t;
-          if (Math.abs(d) < 0.002) { if (it.t !== it.target) { it.t = it.target; changed = true; } return; }
-          it.t += d * k; changed = true; moving = true;
-        });
-        if (changed) drawRow(R);
+        // e: how "awake" the row is: eases in when the mouse arrives (boxes turn out), out when it leaves
+        var de = (R.active ? 1 : 0) - R.e;
+        if (Math.abs(de) > 0.002) { R.e += de * ke; moving = true; changed = true; } else if (de) { R.e += de; changed = true; }
+        // u: the focus point glides after the cursor
+        if (R.active) {
+          var du = R.uT - R.u;
+          if (Math.abs(du) > 0.002) { R.u += du * ku; moving = true; changed = true; } else if (du) { R.u = R.uT; changed = true; }
+        }
+        if (!changed) return;
+        drawRow(R);
       });
       raf = moving ? requestAnimationFrame(step) : 0;
     }
     function aim(row, u) {
       rows.forEach(function (R, r) {
-        if (r !== row) { R.items.forEach(function (it) { it.target = 0; }); return; }
-        R.u = Math.max(0, Math.min(R.items.length, u)); R.dirty = true;
-        R.items.forEach(function (it) {
-          var d = Math.abs(it.col + 0.5 - R.u);
-          it.target = canHover ? waveAt(d) : (d < 0.5 ? 1 : 0);   // phones: just the tapped box
-          if (it.target < 0.01) it.target = 0;
-        });
+        if (r !== row) { R.active = false; return; }
+        var uT = Math.max(0, Math.min(R.items.length, u));
+        if (!R.active && R.e === 0) R.u = uT;                    // coming in fresh: start right where the cursor is
+        R.uT = uT; R.active = true;
       });
       kick();
     }
-    function rest() { items.forEach(function (it) { it.target = 0; }); kick(); }
+    function rest() { rows.forEach(function (R) { R.active = false; }); kick(); }
     function itemOf(el) {
       var li = el && el.closest && el.closest('.slot');
       for (var i = 0; i < items.length; i++) if (items[i].li === li) return items[i];
