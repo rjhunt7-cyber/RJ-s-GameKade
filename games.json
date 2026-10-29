@@ -118,7 +118,12 @@
       "kind": "file",
       "added": "2026-10-19T01:42:10.916Z",
       "thumbnail": "games/ghost-road.jpg?v=mvqvabp2",
-      "players": "multi"
+      "players": "multi",
+      "categories": [
+        "puzzles",
+        "horror",
+        "multi"
+      ]
     },
     {
       "id": "grave-rush",
@@ -275,5 +280,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:03:48.859Z"
+  "updated": "2026-10-29T19:03:57.988Z"
 }
