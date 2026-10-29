@@ -168,6 +168,7 @@
       "categories": [
         "puzzles",
         "fps",
+        "shooter",
         "arcade",
         "1p"
       ],
@@ -400,5 +401,5 @@
     }
   ],
   "count": 28,
-  "updated": "2026-10-29T21:18:46.244Z"
+  "updated": "2026-10-29T21:18:51.408Z"
 }
