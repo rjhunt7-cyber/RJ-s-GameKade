@@ -257,7 +257,13 @@
       "kind": "file",
       "added": "2026-10-27T03:22:39.481Z",
       "players": "2p",
-      "thumbnail": "games/rj-s-8bit-tic-tac-toe.jpg?v=mvqv8lzf"
+      "thumbnail": "games/rj-s-8bit-tic-tac-toe.jpg?v=mvqv8lzf",
+      "categories": [
+        "puzzles",
+        "arcade",
+        "classic",
+        "2p"
+      ]
     },
     {
       "id": "rj-s-ping-pong",
@@ -324,5 +330,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:07:07.448Z"
+  "updated": "2026-10-29T19:07:13.487Z"
 }
