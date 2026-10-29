@@ -344,7 +344,12 @@
       "kind": "file",
       "added": "2026-10-22T00:18:57.055Z",
       "players": "1p",
-      "thumbnail": "games/sparrows-ward.jpg?v=mvqw17yz"
+      "thumbnail": "games/sparrows-ward.jpg?v=mvqw17yz",
+      "categories": [
+        "sidescroller",
+        "arcade",
+        "1p"
+      ]
     },
     {
       "id": "toad-room-server",
@@ -357,5 +362,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:08:12.598Z"
+  "updated": "2026-10-29T19:08:32.132Z"
 }
