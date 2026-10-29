@@ -127,6 +127,15 @@
       "thumbnail": "games/meme-fighter.jpg?v=mvqwt15l"
     },
     {
+      "id": "monolith-dominion",
+      "title": "Monolith Dominion",
+      "path": "games/monolith-dominion.html",
+      "kind": "file",
+      "added": "2026-10-29T15:29:38.706Z",
+      "players": "multi",
+      "thumbnail": "games/monolith-dominion.jpg?v=mvtp8pl6"
+    },
+    {
       "id": "monsters-vs-androids",
       "title": "Monsters vs Androids",
       "path": "games/monsters-vs-androids.html",
@@ -226,6 +235,6 @@
       "players": "1p"
     }
   ],
-  "count": 25,
-  "updated": "2026-10-28T02:46:10.598Z"
+  "count": 26,
+  "updated": "2026-10-29T15:29:38.708Z"
 }
