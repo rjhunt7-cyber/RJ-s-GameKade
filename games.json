@@ -174,7 +174,12 @@
       "kind": "file",
       "added": "2026-10-17T04:16:43.489Z",
       "thumbnail": "games/knightmares.jpg?v=mvqvaobd",
-      "players": "1p"
+      "players": "1p",
+      "categories": [
+        "puzzles",
+        "horror",
+        "1p"
+      ]
     },
     {
       "id": "meme-fighter",
@@ -295,5 +300,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:04:50.322Z"
+  "updated": "2026-10-29T19:04:59.393Z"
 }
