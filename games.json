@@ -315,7 +315,13 @@
       "kind": "file",
       "added": "2026-10-16T21:59:27.621Z",
       "thumbnail": "games/rjs-nutty-adventure.jpg?v=mvqwk7hf",
-      "players": "1p"
+      "players": "1p",
+      "categories": [
+        "puzzles",
+        "sidescroller",
+        "arcade",
+        "1p"
+      ]
     },
     {
       "id": "rowdy-links",
@@ -346,5 +352,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:07:38.817Z"
+  "updated": "2026-10-29T19:07:54.856Z"
 }
