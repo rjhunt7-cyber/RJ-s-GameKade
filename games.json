@@ -287,7 +287,12 @@
       "kind": "file",
       "added": "2026-10-25T23:18:20.430Z",
       "players": "multi",
-      "thumbnail": "games/rj-s-rubber-hose-rally.jpg?v=mvqwtkh3"
+      "thumbnail": "games/rj-s-rubber-hose-rally.jpg?v=mvqwtkh3",
+      "categories": [
+        "racing",
+        "arcade",
+        "multi"
+      ]
     },
     {
       "id": "rjs-frozen-kitchen",
@@ -336,5 +341,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:07:18.206Z"
+  "updated": "2026-10-29T19:07:23.978Z"
 }
