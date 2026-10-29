@@ -188,7 +188,11 @@
       "kind": "file",
       "added": "2026-10-24T14:02:26.488Z",
       "players": "2p",
-      "thumbnail": "games/meme-fighter.jpg?v=mvqwt15l"
+      "thumbnail": "games/meme-fighter.jpg?v=mvqwt15l",
+      "categories": [
+        "arcade",
+        "2p"
+      ]
     },
     {
       "id": "monolith-dominion",
@@ -300,5 +304,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:04:59.393Z"
+  "updated": "2026-10-29T19:05:20.168Z"
 }
