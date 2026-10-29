@@ -132,7 +132,12 @@
       "kind": "file",
       "added": "2026-10-16T15:16:43.961Z",
       "thumbnail": "games/grave-rush.jpg?v=mvqvuu6z",
-      "players": "1p"
+      "players": "1p",
+      "categories": [
+        "horror",
+        "arcade",
+        "1p"
+      ]
     },
     {
       "id": "grave-rush-3d",
@@ -280,5 +285,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:03:57.988Z"
+  "updated": "2026-10-29T19:04:19.572Z"
 }
