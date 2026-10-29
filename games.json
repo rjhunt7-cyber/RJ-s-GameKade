@@ -153,6 +153,7 @@
       "categories": [
         "horror",
         "fps",
+        "shooter",
         "arcade",
         "multi"
       ]
@@ -399,5 +400,5 @@
     }
   ],
   "count": 28,
-  "updated": "2026-10-29T21:18:42.377Z"
+  "updated": "2026-10-29T21:18:46.244Z"
 }
