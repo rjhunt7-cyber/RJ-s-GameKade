@@ -137,6 +137,7 @@
       "players": "1p",
       "categories": [
         "horror",
+        "shooter",
         "arcade",
         "1p"
       ]
@@ -398,5 +399,5 @@
     }
   ],
   "count": 28,
-  "updated": "2026-10-29T21:18:28.664Z"
+  "updated": "2026-10-29T21:18:42.377Z"
 }
