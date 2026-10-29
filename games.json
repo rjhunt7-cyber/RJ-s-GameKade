@@ -77,7 +77,12 @@
       "kind": "file",
       "added": "2026-10-27T22:54:00.099Z",
       "players": "multi",
-      "thumbnail": "games/block-party.jpg?v=mvra8gdf"
+      "thumbnail": "games/block-party.jpg?v=mvra8gdf",
+      "categories": [
+        "puzzles",
+        "arcade",
+        "multi"
+      ]
     },
     {
       "id": "cob-and-dune",
@@ -261,5 +266,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:02:52.944Z"
+  "updated": "2026-10-29T19:03:04.233Z"
 }
