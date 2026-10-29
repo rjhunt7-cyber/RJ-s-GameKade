@@ -1184,11 +1184,19 @@ function pbox(x,y){return{x:x+3,y:y+8,w:10,h:7};}
 function boxBlocked(bx,by,w,h,isP,fly){
   const x0=Math.floor(bx/16),x1=Math.floor((bx+w-1)/16),y0=Math.floor(by/16),y1=Math.floor((by+h-1)/16);
   for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){
-    if(tx<0||ty<0||tx>=SW||ty>=SH){if(isP&&edgeOpen(tx,ty))continue;return true;}
+    if(tx<0||ty<0||tx>=SW||ty>=SH){
+      if(!isP||!edgeOpen(tx,ty))return true;
+      if(A.type==='ow'&&SOLID.has(owTileAt(A.sx*16+tx,A.sy*12+ty)))return true;   // solid tiles on the far side of a screen edge still block
+      continue;}
     const t=A.tiles[ty*16+tx];if(isSolidTile(t))return true;
     if(!fly&&!isP&&(t===PIT||t===LAV||t===WA))return true;
   }
   return false;
+}
+function owTileAt(gx,gy){
+  if(gx<0||gy<0||gx>=OWW||gy>=OWH)return RO;
+  const m=S.mods['ow:'+Math.floor(gx/16)+','+Math.floor(gy/12)],i=(gy%12)*16+(gx%16);
+  if(m&&m[i]!==undefined)return m[i];return OWT[gy*OWW+gx];
 }
 function edgeOpen(tx,ty){
   let nx=A.type==='ow'?A.sx:A.rx,ny=A.type==='ow'?A.sy:A.ry;
@@ -1418,9 +1426,15 @@ function startSlide(dir,key){
   const old=A,oldDark=A.dark;
   loadArea(key);
   if(A.dirty)rebuildCanvas();
-  const start=[[0,-14],[0,186],[250,0],[-10,0]][dir],tgt=[[0,12],[0,150],[222,0],[16,0]][dir];
-  const keepX=P.x,keepY=P.y;
-  if(dir===0||dir===1){P.x=keepX;P.y=start[1];}else{P.y=keepY;P.x=start[0];}
+  let tgt;
+  if(old.type==='ow'){ // keep the exact world position: walls on the other side keep blocking, nothing teleports
+    if(dir===0)P.y-=192;else if(dir===1)P.y+=192;else if(dir===2)P.x+=256;else P.x-=256;
+    tgt=[P.x,P.y];const nx=P.x+DXS[dir]*6,ny=P.y+DYS[dir]*6;if(!pboxBlockedAt(nx,ny))tgt=[nx,ny];
+  }else{
+    const start=[[0,-14],[0,186],[250,0],[-10,0]][dir];tgt=[[0,12],[0,150],[222,0],[16,0]][dir];
+    const keepX=P.x,keepY=P.y;
+    if(dir===0||dir===1){P.x=keepX;P.y=start[1];}else{P.y=keepY;P.x=start[0];}
+  }
   trans={dir,t:0,snap,tx:tgt,pending:true,oldDark};
   P.lock=true;shake=0;
 }
@@ -1868,7 +1882,7 @@ function rebuildCanvas(){renderArea(A);}
 function pboxBlockedAt(x,y){const b=pbox(x,y);return boxBlocked(b.x,b.y,b.w,b.h,true);}
 function unstick(){
   if(!pboxBlockedAt(P.x,P.y))return false;
-  for(let r=2;r<=80;r+=2)for(let a=0;a<24;a++){const x=P.x+Math.cos(a*Math.PI/12)*r,y=P.y+Math.sin(a*Math.PI/12)*r;
+  for(let r=2;r<=20;r+=2)for(let a=0;a<24;a++){const x=P.x+Math.cos(a*Math.PI/12)*r,y=P.y+Math.sin(a*Math.PI/12)*r;
     if(x<4||x>236||y<0||y>172)continue;
     if(!pboxBlockedAt(x,y)){P.x=Math.round(x);P.y=Math.round(y);P.kx=P.ky=0;return true;}}
   return false;
