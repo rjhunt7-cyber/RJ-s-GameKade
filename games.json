@@ -161,7 +161,11 @@
       "kind": "file",
       "added": "2026-10-21T23:30:45.011Z",
       "players": "multi",
-      "thumbnail": "games/keystone-drift.jpg?v=mviqwlu6"
+      "thumbnail": "games/keystone-drift.jpg?v=mviqwlu6",
+      "categories": [
+        "racing",
+        "multi"
+      ]
     },
     {
       "id": "knightmares",
@@ -291,5 +295,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:04:28.692Z"
+  "updated": "2026-10-29T19:04:50.322Z"
 }
