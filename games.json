@@ -63,7 +63,12 @@
       "kind": "file",
       "added": "2026-10-17T05:17:29.141Z",
       "thumbnail": "games/ballistic.jpg?v=mvqw5a9q",
-      "players": "2p"
+      "players": "2p",
+      "categories": [
+        "sidescroller",
+        "arcade",
+        "2p"
+      ]
     },
     {
       "id": "block-party",
@@ -256,5 +261,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:02:30.761Z"
+  "updated": "2026-10-29T19:02:52.944Z"
 }
