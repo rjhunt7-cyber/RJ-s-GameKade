@@ -24,6 +24,7 @@
       "players": "multi",
       "categories": [
         "arcade",
+        "party",
         "multi"
       ]
     },
@@ -396,5 +397,5 @@
     }
   ],
   "count": 28,
-  "updated": "2026-10-29T20:32:55.733Z"
+  "updated": "2026-10-29T21:18:13.840Z"
 }
