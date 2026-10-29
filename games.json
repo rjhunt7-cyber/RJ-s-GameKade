@@ -155,6 +155,21 @@
       ]
     },
     {
+      "id": "hit-man-pie",
+      "title": "Hit Man Pie",
+      "path": "games/hit-man-pie.html",
+      "kind": "file",
+      "added": "2026-10-29T20:32:55.733Z",
+      "players": "1p",
+      "categories": [
+        "puzzles",
+        "fps",
+        "arcade",
+        "1p"
+      ],
+      "thumbnail": "games/hit-man-pie.jpg?v=mvu02qiy"
+    },
+    {
       "id": "keystone-drift",
       "title": "Keystone Drift",
       "path": "games/keystone-drift.html",
@@ -380,6 +395,6 @@
       ]
     }
   ],
-  "count": 27,
-  "updated": "2026-10-29T19:55:43.297Z"
+  "count": 28,
+  "updated": "2026-10-29T20:32:55.733Z"
 }
