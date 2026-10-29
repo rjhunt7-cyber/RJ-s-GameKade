@@ -21,7 +21,11 @@
       "kind": "file",
       "added": "2026-10-18T20:00:37.588Z",
       "thumbnail": "games/8-bit-tag.jpg?v=mvqv70w8",
-      "players": "multi"
+      "players": "multi",
+      "categories": [
+        "arcade",
+        "multi"
+      ]
     },
     {
       "id": "aces-arcade",
@@ -241,5 +245,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:01:38.861Z"
+  "updated": "2026-10-29T19:01:51.869Z"
 }
