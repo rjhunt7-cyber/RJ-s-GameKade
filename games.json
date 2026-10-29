@@ -330,7 +330,12 @@
       "kind": "file",
       "added": "2026-10-28T02:46:10.598Z",
       "players": "multi",
-      "thumbnail": "games/rowdy-links.jpg?v=mvrij17r"
+      "thumbnail": "games/rowdy-links.jpg?v=mvrij17r",
+      "categories": [
+        "sports",
+        "arcade",
+        "multi"
+      ]
     },
     {
       "id": "sparrows-ward",
@@ -352,5 +357,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:07:54.856Z"
+  "updated": "2026-10-29T19:08:12.598Z"
 }
