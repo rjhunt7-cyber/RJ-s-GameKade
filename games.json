@@ -201,7 +201,12 @@
       "kind": "file",
       "added": "2026-10-29T15:29:38.706Z",
       "players": "multi",
-      "thumbnail": "games/monolith-dominion.jpg?v=mvtp8pl6"
+      "thumbnail": "games/monolith-dominion.jpg?v=mvtp8pl6",
+      "categories": [
+        "puzzles",
+        "arcade",
+        "multi"
+      ]
     },
     {
       "id": "monsters-vs-androids",
@@ -304,5 +309,5 @@
     }
   ],
   "count": 26,
-  "updated": "2026-10-29T19:05:20.168Z"
+  "updated": "2026-10-29T19:05:53.335Z"
 }
