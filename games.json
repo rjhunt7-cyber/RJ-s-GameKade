@@ -332,6 +332,22 @@
       ]
     },
     {
+      "id": "rjs-8-bit-worm",
+      "title": "Rjs 8 Bit Worm",
+      "path": "games/rjs-8-bit-worm.html",
+      "kind": "file",
+      "added": "2026-10-30T14:35:35.570Z",
+      "players": "multi",
+      "categories": [
+        "puzzles",
+        "pvp",
+        "arcade",
+        "classic",
+        "multi"
+      ],
+      "thumbnail": "games/rjs-8-bit-worm.jpg?v=mvv2r21a"
+    },
+    {
       "id": "rjs-frozen-kitchen",
       "title": "Rjs Frozen Kitchen",
       "path": "games/rjs-frozen-kitchen.html",
@@ -403,6 +419,6 @@
       ]
     }
   ],
-  "count": 28,
-  "updated": "2026-10-30T13:09:56.880Z"
+  "count": 29,
+  "updated": "2026-10-30T14:35:35.571Z"
 }
