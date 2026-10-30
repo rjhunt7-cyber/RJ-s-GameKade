@@ -10,6 +10,7 @@
       "players": "2p",
       "categories": [
         "puzzles",
+        "pvp",
         "classic",
         "2p"
       ]
@@ -402,5 +403,5 @@
     }
   ],
   "count": 28,
-  "updated": "2026-10-29T21:23:53.475Z"
+  "updated": "2026-10-30T13:08:56.021Z"
 }
