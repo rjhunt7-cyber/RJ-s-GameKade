@@ -211,6 +211,7 @@
       "players": "2p",
       "thumbnail": "games/meme-fighter.jpg?v=mvqwt15l",
       "categories": [
+        "pvp",
         "arcade",
         "2p"
       ]
@@ -403,5 +404,5 @@
     }
   ],
   "count": 28,
-  "updated": "2026-10-30T13:08:56.021Z"
+  "updated": "2026-10-30T13:09:56.880Z"
 }
