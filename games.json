@@ -30,6 +30,21 @@
       ]
     },
     {
+      "id": "a-pets-9-to-5",
+      "title": "A Pets 9 to 5",
+      "path": "games/a-pets-9-to-5.html",
+      "kind": "file",
+      "added": "2026-10-30T17:14:25.245Z",
+      "players": "1p",
+      "categories": [
+        "puzzles",
+        "arcade",
+        "party",
+        "1p"
+      ],
+      "thumbnail": "games/a-pets-9-to-5.jpg?v=mvv8fb6j"
+    },
+    {
       "id": "aces-arcade",
       "title": "Aces Arcade",
       "path": "games/aces-arcade.html",
@@ -434,6 +449,6 @@
       ]
     }
   ],
-  "count": 30,
-  "updated": "2026-10-30T14:41:22.299Z"
+  "count": 31,
+  "updated": "2026-10-30T17:14:25.246Z"
 }
