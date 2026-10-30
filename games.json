@@ -73,6 +73,21 @@
       ]
     },
     {
+      "id": "belfry-bat",
+      "title": "Belfry Bat",
+      "path": "games/belfry-bat.html",
+      "kind": "file",
+      "added": "2026-10-30T14:41:22.299Z",
+      "players": "1p",
+      "categories": [
+        "puzzles",
+        "arcade",
+        "classic",
+        "1p"
+      ],
+      "thumbnail": "games/belfry-bat.jpg?v=mvv2yhkm"
+    },
+    {
       "id": "block-party",
       "title": "Block Party",
       "path": "games/block-party.html",
@@ -419,6 +434,6 @@
       ]
     }
   ],
-  "count": 29,
-  "updated": "2026-10-30T14:35:35.571Z"
+  "count": 30,
+  "updated": "2026-10-30T14:41:22.299Z"
 }
