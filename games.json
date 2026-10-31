@@ -132,6 +132,21 @@
       ]
     },
     {
+      "id": "dead-chamber",
+      "title": "Dead Chamber",
+      "path": "games/dead-chamber.html",
+      "kind": "file",
+      "added": "2026-10-31T16:46:06.020Z",
+      "players": "multi",
+      "categories": [
+        "fps",
+        "shooter",
+        "pvp",
+        "multi"
+      ],
+      "thumbnail": "games/dead-chamber.jpg?v=mvwmuqjl"
+    },
+    {
       "id": "dead-scope",
       "title": "Dead Scope",
       "path": "games/dead-scope.html",
@@ -449,6 +464,6 @@
       ]
     }
   ],
-  "count": 31,
-  "updated": "2026-10-30T17:14:25.246Z"
+  "count": 32,
+  "updated": "2026-10-31T16:46:06.021Z"
 }
