@@ -1746,7 +1746,9 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
     var game = null, frame = null, zoom = null, pseudoFs = false, frameReady = false, problem = null;
     var idleTimer = 0, fitTimer = 0, loadTimer = 0, queued = false, ticket = 0;
 
-    function isFullscreen() { return pseudoFs || (document.fullscreenElement || document.webkitFullscreenElement) === stage; }
+    function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+    // true for the site's fullscreen AND for a game that made itself fullscreen (its own button or key)
+    function isFullscreen() { var f = fsEl(); return pseudoFs || (!!f && (f === stage || stage.contains(f))); }
 
     function available() {
       if (isFullscreen()) return { w: stage.clientWidth, h: stage.clientHeight };
@@ -1859,17 +1861,20 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
       var on = document.fullscreenEnabled !== undefined ? document.fullscreenEnabled : document.webkitFullscreenEnabled;
       return !!(stage.requestFullscreen || stage.webkitRequestFullscreen) && on !== false;
     }
+    function canKeepEsc() { return !!(navigator.keyboard && navigator.keyboard.lock); }
     function enterFullscreen() {
-      if (!apiOK()) { setPseudo(true); return; }
+      // Firefox and Safari always leave real fullscreen on Esc, so there the game fills the whole window instead
+      if (!apiOK() || !canKeepEsc()) { setPseudo(true); return; }
+      lockEsc(true);                                   // ask Chrome/Edge to hand Esc to the page (becomes active in fullscreen)
       try {
-        var p = stage.requestFullscreen ? stage.requestFullscreen({ navigationUI: 'hide' }) : stage.webkitRequestFullscreen();
+        var p = stage.requestFullscreen ? stage.requestFullscreen({ navigationUI: 'hide', keyboardLock: 'browser' }) : stage.webkitRequestFullscreen();
         if (p && p.catch) p.catch(function () { setPseudo(true); });
       } catch (e) { setPseudo(true); }
     }
     function exitFullscreen() {
       if (pseudoFs) { setPseudo(false); return; }
       var exit = document.exitFullscreen || document.webkitExitFullscreen;
-      if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+      if (exit && fsEl()) {
         try { var p = exit.call(document); if (p && p.catch) p.catch(function () {}); } catch (e) { /* already out */ }
       }
     }
@@ -1883,7 +1888,7 @@ html.has-pseudo-fs, html.has-pseudo-fs body { overflow: hidden; }
     // Two quick presses leave fullscreen. Chrome and Edge let a page keep Esc while in
     // fullscreen (keyboard lock); holding Esc down still exits there, that's the browser's rule.
     var escAt = 0;
-    var keyboardless = !!(window.matchMedia && matchMedia('(hover: none) and (pointer: coarse)').matches);
+    var keyboardless = !!(window.matchMedia && matchMedia('(any-hover: none)').matches && matchMedia('(any-pointer: coarse)').matches);
     function onEsc(e) {
       if (!isFullscreen() || e.repeat) return;
       var now = Date.now();
