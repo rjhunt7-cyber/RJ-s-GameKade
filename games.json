@@ -393,6 +393,22 @@
       "thumbnail": "games/rjs-8-bit-worm.jpg?v=mvv2r21a"
     },
     {
+      "id": "rjs-bot-cage-combat",
+      "title": "RJs Bot Cage Combat",
+      "path": "games/rjs-bot-cage-combat.html",
+      "kind": "file",
+      "added": "2026-11-05T20:26:22.350Z",
+      "players": "multi",
+      "categories": [
+        "pvp",
+        "sports",
+        "arcade",
+        "party",
+        "multi"
+      ],
+      "thumbnail": "games/rjs-bot-cage-combat.jpg?v=mw3zx9u3"
+    },
+    {
       "id": "rjs-frozen-kitchen",
       "title": "Rjs Frozen Kitchen",
       "path": "games/rjs-frozen-kitchen.html",
@@ -464,6 +480,6 @@
       ]
     }
   ],
-  "count": 32,
-  "updated": "2026-10-31T16:46:06.021Z"
+  "count": 33,
+  "updated": "2026-11-05T20:26:22.350Z"
 }
