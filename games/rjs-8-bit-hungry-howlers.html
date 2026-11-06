@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>RJ's 8-Bit Hungry Howlers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<!-- PeerJS powers the room-code online play (peer-to-peer, no server of your own needed) -->
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+:root{
+  --ink:#26101e; --p1:#5c2c78; --p2:#3a1850; --pink:#f8a8c0; --gum:#f06888; --bile:#9cd848;
+  --mus:#f0c030; --wht:#fcf8ec; --u:3px; --font:'Press Start 2P','Courier New',monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#1a0a14;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
+body{display:flex;align-items:center;justify-content:center;font-family:var(--font);color:var(--wht);line-height:1.5}
+#stage{position:relative;width:calc(var(--u)*256);height:calc(var(--u)*240);flex:none}
+#cv{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+#ui{position:absolute;inset:0;pointer-events:none}
+#touch{position:absolute;inset:0;pointer-events:none}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*4);pointer-events:auto;padding:calc(var(--u)*4)}
+.screen.on{display:flex}
+.dim{background:rgba(38,16,30,.62)}
+.panel{background:var(--p2);border:var(--u) solid var(--ink);box-shadow:0 0 0 var(--u) var(--gum),calc(var(--u)*4) calc(var(--u)*4) 0 var(--u) var(--ink);
+  padding:calc(var(--u)*6);width:calc(var(--u)*152);display:flex;flex-direction:column;gap:calc(var(--u)*3);max-height:100%;overflow:auto}
+.panel.wide{width:calc(var(--u)*240);padding:calc(var(--u)*5);gap:calc(var(--u)*2.5)}
+h2{font-size:calc(var(--u)*7);color:var(--mus);margin:0 0 var(--u);text-shadow:var(--u) var(--u) 0 var(--ink);font-weight:400;line-height:1.2}
+p,li{font-size:calc(var(--u)*4);margin:0;color:var(--pink)}
+.btn{font:inherit;font-size:calc(var(--u)*5);color:var(--wht);background:var(--p1);border:var(--u) solid var(--ink);
+  padding:calc(var(--u)*3) calc(var(--u)*4);cursor:pointer;text-align:left;line-height:1.2;
+  box-shadow:inset 0 calc(var(--u)*-1.5) 0 rgba(0,0,0,.35)}
+.btn:hover{background:var(--gum);color:var(--ink)}
+.btn:focus{outline:none}
+.btn:focus-visible{background:var(--gum);color:var(--ink);box-shadow:0 0 0 var(--u) var(--mus)}
+.btn.sel{background:var(--mus);color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.sm{font-size:calc(var(--u)*4);padding:calc(var(--u)*2) calc(var(--u)*3)}
+.btn.go{background:var(--bile);color:var(--ink);text-align:center}
+.btn.go:hover,.btn.go:focus-visible{background:var(--mus)}
+.row{display:flex;gap:calc(var(--u)*2);align-items:center;flex-wrap:wrap}
+.row.end{justify-content:flex-end}
+.lbl{font-size:calc(var(--u)*4);color:var(--pink);min-width:calc(var(--u)*46)}
+.note{font-size:calc(var(--u)*3.6);color:var(--mus);min-height:calc(var(--u)*5)}
+.note.err{color:var(--gum)}
+/* logo */
+.logo{text-align:center;pointer-events:none}
+.logo-top{font-size:calc(var(--u)*6);color:var(--wht);text-shadow:var(--u) var(--u) 0 var(--ink);display:flex;gap:calc(var(--u)*3);align-items:center;justify-content:center}
+.star{display:inline-flex;align-items:center;justify-content:center;width:calc(var(--u)*24);height:calc(var(--u)*24);color:var(--ink);font-size:calc(var(--u)*4.4);
+  background:var(--mus);clip-path:polygon(50% 0,63% 34%,100% 38%,72% 60%,80% 100%,50% 78%,20% 100%,28% 60%,0 38%,37% 34%);padding-top:calc(var(--u)*2)}
+.logo-main{margin:calc(var(--u)*2) 0 0;font-weight:400;font-size:calc(var(--u)*17);line-height:1.08;letter-spacing:calc(var(--u)*-0.5)}
+.logo-main .ln{display:block;white-space:nowrap}
+.logo-main span span{display:inline-block;-webkit-text-stroke:calc(var(--u)*1.2) var(--ink);paint-order:stroke fill;
+  text-shadow:calc(var(--u)*1.6) calc(var(--u)*1.6) 0 var(--ink),calc(var(--u)*3) calc(var(--u)*3) 0 var(--p1)}
+.logo-main .tw{animation:twitch 3.3s steps(1) infinite}
+.logo-main .tw2{animation:twitch 4.1s steps(1) infinite .7s}
+@keyframes twitch{0%,92%{translate:0 0}93%{translate:calc(var(--u)*-1) calc(var(--u)*1)}95%{translate:calc(var(--u)*1.5) calc(var(--u)*-1)}97%{translate:0 calc(var(--u)*1)}}
+.tag{font-size:calc(var(--u)*4);color:var(--pink);text-shadow:calc(var(--u)*.7) calc(var(--u)*.7) 0 var(--ink);text-align:center}
+.faces{display:flex;gap:calc(var(--u)*3);pointer-events:none}
+canvas.pt{width:calc(var(--u)*48);height:calc(var(--u)*42);image-rendering:pixelated;display:block}
+.faces canvas.pt{width:calc(var(--u)*40);height:calc(var(--u)*35);filter:drop-shadow(calc(var(--u)*2) calc(var(--u)*2) 0 var(--ink))}
+.blink{animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+/* seats */
+.seats{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:calc(var(--u)*2)}
+.seat{background:var(--p1);border:var(--u) solid var(--ink);padding:calc(var(--u)*2);display:flex;flex-direction:column;align-items:center;gap:var(--u);
+  box-shadow:inset 0 calc(var(--u)*-1.5) 0 rgba(0,0,0,.3)}
+.seat.me{box-shadow:0 0 0 var(--u) var(--mus)}
+.seat .nm{font-size:calc(var(--u)*3.6);color:var(--c);text-shadow:calc(var(--u)*.6) calc(var(--u)*.6) 0 var(--ink);text-align:center;white-space:nowrap}
+.seat .sp{font-size:calc(var(--u)*2.8);color:var(--pink);text-align:center;white-space:nowrap}
+.seat .who{font-size:calc(var(--u)*3.4);padding:calc(var(--u)*1.5) calc(var(--u)*2);text-align:center;width:100%}
+.seat .keys{font-size:calc(var(--u)*2.8);color:var(--mus);min-height:calc(var(--u)*4)}
+.pickrow{display:flex;align-items:center;gap:var(--u)}
+.pickrow .btn{padding:var(--u) calc(var(--u)*2);font-size:calc(var(--u)*4)}
+.code{font-size:calc(var(--u)*11);color:var(--mus);letter-spacing:calc(var(--u)*2);text-shadow:var(--u) var(--u) 0 var(--ink)}
+input.codein{font:inherit;font-size:calc(var(--u)*10);width:calc(var(--u)*80);text-transform:uppercase;letter-spacing:calc(var(--u)*2);
+  background:var(--ink);color:var(--mus);border:var(--u) solid var(--gum);padding:calc(var(--u)*2) calc(var(--u)*3);text-align:center}
+input.codein:focus{outline:none;box-shadow:0 0 0 var(--u) var(--mus)}
+.howto{display:flex;flex-direction:column;gap:calc(var(--u)*2.5)}
+.howto p{font-size:calc(var(--u)*3.5);color:var(--wht);line-height:1.6}
+.howto b{color:var(--mus);font-weight:400}
+.res{display:flex;flex-direction:column;gap:var(--u)}
+.rrow{display:flex;align-items:center;gap:calc(var(--u)*3);background:var(--p1);border:var(--u) solid var(--ink);padding:var(--u) calc(var(--u)*3)}
+.rrow canvas.pt{width:calc(var(--u)*24);height:calc(var(--u)*21)}
+.rrow.win{background:var(--gum)}
+.rrow .rk{font-size:calc(var(--u)*6);color:var(--mus);width:calc(var(--u)*10);text-shadow:calc(var(--u)*.6) calc(var(--u)*.6) 0 var(--ink)}
+.rrow .rn{font-size:calc(var(--u)*4);flex:1;color:var(--wht);text-shadow:calc(var(--u)*.6) calc(var(--u)*.6) 0 var(--ink)}
+.rrow .rn small{display:block;font-size:calc(var(--u)*2.8);color:var(--pink);margin-top:calc(var(--u)*.6)}
+.rrow.win .rn small{color:var(--ink)}
+.rrow.win .rn,.rrow.win .rs{text-shadow:none;color:var(--ink)}
+.rrow .rs{font-size:calc(var(--u)*7);color:var(--wht);text-shadow:var(--u) var(--u) 0 var(--ink)}
+.bigface{display:flex;align-items:center;gap:calc(var(--u)*4)}
+.bigface canvas.pt{width:calc(var(--u)*64);height:calc(var(--u)*56)}
+/* touch buttons */
+.tb{position:absolute;pointer-events:auto;width:calc(var(--u)*30);height:calc(var(--u)*30);border-radius:50%;border:var(--u) solid var(--ink);
+  font:inherit;font-size:calc(var(--u)*3.4);color:var(--ink);opacity:.82;touch-action:none;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2}
+.tb.ch{background:var(--gum)}
+.tb.sp{background:var(--mus);width:calc(var(--u)*24);height:calc(var(--u)*24)}
+.tb.down{filter:brightness(1.3);opacity:1}
+.tb.pause{width:calc(var(--u)*14);height:calc(var(--u)*10);border-radius:0;background:var(--p1);color:var(--wht);top:var(--u);left:calc(50% - var(--u)*7)}
+@media (prefers-reduced-motion: reduce){ .logo-main .tw,.logo-main .tw2,.blink{animation:none} }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="cv" width="256" height="240"></canvas>
+  <div id="touch"></div>
+  <div id="ui">
+    <section id="s-title" class="screen dim on">
+      <div class="logo">
+        <div class="logo-top"><span class="star">RJ'S</span><span>8-BIT</span></div>
+        <h1 class="logo-main" id="logo" aria-label="Hungry Howlers"></h1>
+      </div>
+      <div class="faces" id="faces"></div>
+      <p class="tag">Four starving predators. One buffet. No manners.</p>
+      <button class="btn go blink" id="b-start" data-autofocus>Press start</button>
+    </section>
+
+    <section id="s-menu" class="screen dim">
+      <div class="panel">
+        <h2>What's for dinner?</h2>
+        <button class="btn" data-go="solo" data-autofocus>Solo vs bots</button>
+        <button class="btn" data-go="party">Party on one screen</button>
+        <button class="btn" data-go="host">Host online room</button>
+        <button class="btn" data-go="join">Join with a code</button>
+        <button class="btn" data-go="howto">How to play</button>
+        <div class="row"><button class="btn sm" id="b-sfx">Sound: on</button><button class="btn sm" id="b-mus">Music: on</button></div>
+      </div>
+    </section>
+
+    <section id="s-setup" class="screen dim">
+      <div class="panel wide">
+        <div class="row" style="justify-content:space-between"><h2 id="su-title">Solo vs bots</h2><div class="code" id="su-code"></div></div>
+        <div class="row"><span class="lbl">Predators</span><span id="su-n" class="row"></span><span class="note" id="su-arena"></span></div>
+        <div class="row"><span class="lbl">Bots</span><span id="su-diff" class="row"></span></div>
+        <div class="row"><span class="lbl">Dinner bell</span><span id="su-time" class="row"></span></div>
+        <div class="seats" id="seats"></div>
+        <div class="note" id="su-status"></div>
+        <div class="row end"><button class="btn sm" id="su-back">Back</button><button class="btn go" id="su-start" data-autofocus>Start eating</button></div>
+      </div>
+    </section>
+
+    <section id="s-join" class="screen dim">
+      <div class="panel">
+        <h2>Join a room</h2>
+        <p>Type the 5-character code from the host.</p>
+        <input class="codein" id="j-code" data-autofocus maxlength="5" autocomplete="off" spellcheck="false" aria-label="Room code">
+        <div class="note" id="j-status"></div>
+        <div class="row end"><button class="btn sm" id="j-back">Back</button><button class="btn go" id="j-go">Join room</button></div>
+      </div>
+    </section>
+
+    <section id="s-howto" class="screen dim">
+      <div class="panel wide howto">
+        <h2>How to eat</h2>
+        <p><b>Chomp</b> lunges your predator's neck out and snaps. Tap it for a quick bite, or hold it to park your mouth open like a trap and let go to snap. Up to 3 critters per bite, and 3 or more in one gulp earns +2.</p>
+        <p><b>Points:</b> mouse and frog 1, rabbit, chicken and duckling 2, piglet and lamb 3, gazelle 4, golden goose 10. <b>Skip the skunk</b> (you get stunned and stink) and the <b>porcupine</b> (minus 3 and a sore snout).</p>
+        <p><b>Special</b> fires when your meter is full. Vinnie lobs a decoy carrot and reels the mob in. Gus inhales everything in front of him. Dale fires a rocket fork that kebabs up to two critters (and sometimes explodes). Lou's laugh dizzies every rival and pulls prey toward him.</p>
+        <p><b>Crates</b> parachute in. They slide around the arena like marbles. Chomp one for Mega Maw, Meat Magnet, Chili Tongue, or a Stink Bomb that makes prey run from the leader. <b>Tunnels</b> link by color, bumpers ricochet critters, and stampedes charge straight through everyone's reach.</p>
+        <p><b>Keys:</b> solo and online use Space or Z to chomp, X or Shift for special, or left and right mouse. Party: P1 Z/X, P2 Q/W, P3 O/P, P4 Left/Right arrows. Gamepads: A chomps, B special. Esc pauses.</p>
+        <div class="row end"><button class="btn go" id="h-back" data-autofocus>Got it</button></div>
+      </div>
+    </section>
+
+    <section id="s-pause" class="screen dim">
+      <div class="panel">
+        <h2 id="pa-title">Paused</h2>
+        <button class="btn" id="pa-resume" data-autofocus>Keep eating</button>
+        <button class="btn" id="pa-quit">Quit to menu</button>
+      </div>
+    </section>
+
+    <section id="s-results" class="screen dim">
+      <div class="panel wide">
+        <div class="bigface"><canvas class="pt" id="r-face" width="64" height="56"></canvas><div><h2 id="r-title">Dinner is served</h2><p id="r-sub"></p></div></div>
+        <div class="res" id="r-list"></div>
+        <div class="note" id="r-status"></div>
+        <div class="row end" id="r-btns"></div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+'use strict';
+/* =========================================================================
+   RJ'S 8-BIT HUNGRY HOWLERS  -  core: helpers, data, audio
+   ========================================================================= */
+const W = 256, H = 240;
+const TAU = Math.PI * 2;
+const rnd = (a = 1, b) => (b === undefined ? Math.random() * a : a + Math.random() * (b - a));
+const ri = (a, b) => Math.floor(rnd(a, b + 1));
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const dist = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
+const pick = a => a[(Math.random() * a.length) | 0];
+function wpick(tbl) {
+  let s = 0;
+  for (const k in tbl) s += tbl[k];
+  let r = Math.random() * s;
+  for (const k in tbl) { r -= tbl[k]; if (r <= 0) return k; }
+  return Object.keys(tbl)[0];
+}
+
+const PAL = {
+  ink: '#26101e', white: '#fcf8ec', eye: '#fff8e4', vein: '#e02838', gum: '#f06888',
+  maw: '#6c1028', mawd: '#3c0818', tongue: '#f890a0', tooth: '#fcf4d0', drool: '#bce8f8',
+  sweat: '#8cd0f8', soot: '#3e3640', soot2: '#5c5460', stink: '#a4dc30', stink2: '#6ca018',
+  star: '#f8e040', gold: '#f8c820', gold2: '#fcf088', pink: '#f8a8c0', purple: '#5c2c78',
+  purple2: '#3a1850', bile: '#9cd848', mustard: '#f0c030', red: '#e02838'
+};
+
+/* ---- the four predators (original characters) ---- */
+const PREDS = {
+  fox: {
+    name: 'SLY VINNIE', kind: 'FOX', fur: '#f07a1a', dark: '#a8460c', light: '#fcecd4', ear: '#2a1010',
+    acc: '#e02838', hud: '#ff9a3c', special: 'DECOY CARROT',
+    quote: "Trust me, kid. It's a real carrot.",
+    desc: 'Lobs a carrot on a string. Prey mob it, then Vinnie reels the whole crowd into his mouth.'
+  },
+  wolf: {
+    name: 'BIG BAD GUS', kind: 'WOLF', fur: '#7c8cb0', dark: '#465274', light: '#cfd6e6', ear: '#2a2438',
+    acc: '#fcf8ec', hud: '#a8bcff', special: "HUFF N' SUCK",
+    quote: "I'll huff, I'll puff, I'll INHALE.",
+    desc: 'Vacuums up everything in front of him for two seconds. Everything. Even the stinky stuff.'
+  },
+  coyote: {
+    name: 'SCRAWNY DALE', kind: 'COYOTE', fur: '#c99a5e', dark: '#86602e', light: '#f2deb2', ear: '#5a3a1c',
+    acc: '#b8c0c8', hud: '#f0c88a', special: 'ROCKET FORK',
+    quote: 'Mail-order genius. Mostly.',
+    desc: 'Fires a rocket fork that kebabs up to two critters and reels them back. One in four blows up in his face.'
+  },
+  hyena: {
+    name: "CACKLIN' LOU", kind: 'HYENA', fur: '#d6b452', dark: '#7a5622', light: '#ecdca4', ear: '#4a2e14',
+    acc: '#5c3818', hud: '#f8e060', special: 'CACKLE QUAKE',
+    quote: 'HEE HEE HAAA HAA HAAAAA!',
+    desc: 'A laugh so unhinged it dizzies every rival and scares the prey into hopping straight at him.'
+  }
+};
+const PRED_KEYS = ['fox', 'wolf', 'coyote', 'hyena'];
+
+/* ---- prey roster: a mix of what all four hunt ---- */
+const PREY = {
+  mouse:     { name: 'MOUSE',        pts: 1,  spd: 36, r: 3 },
+  frog:      { name: 'FROG',         pts: 1,  spd: 0,  r: 3, frog: 1 },
+  rabbit:    { name: 'RABBIT',       pts: 2,  spd: 30, r: 4, hop: 1 },
+  chicken:   { name: 'CHICKEN',      pts: 2,  spd: 24, r: 4, erratic: 1 },
+  duck:      { name: 'DUCKLING',     pts: 2,  spd: 20, r: 4 },
+  piglet:    { name: 'PIGLET',       pts: 3,  spd: 18, r: 4 },
+  lamb:      { name: 'LAMB',         pts: 3,  spd: 18, r: 4 },
+  gazelle:   { name: 'GAZELLE',      pts: 4,  spd: 42, r: 4, smart: 1 },
+  goose:     { name: 'GOLDEN GOOSE', pts: 10, spd: 50, r: 4, smart: 1 },
+  skunk:     { name: 'SKUNK',        pts: 0,  spd: 14, r: 4, bad: 1 },
+  porcupine: { name: 'PORCUPINE',    pts: -3, spd: 10, r: 4, bad: 1 }
+};
+const PREY_KEYS = Object.keys(PREY);
+
+/* ---- arenas: a different screen for 2, 3 and 4 predators ---- */
+const LAYOUTS = {
+  2: {
+    name: 'CACTUS GULCH', a: { x0: 52, y0: 30, x1: 204, y1: 210 }, sides: ['L', 'R'], target: 12,
+    bumpers: [[128, 78, 8], [128, 162, 8]],
+    holes: [[[84, 52], [172, 188]], [[172, 52], [84, 188]]],
+    spawns: [[128, 36], [128, 204]],
+    mix: { rabbit: 5, mouse: 4, frog: 1, chicken: 2, duck: 1, piglet: 1, lamb: 1, gazelle: 1.4, skunk: 1.2, porcupine: 1.2, goose: 0.35 },
+    hud: { L: [3, 3], R: [203, 3] }, timer: [128, 8]
+  },
+  3: {
+    name: 'BARNYARD BRAWL', a: { x0: 52, y0: 46, x1: 204, y1: 204 }, sides: ['B', 'L', 'R'], target: 15,
+    bumpers: [[92, 96, 7], [164, 96, 7], [128, 150, 7]],
+    holes: [[[70, 182], [186, 66]], [[186, 182], [70, 66]]],
+    spawns: [[128, 52]],
+    mix: { chicken: 4, duck: 3, piglet: 3, lamb: 3, rabbit: 2, mouse: 2, frog: 1, gazelle: 0.6, skunk: 1.3, porcupine: 1, goose: 0.4 },
+    hud: { B: [3, 206], L: [3, 3], R: [207, 3] }, timer: [128, 37]
+  },
+  4: {
+    name: 'SAVANNA SLOP BOWL', a: { x0: 48, y0: 40, x1: 208, y1: 200 }, sides: ['B', 'L', 'T', 'R'], target: 18,
+    bumpers: [[128, 120, 10], [82, 74, 6], [174, 74, 6], [82, 166, 6], [174, 166, 6]],
+    holes: [[[104, 62], [152, 178]], [[152, 62], [104, 178]]],
+    spawns: [[128, 106], [128, 134], [114, 120], [142, 120]],
+    mix: { gazelle: 3, rabbit: 3, mouse: 2, frog: 2, lamb: 1.5, chicken: 1.5, duck: 1, piglet: 1, skunk: 1.3, porcupine: 1.2, goose: 0.45 },
+    hud: { B: [3, 204], L: [3, 3], T: [209, 3], R: [209, 204] }, timer: [128, 117]
+  }
+};
+const SIDE = {
+  B: { dx: 0, dy: -1, m: [1, 0, 0, 1] },
+  T: { dx: 0, dy: 1, m: [-1, 0, 0, -1] },
+  L: { dx: 1, dy: 0, m: [0, 1, -1, 0] },
+  R: { dx: -1, dy: 0, m: [0, -1, 1, 0] }
+};
+function sideBase(L, side) {
+  const a = L.a, cx = (a.x0 + a.x1) / 2, cy = (a.y0 + a.y1) / 2;
+  if (side === 'B') return [cx, a.y1];
+  if (side === 'T') return [cx, a.y0];
+  if (side === 'L') return [a.x0, cy];
+  return [a.x1, cy];
+}
+
+const ITEMS = {
+  mega:   { name: 'MEGA MAW',    dur: 7 },
+  magnet: { name: 'MEAT MAGNET', dur: 5 },
+  chili:  { name: 'CHILI TONGUE', dur: 7 },
+  stink:  { name: 'STINK BOMB',  dur: 6 }
+};
+
+/* ---- tuning ---- */
+const MAXEXT = 42, OUT_SPD = 300, BACK_SPD = 240, HOLD_MAX = 1.2, MOUTH_R = 11, MEGA_R = 18;
+
+/* =========================================================================
+   AUDIO  -  tiny WebAudio chiptune kit
+   ========================================================================= */
+const AU = { ctx: null, sfx: true, music: true, master: null, mg: null, nb: null };
+function auInit() {
+  if (AU.ctx) { if (AU.ctx.state === 'suspended') AU.ctx.resume(); return; }
+  const AC = (typeof window !== 'undefined') && (window.AudioContext || window.webkitAudioContext);
+  if (!AC) return;
+  AU.ctx = new AC();
+  AU.master = AU.ctx.createGain(); AU.master.gain.value = 0.45; AU.master.connect(AU.ctx.destination);
+  AU.mg = AU.ctx.createGain(); AU.mg.gain.value = 0.14; AU.mg.connect(AU.master);
+  const len = AU.ctx.sampleRate;
+  AU.nb = AU.ctx.createBuffer(1, len, AU.ctx.sampleRate);
+  const d = AU.nb.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+}
+function tone(f, d, type = 'square', v = 0.15, f2 = 0, delay = 0, dest = null) {
+  if (!AU.ctx || (!dest && !AU.sfx)) return;
+  const c = AU.ctx, t = c.currentTime + delay;
+  const o = c.createOscillator(), gn = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t);
+  if (f2) o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), t + d);
+  gn.gain.setValueAtTime(v, t); gn.gain.exponentialRampToValueAtTime(0.001, t + d);
+  o.connect(gn); gn.connect(dest || AU.master); o.start(t); o.stop(t + d + 0.03);
+}
+function noise(d, v = 0.15, ff = 1200, delay = 0, ff2 = 0) {
+  if (!AU.ctx || !AU.sfx) return;
+  const c = AU.ctx, t = c.currentTime + delay;
+  const s = c.createBufferSource(); s.buffer = AU.nb; s.loop = true;
+  const fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(ff, t);
+  if (ff2) fl.frequency.exponentialRampToValueAtTime(ff2, t + d);
+  const gn = c.createGain(); gn.gain.setValueAtTime(v, t); gn.gain.exponentialRampToValueAtTime(0.001, t + d);
+  s.connect(fl); fl.connect(gn); gn.connect(AU.master); s.start(t); s.stop(t + d + 0.03);
+}
+function vib(f, d, type, v, rate, depth, delay = 0) {
+  if (!AU.ctx || !AU.sfx) return;
+  const c = AU.ctx, t = c.currentTime + delay;
+  const o = c.createOscillator(), gn = c.createGain(), l = c.createOscillator(), lg = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t);
+  l.frequency.value = rate; lg.gain.value = depth; l.connect(lg); lg.connect(o.frequency);
+  gn.gain.setValueAtTime(v, t); gn.gain.exponentialRampToValueAtTime(0.001, t + d);
+  o.connect(gn); gn.connect(AU.master); o.start(t); l.start(t); o.stop(t + d + 0.03); l.stop(t + d + 0.03);
+}
+const arp = (notes, step, type = 'square', v = 0.12) => notes.forEach((n, i) => tone(n, step * 1.4, type, v, 0, i * step));
+const SFX = {
+  chomp() { tone(720, 0.07, 'square', 0.15, 150); noise(0.05, 0.12, 3200); },
+  whiff() { tone(320, 0.05, 'square', 0.07, 210); },
+  gulp() { tone(240, 0.15, 'triangle', 0.32, 70); tone(130, 0.1, 'square', 0.07, 60, 0.06); },
+  stinky() { vib(72, 0.7, 'sawtooth', 0.22, 23, 20); noise(0.55, 0.1, 500); },
+  ouch() { tone(1250, 0.08, 'square', 0.14, 700); tone(950, 0.16, 'square', 0.14, 280, 0.08); },
+  goose() { arp([784, 988, 1175, 1568, 1976], 0.06); },
+  triple() { arp([523, 659, 784, 1047], 0.06); },
+  crate() { noise(0.14, 0.24, 800); tone(170, 0.1, 'square', 0.12, 80); },
+  item() { arp([660, 880, 1320, 1760], 0.05, 'triangle', 0.18); },
+  lure() { tone(220, 0.25, 'square', 0.1, 900); vib(500, 0.4, 'triangle', 0.08, 16, 120, 0.15); },
+  reel() { for (let i = 0; i < 8; i++) tone(1300, 0.025, 'square', 0.06, 0, i * 0.12); },
+  suck() { noise(2.1, 0.16, 260, 0, 3400); tone(80, 2.1, 'sawtooth', 0.05, 260); },
+  fork() { tone(900, 0.35, 'square', 0.09, 1700); noise(0.35, 0.09, 4000); },
+  boom() { noise(0.7, 0.34, 700, 0, 90); tone(130, 0.45, 'square', 0.18, 40); },
+  laugh() { [880, 990, 880, 1170, 990, 1320, 1100, 1480].forEach((f, i) => tone(f, 0.07, 'square', 0.12, f * 0.78, i * 0.1)); },
+  stinkbomb() { tone(420, 0.25, 'triangle', 0.15, 110); vib(80, 0.5, 'sawtooth', 0.12, 20, 14, 0.2); },
+  pop() { tone(480, 0.06, 'square', 0.08, 1150); },
+  burp() { vib(96, 0.6, 'sawtooth', 0.24, 13, 13); },
+  count() { tone(440, 0.12, 'square', 0.14); },
+  go() { tone(523, 0.3, 'square', 0.12); tone(659, 0.3, 'square', 0.1); tone(784, 0.4, 'square', 0.1); },
+  stampede() { noise(1.3, 0.22, 240); for (let i = 0; i < 6; i++) tone(70, 0.08, 'square', 0.1, 50, i * 0.18); },
+  whistle() { tone(1500, 0.18, 'square', 0.1, 1460); tone(1500, 0.5, 'square', 0.1, 1420, 0.22); },
+  win() { arp([392, 523, 659, 784, 659, 784, 1047], 0.11, 'square', 0.13); },
+  dizzy() { tone(1400, 0.3, 'triangle', 0.08, 1900); },
+  hurry() { arp([988, 1319, 988, 1319], 0.09, 'square', 0.09); },
+  menu() { tone(660, 0.05, 'square', 0.08, 880); },
+  back() { tone(440, 0.06, 'square', 0.08, 330); }
+};
+function sfx(n) { try { if (SFX[n]) SFX[n](); } catch (e) { /* audio is optional */ } }
+
+/* ---- music: a lopsided little polka on loop ---- */
+const MUS = { on: false, step: 0, next: 0, timer: null };
+const midi = n => 440 * Math.pow(2, (n - 69) / 12);
+const SONG = {
+  bass: [36, 0, 43, 0, 36, 0, 43, 0, 39, 0, 46, 0, 41, 0, 42, 43, 36, 0, 43, 0, 36, 0, 43, 0, 44, 0, 43, 0, 42, 0, 41, 0],
+  lead: [72, 0, 71, 72, 75, 0, 74, 0, 72, 71, 70, 69, 67, 0, 68, 0, 72, 0, 71, 72, 79, 0, 78, 0, 77, 76, 75, 74, 72, 0, 0, 0]
+};
+function musicTick() {
+  if (!AU.ctx || !MUS.on) return;
+  const c = AU.ctx, sd = 0.19;
+  while (MUS.next < c.currentTime + 0.25) {
+    const i = MUS.step % 32, dl = Math.max(0, MUS.next - c.currentTime);
+    if (AU.music) {
+      if (SONG.bass[i]) tone(midi(SONG.bass[i]), sd * 0.9, 'square', 0.5, 0, dl, AU.mg);
+      if (SONG.lead[i]) tone(midi(SONG.lead[i]), sd * 0.8, 'triangle', 0.7, 0, dl, AU.mg);
+      if (i % 4 === 2) tone(1800, 0.03, 'square', 0.12, 900, dl, AU.mg);
+    }
+    MUS.next += sd; MUS.step++;
+  }
+}
+function musicStart() {
+  if (!AU.ctx || MUS.on) return;
+  MUS.on = true; MUS.next = AU.ctx.currentTime + 0.05;
+  MUS.timer = setInterval(musicTick, 60);
+}
+/* =========================================================================
+   SIM  -  host/local authoritative game world
+   ========================================================================= */
+const shortName = k => PREDS[k].name.split(' ').pop();
+
+function makePred(seat, i, side, L) {
+  const [bx, by] = sideBase(L, side), S = SIDE[side];
+  return {
+    seat: i, pred: seat.pred, kind: seat.kind, label: seat.label || '', side, bx, by, dx: S.dx, dy: S.dy,
+    ext: 0, st: 'idle', open: 0, hold: 0, stun: 0, stunKind: '', meter: 45, score: 0, mouth: [],
+    gulpT: 0, spec: '', specT: 0, items: { mega: 0, magnet: 0, chili: 0 }, stinkOn: 0, prevCh: false,
+    cd: 0, tally: {}, ai: { see: 0, full: 0, whiff: rnd(1, 3) }, inp: { ch: false, sp: false }
+  };
+}
+
+function makeWorld(cfg) {
+  const L = LAYOUTS[cfg.n];
+  const w = {
+    n: cfg.n, L, time: cfg.time, diff: cfg.diff, t: 0, phase: 'count', countT: 3, endT: 0,
+    preds: cfg.seats.map((s, i) => makePred(s, i, L.sides[i], L)),
+    prey: [], nid: 1, crates: [], lures: [], forks: [], shocks: [],
+    spawnT: 0.3, crateT: rnd(7, 10), stampT: rnd(18, 22), gross: null, grossCd: 2,
+    banner: null, ev: [], lastCall: false, lastCount: 4, ranking: null, bcd: {}
+  };
+  for (let i = 0; i < Math.round(L.target * 0.6); i++) {
+    const a = L.a;
+    spawnPrey(w, null, rnd(a.x0 + 30, a.x1 - 30), rnd(a.y0 + 30, a.y1 - 30));
+  }
+  return w;
+}
+const emit = (w, e) => w.ev.push(e);
+const mouthPos = (p, ext) => { const e = ext === undefined ? p.ext : ext; return [p.bx + p.dx * (e + 2), p.by + p.dy * (e + 2)]; };
+const headPos = p => [p.bx + p.dx * (p.ext - 8), p.by + p.dy * (p.ext - 8)];
+const mouthR = p => (p.items.mega > 0 ? MEGA_R : MOUTH_R);
+const maxExt = p => MAXEXT + (p.items.chili > 0 ? 12 : 0) + (p.items.mega > 0 ? 4 : 0);
+const banner = (w, text, t = 1.6, c) => { w.banner = { text, t, c: c || '' }; };
+
+function spawnPrey(w, type, x, y, opt) {
+  const L = w.L;
+  type = type || wpick(L.mix);
+  if (x === undefined || x === null) { const sp = pick(L.spawns); x = sp[0] + rnd(-4, 4); y = sp[1] + rnd(-3, 3); }
+  const an = rnd(TAU);
+  const p = {
+    id: w.nid++, type, x, y, vx: Math.cos(an) * 20, vy: Math.sin(an) * 20, hx: Math.cos(an), hy: Math.sin(an),
+    wt: rnd(0.3, 1), anim: rnd(5), hole: 0, holeCd: 0.6, frozen: 0, pop: 0.35, rush: 0, pullT: 0, pullS: -1,
+    face: Math.cos(an) >= 0 ? 1 : -1, hopT: rnd(0.6), hopAir: 0
+  };
+  if (opt) Object.assign(p, opt);
+  w.prey.push(p);
+  return p;
+}
+
+function stampede(w) {
+  const type = pick(['gazelle', 'piglet', 'chicken', 'lamb', 'rabbit', 'duck']);
+  const a = w.L.a, horiz = Math.random() < 0.5, fwd = Math.random() < 0.5 ? 1 : -1;
+  for (let i = 0; i < 6; i++) {
+    let x, y;
+    if (horiz) { x = fwd > 0 ? a.x0 + 6 + (i % 2) * 8 : a.x1 - 6 - (i % 2) * 8; y = rnd(a.y0 + 14, a.y1 - 14); }
+    else { y = fwd > 0 ? a.y0 + 6 + (i % 2) * 8 : a.y1 - 6 - (i % 2) * 8; x = rnd(a.x0 + 14, a.x1 - 14); }
+    const hx = horiz ? fwd : rnd(-0.2, 0.2), hy = horiz ? rnd(-0.2, 0.2) : fwd;
+    spawnPrey(w, type, x, y, { hx, hy, vx: hx * 70, vy: hy * 70, rush: 2.4 + i * 0.05, pop: 0, wt: 2.6 });
+  }
+  banner(w, 'STAMPEDE!!', 1.4);
+  emit(w, { k: 'stampede' });
+}
+
+/* ---------------- prey ---------------- */
+function stepPrey(w, dt) {
+  const a = w.L.a, P = w.prey;
+  for (const p of P) {
+    const D = PREY[p.type];
+    if (p.pop > 0) p.pop -= dt;
+    if (p.holeCd > 0) p.holeCd -= dt;
+    if (p.hole > 0) {
+      p.hole -= dt;
+      if (p.hole <= 0) {
+        p.pop = 0.25;
+        emit(w, { k: 'pop', x: p.x, y: p.y });
+        const an = rnd(TAU);
+        p.vx = Math.cos(an) * 45; p.vy = Math.sin(an) * 45; p.hx = Math.cos(an); p.hy = Math.sin(an);
+      }
+      continue;
+    }
+    if (p.frozen > 0) {
+      p.frozen -= dt; p.vx *= 0.85; p.vy *= 0.85;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      wallsAndBumpers(w, p, D);
+      continue;
+    }
+    p.wt -= dt;
+    if (p.wt <= 0 && p.rush <= 0) {
+      const an = Math.atan2(p.hy, p.hx) + rnd(-1.6, 1.6) * (D.erratic ? 1.8 : 1);
+      p.hx = Math.cos(an); p.hy = Math.sin(an);
+      p.wt = D.erratic ? rnd(0.15, 0.5) : rnd(0.4, 1.4);
+    }
+    let sp = D.spd;
+    if (D.frog || D.hop) {
+      p.hopT -= dt;
+      if (p.hopT <= 0) {
+        p.hopT = D.frog ? rnd(0.6, 1.3) : rnd(0.32, 0.55);
+        const pw = D.frog ? 80 : 58;
+        p.vx += p.hx * pw; p.vy += p.hy * pw; p.hopAir = D.frog ? 0.34 : 0.24;
+      }
+      sp = 0;
+    }
+    let tx = p.hx * sp, ty = p.hy * sp, ax = 0, ay = 0;
+    if (p.rush > 0) { p.rush -= dt; tx = p.hx * 72; ty = p.hy * 72; }
+    for (const q of w.preds) {
+      const [mx, my] = mouthPos(q);
+      const d = dist(p.x, p.y, mx, my);
+      if (q.st === 'out' && d < 28 && p.rush <= 0) {
+        const k = (D.smart ? 2 : 1.1) * 60 / (d + 4);
+        tx += (p.x - mx) * k; ty += (p.y - my) * k;
+      }
+      if (q.items.magnet > 0) {
+        const [gx, gy] = mouthPos(q, 30), dd = dist(p.x, p.y, gx, gy);
+        if (dd < 150 && dd > 2) { tx += (gx - p.x) / dd * 48; ty += (gy - p.y) / dd * 48; }
+      }
+      if (q.stinkOn > 0) {
+        const [gx, gy] = mouthPos(q, 20), dd = dist(p.x, p.y, gx, gy);
+        if (dd < 82) { tx += (p.x - gx) / (dd + 1) * 75; ty += (p.y - gy) / (dd + 1) * 75; }
+      }
+      if (q.spec === 'suck') {
+        const [gx, gy] = mouthPos(q);
+        const vx = p.x - gx, vy = p.y - gy, al = vx * q.dx + vy * q.dy, lat = Math.abs(vx * q.dy - vy * q.dx);
+        if (al > -6 && al < 150 && lat < al * 0.75 + 16) {
+          const dd = Math.hypot(vx, vy) + 1, f = 300 * (1 - al / 170);
+          ax -= vx / dd * f; ay -= vy / dd * f;
+        }
+      }
+    }
+    if (p.pullT > 0) {
+      p.pullT -= dt;
+      const q = w.preds[p.pullS];
+      if (q) { const [gx, gy] = mouthPos(q, 26), dd = dist(p.x, p.y, gx, gy) + 1; tx += (gx - p.x) / dd * 62; ty += (gy - p.y) / dd * 62; }
+    }
+    for (const l of w.lures) {
+      const dd = dist(p.x, p.y, l.x, l.y);
+      if (dd < 72 && dd > 4) { const s = l.phase === 'reel' ? 80 : 58; tx += (l.x - p.x) / dd * s; ty += (l.y - p.y) / dd * s; }
+      else if (dd <= 4) { tx *= 0.2; ty *= 0.2; }
+    }
+    const steer = Math.min(1, dt * ((D.frog || D.hop) && p.rush <= 0 ? 1.6 : 5));
+    p.vx += (tx - p.vx) * steer + ax * dt;
+    p.vy += (ty - p.vy) * steer + ay * dt;
+    const v = Math.hypot(p.vx, p.vy), cap = p.rush > 0 ? 95 : 125;
+    if (v > cap) { p.vx *= cap / v; p.vy *= cap / v; }
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    if (Math.abs(p.vx) > 3) p.face = p.vx > 0 ? 1 : -1;
+    p.anim += dt * (2 + v * 0.16);
+    if (p.hopAir > 0) p.hopAir -= dt;
+    wallsAndBumpers(w, p, D);
+    if (p.rush <= 0 && p.holeCd <= 0 && p.pop <= 0) {
+      for (const pair of w.L.holes) {
+        for (let e = 0; e < 2; e++) {
+          const h = pair[e];
+          if (dist(p.x, p.y, h[0], h[1]) < 4.5) {
+            const o = pair[1 - e];
+            p.hole = 0.45; p.holeCd = 1.6; p.x = o[0]; p.y = o[1];
+            emit(w, { k: 'hole', x: h[0], y: h[1] });
+            break;
+          }
+        }
+        if (p.hole > 0) break;
+      }
+    }
+  }
+  for (let i = 0; i < P.length; i++) {
+    const p = P[i]; if (p.hole > 0) continue;
+    for (let j = i + 1; j < P.length; j++) {
+      const q = P[j]; if (q.hole > 0) continue;
+      const dx = q.x - p.x, dy = q.y - p.y, d2 = dx * dx + dy * dy;
+      if (d2 < 36 && d2 > 0.01) {
+        const d = Math.sqrt(d2), push = (6 - d) * 0.5;
+        p.x -= dx / d * push; p.y -= dy / d * push; q.x += dx / d * push; q.y += dy / d * push;
+      }
+    }
+  }
+}
+
+function wallsAndBumpers(w, p, D) {
+  const a = w.L.a, r = D.r;
+  if (p.x < a.x0 + r) { p.x = a.x0 + r; p.vx = Math.abs(p.vx); p.hx = Math.abs(p.hx); }
+  if (p.x > a.x1 - r) { p.x = a.x1 - r; p.vx = -Math.abs(p.vx); p.hx = -Math.abs(p.hx); }
+  if (p.y < a.y0 + r) { p.y = a.y0 + r; p.vy = Math.abs(p.vy); p.hy = Math.abs(p.hy); }
+  if (p.y > a.y1 - r) { p.y = a.y1 - r; p.vy = -Math.abs(p.vy); p.hy = -Math.abs(p.hy); }
+  for (const b of w.L.bumpers) {
+    const dx = p.x - b[0], dy = p.y - b[1], d = Math.hypot(dx, dy), mn = b[2] + r;
+    if (d < mn && d > 0.01) {
+      const nx = dx / d, ny = dy / d;
+      p.x = b[0] + nx * mn; p.y = b[1] + ny * mn;
+      const vn = p.vx * nx + p.vy * ny;
+      if (vn < 0) { p.vx -= 2 * vn * nx; p.vy -= 2 * vn * ny; }
+      p.vx += nx * 38; p.vy += ny * 38; p.hx = nx; p.hy = ny;
+      const bk = b[0] * 1000 + b[1];
+      if (!(w.bcd[bk] > w.t - 0.25)) { w.bcd[bk] = w.t; emit(w, { k: 'bump', x: b[0], y: b[1] }); }
+    }
+  }
+}
+
+/* ---------------- predators ---------------- */
+function stepPred(w, p, dt) {
+  const inp = p.inp;
+  const chEdge = inp.ch && !p.prevCh;
+  p.prevCh = inp.ch;
+  const spEdge = inp.sp; inp.sp = false;
+  for (const k in p.items) if (p.items[k] > 0) p.items[k] = Math.max(0, p.items[k] - dt);
+  if (p.stinkOn > 0) p.stinkOn = Math.max(0, p.stinkOn - dt);
+  if (p.gulpT > 0) p.gulpT -= dt;
+  if (p.cd > 0) p.cd -= dt;
+  if (w.phase === 'play') p.meter = Math.min(100, p.meter + dt * 8.5);
+  if (p.stun > 0) {
+    p.stun -= dt;
+    if (p.stun <= 0) { p.stun = 0; p.stunKind = ''; }
+    if (p.st === 'out' || p.st === 'hold') { p.st = 'back'; p.open = 0; }
+    if (p.spec === 'suck') { p.spec = ''; p.open = 0; }
+  }
+  if (p.spec) {
+    p.specT -= dt;
+    if (p.spec === 'suck') { p.open = 0.8; p.ext = Math.min(8, p.ext + dt * 60); suckIn(w, p); }
+    if (p.specT <= 0) { if (p.spec === 'suck') p.open = 0; p.spec = ''; }
+    if (p.spec === 'suck') return;
+  } else if (spEdge && p.meter >= 100 && p.stun <= 0 && p.st === 'idle' && w.phase === 'play') {
+    castSpecial(w, p);
+    if (p.spec === 'suck') return;
+  }
+  const spdM = p.items.chili > 0 ? 1.6 : 1, mx = maxExt(p);
+  switch (p.st) {
+    case 'idle':
+      p.open = Math.max(0, p.open - dt * 6);
+      if (p.ext > 0) p.ext = Math.max(0, p.ext - BACK_SPD * dt);
+      if (chEdge && p.stun <= 0 && p.cd <= 0 && w.phase === 'play') { p.st = 'out'; p.hold = 0; }
+      break;
+    case 'out':
+      p.ext += OUT_SPD * spdM * dt; p.open = Math.min(1, p.open + dt * 12);
+      if (p.ext >= mx) { p.ext = mx; p.open = 1; if (inp.ch) p.st = 'hold'; else snap(w, p); }
+      break;
+    case 'hold':
+      p.hold += dt;
+      if (!inp.ch || p.hold > HOLD_MAX) snap(w, p);
+      break;
+    case 'back':
+      p.ext -= BACK_SPD * spdM * dt; p.open = Math.max(0, p.open - dt * 10);
+      if (p.ext <= 0) { p.ext = 0; p.st = 'idle'; p.cd = 0.05; if (p.mouth.length) { eatList(w, p, p.mouth); p.mouth = []; } }
+      break;
+  }
+}
+
+function snap(w, p) {
+  const [mx, my] = mouthPos(p), R = mouthR(p), cap = p.items.mega > 0 ? 5 : 3;
+  const got = [];
+  for (const q of w.prey) {
+    if (q.hole > 0 || q.pop > 0.15) continue;
+    const d = dist(q.x, q.y, mx, my);
+    if (d < R + PREY[q.type].r) got.push([d, q]);
+  }
+  got.sort((a, b) => a[0] - b[0]);
+  const taken = got.slice(0, cap).map(g => g[1]);
+  if (taken.length) w.prey = w.prey.filter(q => !taken.includes(q));
+  p.mouth = taken.map(q => q.type);
+  for (let i = w.crates.length - 1; i >= 0; i--) {
+    const c = w.crates[i];
+    if (c.fall <= 0 && dist(c.x, c.y, mx, my) < R + 5) { p.mouth.push('crate'); w.crates.splice(i, 1); }
+  }
+  p.st = 'back'; p.open = 0;
+  emit(w, { k: p.mouth.length ? 'chomp' : 'whiff', s: p.seat, x: mx, y: my });
+}
+
+function eatList(w, p, list) {
+  let pts = 0, good = 0, bad = '', goose = false;
+  for (const t of list) {
+    if (t === 'crate') { giveItem(w, p); continue; }
+    p.tally[t] = (p.tally[t] || 0) + 1;
+    if (t === 'skunk') bad = 'skunk';
+    else if (t === 'porcupine') { if (!bad) bad = 'quill'; pts -= 3; }
+    else { pts += PREY[t].pts; good++; if (t === 'goose') goose = true; }
+  }
+  if (!good && !bad) return;
+  if (good >= 3) pts += 2;
+  p.score = Math.max(0, p.score + pts);
+  p.meter = Math.min(100, p.meter + good * 8);
+  p.gulpT = 0.5;
+  const [hx, hy] = headPos(p);
+  emit(w, { k: 'gulp', s: p.seat, x: hx, y: hy, pts, n: good });
+  if (bad === 'skunk') {
+    p.stun = 2.4; p.stunKind = 'stink';
+    emit(w, { k: 'stinky', s: p.seat, x: hx, y: hy });
+    grossUp(w, p, 'stink', 'P-U!! ' + shortName(p.pred) + ' ATE A SKUNK');
+  } else if (bad === 'quill') {
+    p.stun = Math.max(p.stun, 1.3); p.stunKind = 'quill';
+    emit(w, { k: 'ouch', s: p.seat, x: hx, y: hy });
+  }
+  if (!bad) {
+    if (goose) grossUp(w, p, 'goose', 'GOLDEN GOOSE!!');
+    else if (good >= 3) grossUp(w, p, 'triple', good >= 4 ? 'MEGA GULP!!' : 'TRIPLE GULP!!');
+  }
+}
+
+function grossUp(w, p, mood, text) {
+  if (w.grossCd > 0) return;
+  w.gross = { s: p.seat, pred: p.pred, mood, text, t: 1.05 };
+  w.grossCd = 7;
+  emit(w, { k: 'gross', s: p.seat, mood });
+}
+
+function giveItem(w, p) {
+  const k = wpick({ mega: 3, magnet: 3, chili: 3, stink: 3 });
+  const sn = shortName(p.pred);
+  if (k === 'stink') {
+    let best = null;
+    for (const q of w.preds) if (q !== p && (!best || q.score > best.score || (q.score === best.score && Math.random() < 0.5))) best = q;
+    if (best) {
+      best.stinkOn = ITEMS.stink.dur;
+      banner(w, sn + ' STINK BOMBED ' + shortName(best.pred) + '!', 1.8);
+      emit(w, { k: 'item', s: p.seat, item: 'stink', tg: best.seat });
+    }
+    return;
+  }
+  p.items[k] = ITEMS[k].dur;
+  banner(w, sn + ' GOT ' + ITEMS[k].name + '!', 1.6);
+  emit(w, { k: 'item', s: p.seat, item: k });
+}
+
+function castSpecial(w, p) {
+  p.meter = 0;
+  const [mx, my] = mouthPos(p, 8), [hx, hy] = headPos(p);
+  switch (p.pred) {
+    case 'fox':
+      w.lures.push({ o: p.seat, x: p.bx + p.dx * 82, y: p.by + p.dy * 82, phase: 'bait', t: 1.3 });
+      banner(w, 'DECOY CARROT!', 1.1);
+      emit(w, { k: 'lure', s: p.seat });
+      break;
+    case 'wolf':
+      p.spec = 'suck'; p.specT = 2.2; p.st = 'idle';
+      banner(w, "HUFF N' SUCK!", 1.1);
+      emit(w, { k: 'suck', s: p.seat });
+      break;
+    case 'coyote':
+      if (Math.random() < 0.25) {
+        p.stun = 1.6; p.stunKind = 'soot';
+        banner(w, 'KA-BLOOEY!', 1.1);
+        emit(w, { k: 'boom', s: p.seat, x: hx, y: hy });
+      } else {
+        w.forks.push({ o: p.seat, x: mx, y: my, phase: 'out', prey: [] });
+        banner(w, 'ROCKET FORK!', 1.1);
+        emit(w, { k: 'fork', s: p.seat });
+      }
+      break;
+    case 'hyena':
+      w.shocks.push({ o: p.seat, x: mx, y: my, r: 4 });
+      for (const q of w.preds) if (q !== p) { q.stun = Math.max(q.stun, 1.25); q.stunKind = 'dizzy'; }
+      for (const q of w.prey) { if (q.hole > 0) continue; q.frozen = 0.5; q.pullT = 1.1; q.pullS = p.seat; q.rush = 0; }
+      banner(w, 'CACKLE QUAKE!', 1.1);
+      emit(w, { k: 'laugh', s: p.seat });
+      break;
+  }
+}
+
+function suckIn(w, p) {
+  const [mx, my] = mouthPos(p), R = mouthR(p) - 1, got = [];
+  for (const q of w.prey) if (q.hole <= 0 && q.pop <= 0.1 && dist(q.x, q.y, mx, my) < R) got.push(q);
+  for (let i = w.crates.length - 1; i >= 0; i--) {
+    const c = w.crates[i];
+    if (c.fall <= 0 && dist(c.x, c.y, mx, my) < R + 4) { w.crates.splice(i, 1); giveItem(w, p); }
+  }
+  if (!got.length) return;
+  w.prey = w.prey.filter(q => !got.includes(q));
+  eatList(w, p, got.map(q => q.type));
+}
+
+/* ---------------- gadgets ---------------- */
+function stepGadgets(w, dt) {
+  for (let i = w.lures.length - 1; i >= 0; i--) {
+    const l = w.lures[i], q = w.preds[l.o];
+    l.t -= dt;
+    if (l.phase === 'bait') { if (l.t <= 0) { l.phase = 'reel'; l.t = 1.8; emit(w, { k: 'reel', s: l.o }); } }
+    else {
+      const [gx, gy] = mouthPos(q, 30), d = dist(l.x, l.y, gx, gy);
+      if (d > 1) { const s = Math.min(d, 44 * dt); l.x += (gx - l.x) / d * s; l.y += (gy - l.y) / d * s; }
+      if (l.t <= 0) w.lures.splice(i, 1);
+    }
+  }
+  const a = w.L.a;
+  for (let i = w.forks.length - 1; i >= 0; i--) {
+    const f = w.forks[i], q = w.preds[f.o];
+    if (f.phase === 'out') {
+      let best = null, bl = 30;
+      for (const pr of w.prey) {
+        if (pr.hole > 0) continue;
+        const vx = pr.x - f.x, vy = pr.y - f.y, al = vx * q.dx + vy * q.dy, lat = vx * q.dy - vy * q.dx;
+        if (al > 0 && al < 60 && Math.abs(lat) < bl) { bl = Math.abs(lat); best = lat; }
+      }
+      f.x += q.dx * 190 * dt; f.y += q.dy * 190 * dt;
+      if (best !== null) { const s = Math.sign(best) * Math.min(Math.abs(best), 70 * dt); f.x += q.dy * s; f.y -= q.dx * s; }
+      for (let j = 0; j < w.prey.length; j++) {
+        const pr = w.prey[j];
+        if (pr.hole > 0 || pr.pop > 0.1) continue;
+        if (dist(pr.x, pr.y, f.x, f.y) < 8) {
+          f.prey.push(pr.type); w.prey.splice(j, 1); j--;
+          emit(w, { k: 'skewer', x: f.x, y: f.y });
+          if (f.prey.length >= 2) { f.phase = 'back'; break; }
+        }
+      }
+      if (f.phase === 'out') for (let j = w.crates.length - 1; j >= 0; j--) {
+        const c = w.crates[j];
+        if (c.fall <= 0 && dist(c.x, c.y, f.x, f.y) < 9) { f.prey.push('crate'); w.crates.splice(j, 1); f.phase = 'back'; break; }
+      }
+      if (f.x < a.x0 || f.x > a.x1 || f.y < a.y0 || f.y > a.y1) f.phase = 'back';
+    } else {
+      const [gx, gy] = mouthPos(q, 6), d = dist(f.x, f.y, gx, gy);
+      const s = Math.min(d, 230 * dt);
+      if (d > 0.5) { f.x += (gx - f.x) / d * s; f.y += (gy - f.y) / d * s; }
+      if (d < 4) { if (f.prey.length) eatList(w, q, f.prey); w.forks.splice(i, 1); }
+    }
+  }
+  for (let i = w.shocks.length - 1; i >= 0; i--) {
+    const s = w.shocks[i]; s.r += 240 * dt;
+    if (s.r > 210) w.shocks.splice(i, 1);
+  }
+  w.crateT -= dt;
+  if (w.crateT <= 0 && w.crates.length < 2 && w.time - w.t > 6) {
+    w.crateT = rnd(11, 15);
+    let x, y, tries = 0;
+    do {
+      x = rnd(a.x0 + 26, a.x1 - 26); y = rnd(a.y0 + 26, a.y1 - 26); tries++;
+    } while (tries < 20 && w.L.bumpers.some(b => dist(x, y, b[0], b[1]) < b[2] + 10));
+    w.crates.push({ x, y, fall: 1.5, life: 12, vx: 0, vy: 0 });
+    emit(w, { k: 'cratedrop' });
+  }
+  for (let i = w.crates.length - 1; i >= 0; i--) {
+    const c = w.crates[i];
+    if (c.fall > 0) {
+      c.fall -= dt;
+      if (c.fall <= 0) { const an = rnd(TAU); c.vx = Math.cos(an) * 34; c.vy = Math.sin(an) * 34; emit(w, { k: 'crate', x: c.x, y: c.y }); }
+    } else {
+      c.life -= dt;
+      c.x += c.vx * dt; c.y += c.vy * dt;
+      if (c.x < a.x0 + 6) { c.x = a.x0 + 6; c.vx = Math.abs(c.vx); }
+      if (c.x > a.x1 - 6) { c.x = a.x1 - 6; c.vx = -Math.abs(c.vx); }
+      if (c.y < a.y0 + 6) { c.y = a.y0 + 6; c.vy = Math.abs(c.vy); }
+      if (c.y > a.y1 - 6) { c.y = a.y1 - 6; c.vy = -Math.abs(c.vy); }
+      for (const b of w.L.bumpers) {
+        const dx = c.x - b[0], dy = c.y - b[1], d = Math.hypot(dx, dy), mn = b[2] + 6;
+        if (d < mn && d > 0.01) { const nx = dx / d, ny = dy / d, vn = c.vx * nx + c.vy * ny; c.x = b[0] + nx * mn; c.y = b[1] + ny * mn; if (vn < 0) { c.vx -= 2 * vn * nx; c.vy -= 2 * vn * ny; } }
+      }
+      for (const q of w.preds) if (q.items.magnet > 0) { const [gx, gy] = mouthPos(q, 30), dd = dist(c.x, c.y, gx, gy); if (dd < 150 && dd > 2) { c.x += (gx - c.x) / dd * 20 * dt; c.y += (gy - c.y) / dd * 20 * dt; } }
+      if (c.life <= 0) { w.crates.splice(i, 1); emit(w, { k: 'poof', x: c.x, y: c.y }); }
+    }
+  }
+}
+
+/* ---------------- CPU predators ---------------- */
+const DIFF = [
+  { react: 0.34, whiff: 0.3, bad: 0.55, sp: 6 },
+  { react: 0.14, whiff: 0.1, bad: 0.2, sp: 3.5 },
+  { react: 0.035, whiff: 0, bad: 0, sp: 1.2 }
+];
+function aiThink(w, p, dt) {
+  const d = DIFF[w.diff] || DIFF[1], inp = p.inp;
+  inp.ch = false;
+  if (p.stun > 0 || p.spec || w.phase !== 'play') { p.ai.see = 0; return; }
+  if (p.meter >= 100) {
+    p.ai.full += dt;
+    if ((p.st === 'idle' && aiSpecialGood(w, p)) || p.ai.full > d.sp + 3) { inp.sp = true; p.ai.full = 0; return; }
+  }
+  if (p.st !== 'idle' || p.cd > 0) return;
+  const [tx, ty] = mouthPos(p, maxExt(p)), R = mouthR(p);
+  let good = false, bad = false;
+  for (const q of w.prey) {
+    if (q.hole > 0 || q.pop > 0) continue;
+    const D = PREY[q.type], fx = q.x + q.vx * 0.15, fy = q.y + q.vy * 0.15;
+    if (dist(fx, fy, tx, ty) < R + D.r + 1) { if (D.bad) bad = true; else good = true; }
+  }
+  for (const c of w.crates) if (c.fall <= 0 && dist(c.x, c.y, tx, ty) < R + 5) good = true;
+  if (good && bad && Math.random() > d.bad) good = false;
+  if (good) { p.ai.see += dt; if (p.ai.see >= d.react) { p.ai.see = 0; inp.ch = true; } }
+  else p.ai.see = Math.max(0, p.ai.see - dt);
+  p.ai.whiff -= dt;
+  if (p.ai.whiff <= 0) { p.ai.whiff = rnd(1, 3); if (Math.random() < d.whiff) inp.ch = true; }
+}
+function aiSpecialGood(w, p) {
+  const [mx, my] = mouthPos(p, 8);
+  let n = 0, bad = 0;
+  for (const q of w.prey) {
+    if (q.hole > 0) continue;
+    const D = PREY[q.type], vx = q.x - mx, vy = q.y - my, al = vx * p.dx + vy * p.dy, lat = Math.abs(vx * p.dy - vy * p.dx);
+    switch (p.pred) {
+      case 'fox': if (!D.bad && dist(q.x, q.y, p.bx + p.dx * 82, p.by + p.dy * 82) < 60) n++; break;
+      case 'wolf': if (al > 0 && al < 120 && lat < al * 0.75 + 16) { if (D.bad) bad++; else n++; } break;
+      case 'coyote': if (!D.bad && al > 16 && al < 140 && lat < 12) n += 3; break;
+      case 'hyena': if (dist(q.x, q.y, mx, my) < 100) n++; break;
+    }
+  }
+  if (p.pred === 'hyena' && w.preds.some(q => q !== p && (q.st === 'out' || q.st === 'hold' || q.spec))) n += 2;
+  if (p.pred === 'wolf' && bad && w.diff >= 2) return false;
+  return n >= (p.pred === 'hyena' ? 5 : 3);
+}
+
+/* ---------------- world tick ---------------- */
+function stepWorld(w, dt) {
+  if (w.gross) { w.gross.t -= dt; if (w.gross.t <= 0) w.gross = null; return; }
+  if (w.banner) { w.banner.t -= dt; if (w.banner.t <= 0) w.banner = null; }
+  if (w.grossCd > 0) w.grossCd -= dt;
+  if (w.phase === 'count') {
+    w.countT -= dt;
+    const c = Math.ceil(w.countT);
+    if (c < w.lastCount && c > 0) { w.lastCount = c; emit(w, { k: 'count', n: c }); }
+    if (w.countT <= 0) { w.phase = 'play'; banner(w, 'DINNER TIME!!', 1.2); emit(w, { k: 'go' }); }
+    stepPrey(w, dt);
+    return;
+  }
+  if (w.phase === 'over') return;
+  if (w.phase === 'play') {
+    w.t += dt;
+    const remain = w.time - w.t;
+    if (remain <= 10 && !w.lastCall) { w.lastCall = true; banner(w, 'LAST CALL!!', 1.4); emit(w, { k: 'hurry' }); }
+    if (remain <= 0) {
+      w.phase = 'end'; w.endT = 2.4; banner(w, "TIME'S UP!", 2.4);
+      emit(w, { k: 'whistle' });
+      for (const p of w.preds) { p.inp.ch = false; if (p.spec === 'suck') { p.spec = ''; p.open = 0; } }
+    }
+  }
+  for (const p of w.preds) if (p.kind === 'cpu') aiThink(w, p, dt);
+  if (w.phase === 'end') for (const p of w.preds) { p.inp.ch = false; p.inp.sp = false; }
+  for (const p of w.preds) stepPred(w, p, dt);
+  stepPrey(w, dt);
+  stepGadgets(w, dt);
+  if (w.phase === 'play') {
+    const remain = w.time - w.t, target = w.L.target + (remain < 15 ? 4 : 0);
+    w.spawnT -= dt;
+    if (w.spawnT <= 0) { w.spawnT = remain < 15 ? 0.35 : 0.6; if (w.prey.length < target) spawnPrey(w); }
+    w.stampT -= dt;
+    if (w.stampT <= 0 && remain > 8) { w.stampT = rnd(20, 26); stampede(w); }
+  }
+  if (w.phase === 'end') {
+    w.endT -= dt;
+    if (w.endT <= 0) {
+      w.phase = 'over';
+      w.ranking = w.preds.map(p => p.seat).sort((a, b) => w.preds[b].score - w.preds[a].score);
+      emit(w, { k: 'over' });
+    }
+  }
+}
+/* =========================================================================
+   ART  -  everything is drawn with chunky fillRect pixels, no image files
+   ========================================================================= */
+let g = null;
+const useCtx = c => { g = c; };
+function R(x, y, w, h, c) { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+function P(x, y, c) { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), 1, 1); }
+function E(cx, cy, rx, ry, c) {
+  cx = Math.round(cx); cy = Math.round(cy); rx = Math.round(rx); ry = Math.round(ry);
+  g.fillStyle = c;
+  if (rx <= 0 || ry <= 0) { g.fillRect(cx, cy, 1, 1); return; }
+  for (let y = -ry; y <= ry; y++) {
+    const hw = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry))));
+    g.fillRect(cx - hw, cy + y, hw * 2 + 1, 1);
+  }
+}
+function EO(cx, cy, rx, ry, f, o) { E(cx, cy, rx + 1, ry + 1, o || PAL.ink); E(cx, cy, rx, ry, f); }
+function TRI(ax, ay, bx, by, cx, cy, c) {
+  g.fillStyle = c;
+  const x0 = Math.floor(Math.min(ax, bx, cx)), x1 = Math.ceil(Math.max(ax, bx, cx));
+  const y0 = Math.floor(Math.min(ay, by, cy)), y1 = Math.ceil(Math.max(ay, by, cy));
+  const s = (px, py, qx, qy, rx, ry) => (px - rx) * (qy - ry) - (qx - rx) * (py - ry);
+  for (let y = y0; y <= y1; y++) {
+    let run = -1;
+    for (let x = x0; x <= x1 + 1; x++) {
+      let inside = false;
+      if (x <= x1) {
+        const px = x + 0.5, py = y + 0.5;
+        const d1 = s(px, py, ax, ay, bx, by), d2 = s(px, py, bx, by, cx, cy), d3 = s(px, py, cx, cy, ax, ay);
+        inside = !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
+      }
+      if (inside && run < 0) run = x;
+      else if (!inside && run >= 0) { g.fillRect(run, y, x - run, 1); run = -1; }
+    }
+  }
+}
+function TRIO(ax, ay, bx, by, cx, cy, f) {
+  for (const o of [[-1, 0], [1, 0], [0, -1], [0, 1]]) TRI(ax + o[0], ay + o[1], bx + o[0], by + o[1], cx + o[0], cy + o[1], PAL.ink);
+  TRI(ax, ay, bx, by, cx, cy, f);
+}
+function LN(x0, y0, x1, y1, c) {
+  x0 = Math.round(x0); y0 = Math.round(y0); x1 = Math.round(x1); y1 = Math.round(y1);
+  g.fillStyle = c;
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+  let e = dx + dy, n = 0;
+  for (;;) {
+    g.fillRect(x0, y0, 1, 1);
+    if ((x0 === x1 && y0 === y1) || n++ > 400) break;
+    const e2 = 2 * e;
+    if (e2 >= dy) { e += dy; x0 += sx; }
+    if (e2 <= dx) { e += dx; y0 += sy; }
+  }
+}
+function ring(cx, cy, r, c) {
+  const n = Math.max(12, Math.round(r * 5));
+  for (let i = 0; i < n; i++) { const a = i / n * TAU; P(cx + Math.cos(a) * r, cy + Math.sin(a) * r, c); }
+}
+
+/* ---- 3x5 pixel font ---- */
+const FONT = {
+  A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111',
+  F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010',
+  K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010',
+  P: '110101110100100', Q: '010101101110011', R: '110101110101101', S: '011100010001110', T: '111010010010010',
+  U: '101101101101111', V: '101101101101010', W: '101101111111101', X: '101101010101101', Y: '101101010010010',
+  Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110',
+  4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111',
+  9: '111101111001110', '!': '010010010000010', '?': '110001010000010', '.': '000000000000010', ':': '000010000010000',
+  "'": '010010000000000', '-': '000000111000000', '+': '000010111010000', '/': '001001010100100', ',': '000000000010100',
+  '>': '100010001010100', '<': '001010100010001', '(': '010100100100010', ')': '010001001001010', '*': '000101010101000',
+  '=': '000111000111000', '%': '101001010100101', '#': '101111101111101'
+};
+const txtW = (s, sc = 1) => String(s).length * 4 * sc - sc;
+function txt(s, x, y, c, sc = 1, al = 'l', sh = PAL.ink) {
+  s = String(s).toUpperCase();
+  let X = al === 'c' ? x - Math.floor(txtW(s, sc) / 2) : al === 'r' ? x - txtW(s, sc) : x;
+  X = Math.round(X); y = Math.round(y);
+  if (sh) txt0(s, X + sc, y + sc, sh, sc);
+  txt0(s, X, y, c, sc);
+}
+function txt0(s, x, y, c, sc) {
+  g.fillStyle = c;
+  for (let i = 0; i < s.length; i++) {
+    const gl = FONT[s[i]];
+    if (gl) for (let k = 0; k < 15; k++) if (gl[k] === '1') g.fillRect(x + (k % 3) * sc + i * 4 * sc, y + ((k / 3) | 0) * sc, sc, sc);
+  }
+}
+
+/* ---- prey sprites (side view, facing right, 10x8) ---- */
+const SPR = {
+  rabbit: { pal: { o: PAL.ink, w: '#ddd6ec', p: '#f890a8', e: PAL.ink, g: '#a89cc0' },
+    rows: ['.....o.o..', '....opopo.', '....opopo.', '..oooowwwo', '.owwwwwewo', 'owwwwwwwwp', 'ogggwwwwo.'],
+    legs: ['.oo..o.oo.', '..oo.oo...'] },
+  mouse: { pal: { o: PAL.ink, g: '#9c94a8', p: '#f890a8', e: PAL.ink, k: '#f06888' },
+    rows: ['..........', '..........', '.....oo...', '....oppo..', '..oooggo..', 'p.ogggggeo', 'poggggggok'],
+    legs: ['..o..o....', '...o..o...'] },
+  frog: { pal: { o: PAL.ink, n: '#58c030', l: '#c8f070', w: PAL.white, e: PAL.ink },
+    rows: ['..........', '..........', '......oo..', '.....oweo.', '..oooonnno', '.onnnnnnno', 'onlllllnno'],
+    legs: ['onno..ono.', '.oo.onno..'] },
+  chicken: { pal: { o: PAL.ink, w: PAL.white, r: '#e83030', y: '#f8b818', e: PAL.ink },
+    rows: ['......rr..', '.....orro.', '.....owwo.', '.....owewy', 'oo..oowwor', 'owoowwwwo.', '.owwwwwwo.'],
+    legs: ['...y..y...', '..y....y..'] },
+  duck: { pal: { o: PAL.ink, y: '#f8e040', a: '#f88818', e: PAL.ink },
+    rows: ['..........', '.....ooo..', '....oyyyo.', '....oyeyaa', 'o...oyyyo.', 'oyoooyyyo.', '.oyyyyyyo.'],
+    legs: ['...a..a...', '..a....a..'] },
+  piglet: { pal: { o: PAL.ink, p: '#f8a0b8', q: '#e06890', l: '#e06890', e: PAL.ink },
+    rows: ['..........', '......oo..', '..oooopo..', '.oppppppo.', 'oppppppeqo', 'lopppppqqo', '.oppppppo.'],
+    legs: ['..o.o.oo..', '.o.o..o.o.'] },
+  lamb: { pal: { o: PAL.ink, w: PAL.white, d: '#3a2a38', g: '#d0c8c0' },
+    rows: ['..........', '..o.o.o...', '.owowowoo.', 'owwwwwwddo', 'owgwwwwdwd', 'owwwgwwddo', '.owwwwwo..'],
+    legs: ['..d.d.d.d.', '.d.d..d.d.'] },
+  gazelle: { pal: { o: PAL.ink, b: '#d08840', w: PAL.white, e: PAL.ink },
+    rows: ['........o.', '.......o.o', '.......obo', '......obeo', '.....obbo.', 'oobbbbbo..', 'obwwwwbo..'],
+    legs: ['.o.o..o.o.', 'o...oo...o'] },
+  goose: { pal: { o: PAL.ink, y: PAL.gold, a: '#f88818', e: PAL.ink, h: PAL.gold2 },
+    rows: ['..........', '......oo..', '.....oyeo.', '.....oyoaa', 'o....oyo..', 'oyoooyhyo.', '.oyyyyyyo.'],
+    legs: ['...a.a....', '..a...a...'] },
+  skunk: { pal: { o: PAL.ink, d: '#302838', w: PAL.white, e: '#f8f0f0' },
+    rows: ['.ooo......', 'owwwo.....', 'odwdo.....', 'oddddoooo.', '.oodwwwwwo', '..oddddeoo', '...oddddo.'],
+    legs: ['...d..d...', '....d.d...'] },
+  porcupine: { pal: { o: PAL.ink, l: '#ecdcb0', b: '#7c5434', q: '#c8a070', e: PAL.ink, k: '#f06888' },
+    rows: ['..l.l.l...', '.lolololl.', 'lobbbbbbol', 'obbbbbbbqo', 'obbbbbbqeq', '.obbbbbqqk', '..ooooooo.'],
+    legs: ['..o..o....', '...o..o...'] }
+};
+function drawSpr(type, x, y, flip, frame) {
+  const S = SPR[type];
+  for (let r = 0; r < 8; r++) {
+    const row = r < 7 ? S.rows[r] : S.legs[frame & 1];
+    for (let c = 0; c < 10; c++) {
+      const ch = row[c];
+      if (ch !== '.') P(flip ? x + 9 - c : x + c, y + r, S.pal[ch]);
+    }
+  }
+}
+function drawPreyOne(p, t, shade) {
+  if (p.hole > 0) return;
+  const D = PREY[p.type];
+  const moving = Math.hypot(p.vx, p.vy) > 6;
+  let hop = 0;
+  if ((D.hop || D.frog) && p.hopAir > 0) hop = Math.round(Math.sin((1 - p.hopAir / (D.frog ? 0.34 : 0.24)) * Math.PI) * (D.frog ? 4 : 3));
+  else if (moving) hop = (Math.floor(p.anim * 2) & 1);
+  let x = Math.round(p.x) - 5, y = Math.round(p.y) - 6 - hop;
+  if (p.frozen > 0) x += (Math.floor(t * 40) & 1) ? 1 : -1;
+  if (p.pop > 0) { const k = clamp(p.pop / 0.35, 0, 1); y += Math.round(k * 6); E(p.x, p.y + 1, 5, 2, '#3a2010'); }
+  E(p.x, p.y + 2, 4, 1, shade);
+  drawSpr(p.type, x, y, p.face < 0, moving ? Math.floor(p.anim * 1.6) : 0);
+  if (p.type === 'goose' && (Math.floor(t * 8 + p.id) % 4 === 0)) { P(x - 1, y + 1, PAL.white); P(x + 10, y + 4, PAL.white); }
+  if (p.type === 'skunk' && (Math.floor(t * 3 + p.id) % 3 === 0)) { P(x - 2, y - 1, PAL.stink); P(x - 1, y - 3, PAL.stink); }
+  if (p.frozen > 0) txt('!', p.x, y - 7, PAL.white, 1, 'c');
+}
+
+/* ---- predator, drawn in its own rotated frame (snout points toward -y) ---- */
+let CAMX = 0, CAMY = 0;
+function setFrame(side, bx, by) { const m = SIDE[side].m; g.setTransform(m[0], m[1], m[2], m[3], Math.round(bx) + CAMX, Math.round(by) + CAMY); }
+function resetFrame() { g.setTransform(1, 0, 0, 1, CAMX, CAMY); }
+
+function drawPredator(p, t, w) {
+  const D = PREDS[p.pred];
+  const ext = Math.round(p.ext), hy = 8 - ext;
+  const soot = p.stunKind === 'soot' && p.stun > 0;
+  const fur = soot ? PAL.soot : D.fur, dark = soot ? '#221c24' : D.dark, light = soot ? PAL.soot2 : D.light;
+  // pupils look at the nearest critter
+  const [hx, hy2] = headPos(p);
+  let lx = 0, ly = -1, best = 1e9;
+  for (const q of w.prey) { if (q.hole > 0) continue; const d = dist(q.x, q.y, hx, hy2); if (d < best) { best = d; lx = q.x - hx; ly = q.y - hy2; } }
+  const ll = Math.hypot(lx, ly) || 1; lx /= ll; ly /= ll;
+  const m = SIDE[p.side].m;            // world -> local is the transpose
+  const llx = lx * m[0] + ly * m[1], lly = lx * m[2] + ly * m[3];
+  setFrame(p.side, p.bx, p.by);
+  const tap = (p.st === 'idle' && Math.sin(t * 9 + p.seat * 2) > 0.6) ? -1 : 0;
+  drawBody(p, D, fur, dark, light, t, tap);
+  // stretchy neck
+  const nl = 12 - hy;
+  if (nl > 0) {
+    R(-6, hy, 13, nl, PAL.ink); R(-5, hy, 11, nl, fur);
+    for (let y = hy + 3; y < 10; y += 4) R(-5, y, 11, 1, dark);
+    if (p.pred === 'hyena') for (let y = hy + 2; y < 12; y += 3) R(-1, y, 3, 2, D.acc);
+    if (p.st === 'out') for (let k = 0; k < 3; k++) { R(-9 - k * 2, hy + 6 + k * 5, 1, 4, PAL.white); R(9 + k * 2, hy + 6 + k * 5, 1, 4, PAL.white); }
+  }
+  if (p.pred === 'fox') { TRIO(-7, 6, -7, 13, -1, 9, D.acc); TRIO(7, 6, 7, 13, 1, 9, D.acc); EO(0, 9, 1, 1, D.acc); }
+  if (p.pred === 'wolf') {
+    R(-8, 6, 17, 9, PAL.ink); R(-7, 7, 15, 7, PAL.white);
+    for (let y = 7; y < 14; y += 2) for (let x = -7 + ((y >> 1) & 1); x < 8; x += 2) P(x, y, '#e86878');
+  }
+  let jx = 0;
+  if (p.st === 'idle' && Math.sin(t * 41 + p.seat * 5) > 0.96) jx = 1;
+  if (p.st === 'hold') jx = (Math.floor(t * 30) & 1) ? 1 : -1;
+  drawHead(p, D, jx, hy, t, llx, lly, fur, dark, light);
+  resetFrame();
+}
+
+function drawBody(p, D, fur, dark, light, t, tap) {
+  EO(0, 21, 17, 10, fur);
+  E(0, 27, 13, 5, dark);
+  if (p.pred === 'coyote') for (let k = 0; k < 4; k++) { LN(-12, 15 + k * 3, -5, 16 + k * 3, dark); LN(5, 16 + k * 3, 12, 15 + k * 3, dark); }
+  if (p.pred === 'hyena') { R(-11, 17, 3, 2, D.acc); R(8, 19, 3, 2, D.acc); R(-4, 24, 2, 2, D.acc); R(3, 15, 2, 2, D.acc); }
+  if (p.pred === 'coyote') {
+    const s = '#c0c8d0';
+    R(-15, -12 + tap, 1, 14, s); R(-18, -12 + tap, 7, 1, s);
+    R(-18, -15 + tap, 1, 3, s); R(-16, -15 + tap, 1, 3, s); R(-14, -15 + tap, 1, 3, s); R(-12, -15 + tap, 1, 3, s);
+    R(15, -14, 1, 15, '#8a6a4a'); R(14, -14, 2, 9, '#e4ecf4'); P(14, -15, '#e4ecf4');
+  }
+  for (const sx of [-1, 1]) {
+    const py = 2 + (sx < 0 ? tap : 0);
+    EO(sx * 15, py, 4, 3, fur);
+    for (let k = -1; k <= 1; k++) R(sx * 15 + k * 2, py - 4, 1, 2, PAL.tooth);
+  }
+}
+
+function drawEars(k, D, fur, dark) {
+  for (const s of [-1, 1]) {
+    if (k === 'fox') {
+      TRIO(s * 7, 0, s * 2, 8, s * 18, 15, fur); TRI(s * 7, 3, s * 5, 7, s * 14, 12, D.ear);
+      TRI(s * 15, 12, s * 18, 15, s * 13, 14, PAL.ink);
+    } else if (k === 'wolf') {
+      TRIO(s * 7, 1, s * 2, 8, s * 15, 13, fur); TRI(s * 7, 4, s * 5, 7, s * 12, 11, D.ear);
+    } else if (k === 'coyote') {
+      TRIO(s * 6, 0, s * 1, 7, s * 21, 21, fur); TRI(s * 6, 3, s * 4, 7, s * 17, 17, D.ear);
+    } else {
+      EO(s * 12, 9, 5, 6, fur); E(s * 12, 9, 3, 4, D.ear);
+    }
+  }
+}
+
+function eyeball(x, y, r, lx, ly, mode, t) {
+  EO(x, y, r, r, PAL.eye);
+  P(x - r + 1, y, PAL.vein); P(x - r + 2, y + 1, PAL.vein); P(x + r - 1, y + 1, PAL.vein);
+  P(x, y + r - 1, PAL.vein); P(x + r - 2, y - r + 2, PAL.vein);
+  if (mode === 'x') { for (let k = -1; k <= 1; k++) { P(x + k, y + k, PAL.ink); P(x + k, y - k, PAL.ink); } return; }
+  let px, py;
+  if (mode === 'spin') { px = x + Math.round(Math.cos(t * 14) * (r - 2)); py = y + Math.round(Math.sin(t * 14) * (r - 2)); }
+  else { px = x + Math.round(lx * (r - 2)); py = y + Math.round(ly * (r - 2)); }
+  R(px, py, 1, 1, PAL.ink); P(px + (lx > 0 ? -1 : 1) * 0, py, PAL.ink);
+}
+
+function drawHead(p, D, cx, cy, t, lx, ly, fur, dark, light) {
+  const open = p.open, mega = p.items.mega > 0, k = p.pred;
+  const puff = p.spec === 'suck' ? 2 + Math.round(Math.sin(t * 30)) : (p.gulpT > 0 ? 2 : 0);
+  if (p.items.chili > 0) for (const s of [-1, 1]) { const f = Math.floor(t * 12) & 1; P(cx + s * 12, cy + 12 + f, '#f85818'); P(cx + s * 13, cy + 14 - f, '#f8d018'); }
+  // ears + tufts
+  g.save(); g.translate(cx, cy); drawEars(k, D, fur, dark); g.restore();
+  if (k === 'wolf') for (const s of [-1, 1]) TRIO(cx + s * 9, cy - 3, cx + s * (14 + puff), cy + 2, cx + s * 9, cy + 6, fur);
+  EO(cx, cy + 2, 10 + puff, 9, fur);
+  E(cx, cy + 7, 7, 3, dark);
+  if (k === 'hyena') { R(cx - 6, cy + 4, 2, 1, D.acc); R(cx + 5, cy + 5, 2, 1, D.acc); R(cx - 1, cy + 8, 2, 1, D.acc); R(cx + 7, cy + 1, 1, 2, D.acc); R(cx - 8, cy + 1, 1, 2, D.acc); }
+  if (k === 'coyote') { R(cx - 6, cy + 6, 2, 2, '#e8a0a0'); R(cx + 5, cy + 3, 2, 1, '#e8a0a0'); P(cx + 2, cy + 8, '#e8a0a0'); }
+  if (k === 'fox') { E(cx - 7, cy - 1, 2, 2, light); E(cx + 7, cy - 1, 2, 2, light); }
+  if (open < 0.15) {
+    EO(cx, cy - 8, 5, 7, fur);
+    E(cx, cy - 7, 3, 5, k === 'hyena' ? '#3a2818' : light);
+    EO(cx, cy - 15, 2, 1, PAL.ink); P(cx - 1, cy - 16, '#9a7a8a');
+    R(cx - 4, cy - 6, 1, 2, PAL.tooth); R(cx + 4, cy - 6, 1, 2, PAL.tooth);
+    if (p.stunKind === 'quill' && p.stun > 0) for (let i = -2; i <= 2; i++) LN(cx + i * 2, cy - 12, cx + i * 4, cy - 18, '#ecdcb0');
+    if (Math.sin(t * 3 + p.seat) > 0.7) { const dy = Math.floor((t * 12) % 5); P(cx + 5, cy - 4 + dy, PAL.drool); }
+  } else {
+    const mm = mega ? 1.6 : 1;
+    const jit = p.st === 'hold' ? (Math.floor(t * 30) & 1) : 0;
+    const rx = Math.round((5 + 5 * open) * mm) + jit, ry = Math.round((4 + 6 * open) * mm);
+    const my = cy - 8 - Math.round(open * 3 * mm);
+    EO(cx, my, rx + 1, ry + 1, PAL.gum);
+    E(cx, my, rx - 1, ry - 1, PAL.maw);
+    E(cx, my - 1, Math.max(1, rx - 3), Math.max(1, ry - 3), PAL.mawd);
+    E(cx, my + ry - 3, Math.max(1, rx - 3), 2, PAL.tongue);
+    R(cx, my - ry + 2, 1, 2, PAL.tongue);
+    for (let x = -rx + 2; x <= rx - 2; x += 3) {
+      const yy = Math.round(ry * Math.sqrt(Math.max(0, 1 - (x * x) / (rx * rx))));
+      R(cx + x, my - yy, 1, Math.abs(x) > rx - 5 ? 3 : 2, PAL.tooth);
+      R(cx + x, my + yy - 1, 1, 2, PAL.tooth);
+    }
+    EO(cx, my - ry - 3, 2, 1, PAL.ink);
+    if (open > 0.6) { const dy = Math.floor((t * 14) % 5); P(cx + rx, my + ry + dy - 1, PAL.drool); P(cx - rx, my + ry + ((dy + 2) % 5), PAL.drool); }
+  }
+  const er = (p.stun > 0 || p.gulpT > 0) ? 5 : 4;
+  const mode = p.stun > 0 ? (p.stunKind === 'dizzy' ? 'spin' : 'x') : '';
+  eyeball(cx - 5, cy - 1, er, lx, ly, mode, t);
+  eyeball(cx + 5, cy - 1, er + (k === 'hyena' ? 1 : 0), lx, ly, mode, t);
+  LN(cx - 10, cy - 5 - er + 4, cx - 2, cy - 3 - er + 4 + 1, PAL.ink); LN(cx - 10, cy - 6 - er + 4, cx - 3, cy - 4 - er + 4 + 1, dark);
+  LN(cx + 10, cy - 5 - er + 4, cx + 2, cy - 3 - er + 4 + 1, PAL.ink); LN(cx + 10, cy - 6 - er + 4, cx + 3, cy - 4 - er + 4 + 1, dark);
+  // stun dressing
+  if (p.stun > 0) {
+    if (p.stunKind === 'dizzy') for (let i = 0; i < 3; i++) {
+      const a = t * 6 + i * TAU / 3, sx = cx + Math.cos(a) * 13, sy = cy + 2 + Math.sin(a) * 8;
+      P(sx, sy, PAL.star); P(sx - 1, sy, PAL.star); P(sx + 1, sy, PAL.star); P(sx, sy - 1, PAL.star); P(sx, sy + 1, PAL.star);
+    }
+    if (p.stunKind === 'stink') for (let i = 0; i < 4; i++) {
+      const ph = (t * 1.5 + i * 0.25) % 1, sx = cx - 9 + i * 6 + Math.round(Math.sin(t * 8 + i) * 2), sy = cy + 4 - ph * 22;
+      P(sx, sy, PAL.stink); P(sx + 1, sy - 1, PAL.stink); P(sx, sy - 2, PAL.stink2);
+    }
+    if (p.stunKind === 'soot') for (let i = 0; i < 3; i++) { const ph = (t + i * 0.33) % 1; E(cx - 6 + i * 6, cy - 4 - ph * 14, 2, 2, ph > 0.5 ? '#9a929e' : '#6a626e'); }
+  }
+  if (p.stinkOn > 0) {
+    g.globalAlpha = 0.55;
+    for (let i = 0; i < 5; i++) { const a = t * 2 + i * 1.3; E(cx + Math.cos(a) * 11, cy - 2 + Math.sin(a * 1.3) * 8, 4, 3, i & 1 ? PAL.stink : PAL.stink2); }
+    g.globalAlpha = 1;
+  }
+}
+
+/* ---- the gross-up close-up: a big front-facing portrait, 64x56 ---- */
+function drawPortrait(k, mood, t) {
+  const D = PREDS[k];
+  const fur = D.fur, dark = D.dark, light = D.light;
+  const sh = mood === 'idle' ? 0 : (Math.floor(t * 30) & 1);
+  // ears
+  if (k === 'fox') for (const s of [-1, 1]) { TRIO(32 + s * 9, 14, 32 + s * 24, 0, 32 + s * 24, 20, fur); TRI(32 + s * 13, 13, 32 + s * 22, 4, 32 + s * 22, 16, D.ear); TRI(32 + s * 21, 1, 32 + s * 24, 0, 32 + s * 24, 6, PAL.ink); }
+  if (k === 'wolf') for (const s of [-1, 1]) { TRIO(32 + s * 8, 12, 32 + s * 20, 1, 32 + s * 23, 18, fur); TRI(32 + s * 12, 12, 32 + s * 19, 5, 32 + s * 20, 15, D.ear); }
+  if (k === 'coyote') for (const s of [-1, 1]) { TRIO(32 + s * 8, 12, 32 + s * 28, -4, 32 + s * 22, 20, fur); TRI(32 + s * 12, 12, 32 + s * 25, 0, 32 + s * 20, 16, D.ear); }
+  if (k === 'hyena') for (const s of [-1, 1]) { EO(32 + s * 18, 6, 7, 10, fur); E(32 + s * 18, 7, 4, 7, D.ear); }
+  // head
+  const hx = 32 + sh;
+  if (k === 'wolf') for (const s of [-1, 1]) { TRIO(hx + s * 18, 20, hx + s * 31, 30, hx + s * 19, 36, fur); TRIO(hx + s * 18, 30, hx + s * 29, 42, hx + s * 15, 42, fur); }
+  if (k === 'fox') for (const s of [-1, 1]) TRIO(hx + s * 16, 28, hx + s * 30, 40, hx + s * 12, 42, light);
+  EO(hx, 28, 22, 19, fur);
+  for (let i = 0; i < 7; i++) { LN(hx - 20 + i, 36 + i, hx - 17 + i, 34 + i, dark); LN(hx + 20 - i, 36 + i, hx + 17 - i, 34 + i, dark); }
+  if (k === 'hyena') for (const s of [[-14, 16], [12, 13], [-17, 30], [16, 31], [-6, 10], [6, 8], [0, 14]]) { R(hx + s[0], s[1], 3, 2, D.acc); }
+  if (k === 'coyote') { R(hx - 15, 14, 4, 3, '#e8a0a0'); R(hx + 13, 30, 3, 3, '#e8a0a0'); R(hx + 6, 10, 2, 2, '#e8a0a0'); }
+  EO(hx, 39, 14, 9, k === 'hyena' ? '#4a3420' : light);
+  for (const s of [[-8, 37], [-5, 39], [6, 36], [9, 39], [-10, 41], [3, 41], [11, 42]]) P(hx + s[0], s[1], dark);
+  // eyes
+  const crazy = mood !== 'idle';
+  const er = crazy ? 9 : 8;
+  for (const s of [-1, 1]) {
+    const ex = hx + s * 10, ey = 21;
+    EO(ex, ey, er - 1 + (s > 0 && crazy ? 1 : 0), er, PAL.eye);
+    for (let v = 0; v < 5; v++) {
+      const a = v * 1.3 + s, x0 = ex + Math.cos(a) * (er - 1), y0 = ey + Math.sin(a) * (er - 1);
+      LN(x0, y0, ex + Math.cos(a) * (er - 4), ey + Math.sin(a) * (er - 4), PAL.vein);
+    }
+    if (mood === 'stink') { for (let d = -2; d <= 2; d++) { P(ex + d, ey + d, PAL.ink); P(ex + d, ey - d, PAL.ink); } }
+    else {
+      const px = ex + (crazy ? (s < 0 ? 2 : -3) : 0), py = ey + (crazy ? (s < 0 ? 1 : -2) : 1);
+      R(px - 1, py - 1, crazy ? 2 : 4, crazy ? 2 : 4, PAL.ink);
+      if (!crazy) P(px, py - 1, PAL.white);
+    }
+    R(ex - 9, ey - er - 2 + (s < 0 ? 2 : 0), 18, 2, PAL.ink);
+  }
+  // nose
+  EO(hx, 31, 4, 3, PAL.ink); P(hx - 2, 30, '#a88898'); P(hx - 1, 30, '#a88898');
+  // mouth
+  if (mood === 'idle') {
+    LN(hx - 11, 40, hx - 4, 43, PAL.ink); LN(hx - 4, 43, hx + 4, 43, PAL.ink); LN(hx + 4, 43, hx + 12, 39, PAL.ink);
+    R(hx - 6, 44, 2, 3, PAL.tooth); R(hx + 5, 44, 2, 3, PAL.tooth);
+  } else if (mood === 'stink') {
+    for (let x = -10; x <= 10; x++) P(hx + x, 43 + Math.round(Math.sin(x * 0.9) * 1.5), PAL.ink);
+    EO(hx + 4, 48, 3, 5, PAL.tongue); LN(hx + 4, 45, hx + 4, 52, '#d86078');
+  } else {
+    EO(hx, 45, 16, 9, PAL.gum);
+    E(hx, 45, 14, 7, PAL.maw); E(hx, 46, 11, 5, PAL.mawd);
+    E(hx, 51, 8, 2, PAL.tongue);
+    R(hx, 38, 1, 4, PAL.tongue); R(hx - 1, 41, 3, 2, PAL.tongue);
+    const top = [3, 4, 2, 5, 3, 2, 4, 3, 5, 2];
+    for (let i = 0; i < 10; i++) R(hx - 13 + i * 3, 37, 2, top[i], PAL.tooth);
+    for (let i = 0; i < 5; i++) R(hx - 9 + i * 4, 51 - (i & 1), 2, 3, PAL.tooth);
+    if (k === 'coyote') R(hx - 4, 37, 2, 4, PAL.mawd);
+    const dr = Math.floor(t * 10) % 4;
+    LN(hx - 13, 49, hx - 15, 52 + dr, PAL.drool); LN(hx + 12, 50, hx + 13, 53 + ((dr + 2) % 4), PAL.drool);
+  }
+  if (crazy) { P(hx - 22, 16, PAL.sweat); P(hx - 22, 17, PAL.sweat); P(hx - 23, 18, PAL.sweat); P(hx + 22, 12, PAL.sweat); P(hx + 23, 13, PAL.sweat); P(hx + 22, 14, PAL.sweat); }
+  if (mood === 'stink') { g.globalAlpha = 0.35; R(0, 0, 64, 56, PAL.stink); g.globalAlpha = 1; for (let i = 0; i < 4; i++) P(10 + ((t * 40 + i * 17) % 44), 6 + ((i * 13 + t * 22) % 14), PAL.ink); }
+  if (k === 'fox' || k === 'wolf') {/* clean-ish */}
+  if (k === 'hyena') for (let i = 0; i < 4; i++) TRI(hx - 6 + i * 4, 9, hx - 4 + i * 4, 3, hx - 2 + i * 4, 9, dark);
+}
+
+let PBUF = null, PCTX = null, GBUF = null, GCTX = null;
+function makeCanvas(w, h) {
+  if (typeof document === 'undefined') return null;
+  const c = document.createElement('canvas'); c.width = w; c.height = h; return c;
+}
+function renderPortraitTo(ctx, k, mood, t) {
+  const prev = g; useCtx(ctx);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 64, 56);
+  drawPortrait(k, mood, t);
+  useCtx(prev);
+}
+
+function drawGross(w, t) {
+  const gr = w.gross, D = PREDS[gr.pred];
+  if (!GBUF) { GBUF = makeCanvas(64, 60); if (!GBUF) return; GCTX = GBUF.getContext('2d'); }
+  const prev = g; useCtx(GCTX);
+  GCTX.setTransform(1, 0, 0, 1, 0, 0);
+  R(0, 0, 64, 60, PAL.purple2);
+  const n = 14, rot = t * 0.8;
+  for (let i = 0; i < n; i += 2) {
+    const a0 = rot + i / n * TAU, a1 = rot + (i + 1) / n * TAU;
+    TRI(32, 30, 32 + Math.cos(a0) * 60, 30 + Math.sin(a0) * 60, 32 + Math.cos(a1) * 60, 30 + Math.sin(a1) * 60, gr.mood === 'stink' ? PAL.stink2 : D.hud);
+  }
+  GCTX.save(); GCTX.translate(0, -2); drawPortrait(gr.pred, gr.mood, t); GCTX.restore();
+  useCtx(prev);
+  g.imageSmoothingEnabled = false;
+  g.drawImage(GBUF, 0, 0, 256, 240);
+  R(0, 214, 256, 24, PAL.ink);
+  txt(gr.text, 128, 219, gr.mood === 'stink' ? PAL.stink : PAL.star, 3, 'c', PAL.purple);
+}
+
+/* ---- arenas ---- */
+const BG = {};
+const ARENA_COL = {
+  2: { margin: '#8c3048', m2: '#a8405c', floor: '#e8b060', f2: '#d09048', f3: '#f4c878', rim: '#5c2440', shade: '#c08840' },
+  3: { margin: '#58b030', m2: '#3c8c24', floor: '#a07040', f2: '#8a5c30', f3: '#e8c860', rim: '#6a3c1c', shade: '#80562c' },
+  4: { margin: '#c89c30', m2: '#a07820', floor: '#e09048', f2: '#c07038', f3: '#f0b070', rim: '#6c4418', shade: '#b86e34' }
+};
+function hash(x, y) { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); }
+function drawBackground(n) {
+  const L = LAYOUTS[n], C = ARENA_COL[n], a = L.a;
+  R(0, 0, W, H, C.margin);
+  for (let y = 0; y < H; y += 2) for (let x = (y >> 1) & 1; x < W; x += 2) if (hash(x, y) < 0.18) P(x, y, C.m2);
+  R(a.x0, a.y0, a.x1 - a.x0, a.y1 - a.y0, C.floor);
+  for (let y = a.y0; y < a.y1; y++) for (let x = a.x0; x < a.x1; x++) { const h = hash(x + 7, y + 3); if (h < 0.05) P(x, y, C.f2); else if (h > 0.97) P(x, y, C.f3); }
+  if (n === 4) { for (let i = 0; i < 9; i++) { let x = a.x0 + 10 + hash(i, 1) * 140, y = a.y0 + 10 + hash(i, 2) * 140; for (let s = 0; s < 6; s++) { const nx = x + (hash(i, s) - 0.5) * 10, ny = y + (hash(s, i) - 0.5) * 10; LN(x, y, nx, ny, C.f2); x = nx; y = ny; } } }
+  if (n === 3) for (let i = 0; i < 60; i++) { const x = a.x0 + hash(i, 9) * (a.x1 - a.x0), y = a.y0 + hash(9, i) * (a.y1 - a.y0); LN(x, y, x + 3, y + (hash(i, i) > 0.5 ? 1 : -1), C.f3); }
+  // rim
+  R(a.x0 - 4, a.y0 - 4, a.x1 - a.x0 + 8, 4, PAL.ink); R(a.x0 - 4, a.y1, a.x1 - a.x0 + 8, 4, PAL.ink);
+  R(a.x0 - 4, a.y0, 4, a.y1 - a.y0, PAL.ink); R(a.x1, a.y0, 4, a.y1 - a.y0, PAL.ink);
+  R(a.x0 - 3, a.y0 - 3, a.x1 - a.x0 + 6, 2, C.rim); R(a.x0 - 3, a.y1 + 1, a.x1 - a.x0 + 6, 2, C.rim);
+  R(a.x0 - 3, a.y0 - 1, 2, a.y1 - a.y0 + 2, C.rim); R(a.x1 + 1, a.y0 - 1, 2, a.y1 - a.y0 + 2, C.rim);
+  if (n === 3) for (let x = a.x0 - 3; x <= a.x1 + 2; x += 10) { R(x, a.y0 - 6, 3, 8, '#8a5228'); R(x, a.y1 - 2, 3, 8, '#8a5228'); }
+  // scenery
+  if (n === 2) {
+    const cactus = (x, y, h) => { R(x - 2, y - h, 5, h, PAL.ink); R(x - 1, y - h + 1, 3, h - 1, '#58a838'); R(x - 6, y - h + 6, 4, 2, PAL.ink); R(x - 6, y - h + 2, 2, 5, PAL.ink); R(x - 5, y - h + 3, 1, 4, '#58a838'); R(x + 3, y - h + 8, 4, 2, PAL.ink); R(x + 5, y - h + 4, 2, 5, PAL.ink); R(x + 5, y - h + 5, 1, 4, '#58a838'); P(x, y - h + 3, '#2c6820'); P(x, y - h + 8, '#2c6820'); };
+    cactus(30, 228, 18); cactus(224, 232, 22); cactus(20, 168, 12); cactus(236, 176, 14); cactus(90, 22, 10); cactus(168, 24, 12);
+    for (const sp of L.spawns) { E(sp[0], sp[1], 8, 4, '#6a3c1c'); E(sp[0], sp[1], 6, 3, '#2a1408'); }
+    for (let i = 0; i < 3; i++) { const bx = 14 + i * 9, by = 196; R(bx, by, 6, 2, PAL.white); P(bx - 1, by - 1, PAL.white); P(bx - 1, by + 2, PAL.white); P(bx + 6, by - 1, PAL.white); P(bx + 6, by + 2, PAL.white); }
+  }
+  if (n === 3) {
+    R(84, 0, 88, 44, PAL.ink); R(86, 4, 84, 40, '#c83030');
+    TRI(80, 8, 128, -8, 176, 8, PAL.ink); TRI(84, 7, 128, -5, 172, 7, '#a02020');
+    for (let x = 88; x < 170; x += 6) R(x, 10, 1, 34, '#a02020');
+    R(108, 22, 40, 24, PAL.ink); R(110, 24, 36, 22, '#2a1008');
+    R(110, 24, 2, 22, PAL.white); R(144, 24, 2, 22, PAL.white);
+    R(104, 30, 48, 12, PAL.ink); R(105, 31, 46, 10, '#f8e8c8');
+    for (let x = 8; x < 50; x += 7) { R(x, 30, 2, 12, '#8a5228'); R(256 - x - 2, 30, 2, 12, '#8a5228'); }
+    R(6, 33, 44, 2, '#8a5228'); R(206, 33, 44, 2, '#8a5228');
+  }
+  if (n === 4) {
+    for (let i = 0; i < 40; i++) { const x = hash(i, 77) * W, y = hash(77, i) * H; if (x > a.x0 - 6 && x < a.x1 + 6 && y > a.y0 - 6 && y < a.y1 + 6) continue; LN(x, y, x - 1, y - 4, '#8a6418'); LN(x + 1, y, x + 2, y - 3, '#8a6418'); }
+    const bone = (x, y) => { R(x, y, 8, 2, PAL.white); P(x - 1, y - 1, PAL.white); P(x - 1, y + 2, PAL.white); P(x + 8, y - 1, PAL.white); P(x + 8, y + 2, PAL.white); };
+    bone(16, 120); bone(232, 100); bone(100, 228); bone(150, 14);
+  }
+  // bumpers
+  L.bumpers.forEach((b, i) => {
+    if (n === 4 && i === 0) { EO(b[0], b[1], b[2], b[2] - 1, '#8a5c30'); E(b[0], b[1], b[2] - 2, b[2] - 3, '#3878d0'); E(b[0] - 2, b[1] - 2, 3, 1, '#88c0f8'); return; }
+    if (n === 3) { EO(b[0], b[1], b[2], b[2], '#e8c048'); ring(b[0], b[1], b[2] - 3, '#b88c20'); ring(b[0], b[1], b[2] - 5, '#b88c20'); return; }
+    if (n === 2) { EO(b[0], b[1], b[2], b[2], '#c89058'); for (let k = 0; k < 10; k++) { const an = k * 1.7; LN(b[0], b[1], b[0] + Math.cos(an) * (b[2] - 1), b[1] + Math.sin(an) * (b[2] - 1), '#8a5c30'); } return; }
+    EO(b[0], b[1], b[2], b[2] - 1, '#9894a0'); E(b[0] - 1, b[1] - 1, b[2] - 3, b[2] - 4, '#b8b4c0'); P(b[0] - 2, b[1] - 3, PAL.white);
+  });
+  // tunnel holes, colour-coded by pair
+  const hc = ['#c060e8', '#60e8c8'];
+  L.holes.forEach((pr, i) => pr.forEach(h => { E(h[0], h[1], 6, 4, hc[i]); E(h[0], h[1], 5, 3, '#5a3418'); E(h[0], h[1], 4, 2, '#1a0c06'); }));
+}
+function getBG(n) {
+  if (BG[n] !== undefined) return BG[n];
+  const c = makeCanvas(W, H);
+  if (!c) { BG[n] = null; return null; }
+  const prev = g; useCtx(c.getContext('2d')); drawBackground(n); useCtx(prev);
+  BG[n] = c; return c;
+}
+
+/* ---- gadgets / items ---- */
+function drawCrate(c, t) {
+  if (c.fall > 0) {
+    const k = c.fall / 1.5, y = c.y - k * 90;
+    E(c.x, c.y + 2, 4 + Math.round((1 - k) * 3), 1, 'rgba(0,0,0,.35)');
+    R(c.x - 9, y - 20, 19, 6, PAL.ink); R(c.x - 8, y - 19, 17, 4, '#f06888'); R(c.x - 3, y - 19, 5, 4, PAL.white);
+    LN(c.x - 8, y - 14, c.x - 4, y - 5, PAL.ink); LN(c.x + 8, y - 14, c.x + 4, y - 5, PAL.ink);
+    drawBox(c.x, y);
+  } else {
+    if (c.life < 2.5 && (Math.floor(t * 10) & 1)) return;
+    if (c.vx === undefined) c.vx = 0;
+    E(c.x, c.y + 3, 5, 1, 'rgba(0,0,0,.35)');
+    drawBox(c.x, c.y - ((Math.floor(t * 4) & 1)));
+  }
+}
+function drawBox(x, y) {
+  R(x - 5, y - 5, 11, 10, PAL.ink); R(x - 4, y - 4, 9, 8, '#c88838'); R(x - 4, y - 1, 9, 1, '#8a5420');
+  txt('?', x - 1, y - 3, PAL.star, 1, 'l', null);
+}
+function drawLure(l, w, t) {
+  const q = w.preds[l.o], [mx, my] = mouthPos(q, 4);
+  LN(mx, my, l.x, l.y, PAL.white);
+  const bob = Math.floor(t * 8) & 1;
+  TRIO(l.x - 2, l.y - 4 + bob, l.x + 2, l.y - 4 + bob, l.x, l.y + 6 + bob, '#f87818');
+  R(l.x - 1, l.y - 7 + bob, 1, 3, '#58c030'); R(l.x + 1, l.y - 8 + bob, 1, 4, '#58c030');
+  P(l.x, l.y - 1 + bob, '#c05008'); P(l.x, l.y + 2 + bob, '#c05008');
+  if (l.phase === 'bait') ring(l.x, l.y, 10 + (Math.floor(t * 10) % 4) * 4, '#f8a868');
+}
+function drawFork(f, w, t) {
+  const q = w.preds[f.o], [mx, my] = mouthPos(q, 4);
+  LN(mx, my, f.x, f.y, '#d8d0c0');
+  g.save(); setFrame(q.side, f.x, f.y);
+  R(0, 0, 1, 7, '#c0c8d0'); R(-2, -1, 5, 1, '#c0c8d0'); R(-2, -4, 1, 3, '#c0c8d0'); R(0, -4, 1, 3, '#c0c8d0'); R(2, -4, 1, 3, '#c0c8d0');
+  R(-2, 7, 5, 4, '#c83030'); if (f.phase === 'out') { P(-1, 11 + (Math.floor(t * 20) & 1), '#f8d018'); P(1, 12, '#f85818'); }
+  g.restore(); resetFrame();
+  (f.prey || []).forEach((ty, i) => {
+    const ox = f.x - q.dx * i * 6, oy = f.y - q.dy * i * 6;
+    if (ty === 'crate') drawBox(ox, oy); else drawSpr(ty, Math.round(ox) - 5, Math.round(oy) - 5, (Math.floor(t * 12 + i) & 1) === 1, 1);
+  });
+}
+function drawShock(s, t) {
+  const c = (Math.floor(t * 20) & 1) ? PAL.star : PAL.white;
+  ring(s.x, s.y, s.r, c); ring(s.x, s.y, s.r - 3, PAL.pink);
+  if (s.r < 60) txt('HA', s.x + Math.cos(s.r) * s.r * 0.6, s.y + Math.sin(s.r * 1.3) * s.r * 0.5, PAL.star, 1, 'c');
+}
+/* =========================================================================
+   RENDER + FX  -  cosmetic layer (particles, floating text, shake, sound)
+   ========================================================================= */
+const FX = { parts: [], floats: [], shake: 0 };
+function fxReset() { FX.parts.length = 0; FX.floats.length = 0; FX.shake = 0; }
+function burst(x, y, n, cols, spd = 40, life = 0.5) {
+  for (let i = 0; i < n; i++) {
+    const a = rnd(TAU), s = rnd(spd * 0.3, spd);
+    FX.parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 10, t: rnd(life * 0.6, life), c: pick(cols) });
+  }
+}
+function floatTxt(x, y, s, c, sc = 1) { FX.floats.push({ x, y, s, c, sc, t: 1 }); }
+
+function fxEvent(e, w, mute) {
+  const S = mute ? () => {} : sfx, T = mute ? () => {} : tone;
+  const p = e.s !== undefined ? w.preds[e.s] : null;
+  switch (e.k) {
+    case 'chomp': S('chomp'); FX.shake = Math.max(FX.shake, 1.5); burst(e.x, e.y, 6, [PAL.white, PAL.tooth, '#e8e0d0'], 50, 0.35); break;
+    case 'whiff': S('whiff'); break;
+    case 'gulp': {
+      S('gulp');
+      const c = e.pts > 0 ? PAL.star : e.pts < 0 ? PAL.red : PAL.white;
+      if (e.n > 0 || e.pts !== 0) floatTxt(e.x, e.y - 12, (e.pts > 0 ? '+' : '') + e.pts, c, e.pts >= 6 ? 2 : 1);
+      if (e.n > 0 && Math.random() < 0.18) { setTimeout(() => S('burp'), 260); floatTxt(e.x, e.y - 22, 'BRAAAP!', PAL.bile); }
+      break;
+    }
+    case 'stinky': S('stinky'); burst(e.x, e.y, 14, [PAL.stink, PAL.stink2], 35, 0.9); floatTxt(e.x, e.y - 20, 'P-U!', PAL.stink, 2); break;
+    case 'ouch': S('ouch'); burst(e.x, e.y, 10, ['#ecdcb0', '#7c5434'], 60, 0.5); floatTxt(e.x, e.y - 20, 'YEOWCH!', PAL.red); break;
+    case 'gross': if (e.mood === 'goose') S('goose'); else if (e.mood === 'triple') S('triple'); FX.shake = 3; break;
+    case 'item': S(e.item === 'stink' ? 'stinkbomb' : 'item'); if (p) { const [hx, hy] = headPos(p); burst(hx, hy, 10, [PAL.star, PAL.white, PREDS[p.pred].hud], 50, 0.6); } break;
+    case 'lure': S('lure'); break;
+    case 'reel': S('reel'); break;
+    case 'suck': S('suck'); break;
+    case 'fork': S('fork'); break;
+    case 'skewer': S('chomp'); burst(e.x, e.y, 5, [PAL.white], 40, 0.3); break;
+    case 'boom': S('boom'); FX.shake = 5; burst(e.x, e.y, 26, ['#f8d018', '#f85818', '#3e3640', '#9a929e'], 80, 0.8); floatTxt(e.x, e.y - 24, 'KA-BLOOEY', '#f85818', 2); break;
+    case 'laugh': S('laugh'); FX.shake = 3; if (p) { const [hx, hy] = headPos(p); floatTxt(hx, hy - 20, 'HEE HEE HAAA!', PAL.star); } setTimeout(() => S('dizzy'), 300); break;
+    case 'pop': S('pop'); burst(e.x, e.y, 6, ['#6a3c1c', '#a06a3c'], 30, 0.4); break;
+    case 'hole': burst(e.x, e.y, 4, ['#6a3c1c'], 25, 0.3); break;
+    case 'bump': T(260, 0.05, 'square', 0.04, 520); break;
+    case 'cratedrop': T(1600, 0.9, 'triangle', 0.05, 500); break;
+    case 'crate': S('crate'); burst(e.x, e.y, 8, ['#e8d0a0', '#c8a878'], 40, 0.4); break;
+    case 'poof': burst(e.x, e.y, 8, [PAL.white, '#c8c0d0'], 30, 0.5); break;
+    case 'stampede': S('stampede'); FX.shake = 3; break;
+    case 'count': S('count'); break;
+    case 'go': S('go'); break;
+    case 'hurry': S('hurry'); break;
+    case 'whistle': S('whistle'); break;
+    case 'over': S('win'); break;
+  }
+}
+function fxStep(dt) {
+  for (let i = FX.parts.length - 1; i >= 0; i--) {
+    const q = FX.parts[i];
+    q.t -= dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 60 * dt; q.vx *= 0.96;
+    if (q.t <= 0) FX.parts.splice(i, 1);
+  }
+  for (let i = FX.floats.length - 1; i >= 0; i--) { const f = FX.floats[i]; f.t -= dt * 0.9; f.y -= 14 * dt; if (f.t <= 0) FX.floats.splice(i, 1); }
+  FX.shake = Math.max(0, FX.shake - dt * 14);
+}
+
+function renderWorld(w, t, me, labels) {
+  CAMX = FX.shake > 0.2 ? Math.round(rnd(-FX.shake, FX.shake)) : 0;
+  CAMY = FX.shake > 0.2 ? Math.round(rnd(-FX.shake, FX.shake)) : 0;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.imageSmoothingEnabled = false;
+  if (CAMX || CAMY) R(0, 0, W, H, PAL.ink);
+  resetFrame();
+  const bg = getBG(w.n);
+  if (bg) g.drawImage(bg, 0, 0); else drawBackground(w.n);
+  const shade = ARENA_COL[w.n].shade;
+  // field effects
+  for (const p of w.preds) {
+    if (p.items.magnet > 0) { const [gx, gy] = mouthPos(p, 30); const r = 40 - ((t * 40) % 36); ring(gx, gy, r, PREDS[p.pred].hud); }
+    if (p.spec === 'suck') {
+      const [mx, my] = mouthPos(p);
+      for (let i = 0; i < 9; i++) {
+        const ph = (t * 2.4 + i / 9) % 1, al = 140 * (1 - ph), lat = (i - 4) / 4 * (al * 0.7 + 12);
+        const x = mx + p.dx * al + p.dy * lat, y = my + p.dy * al - p.dx * lat;
+        LN(x, y, x - p.dx * 6 - p.dy * lat * 0.05, y - p.dy * 6 + p.dx * lat * 0.05, PAL.white);
+      }
+    }
+  }
+  for (const c of w.crates) if (c.fall <= 0) drawCrate(c, t);
+  const list = w.prey.slice().sort((a, b) => a.y - b.y);
+  for (const q of list) drawPreyOne(q, t, shade);
+  for (const l of w.lures) drawLure(l, w, t);
+  for (const p of w.preds) drawPredator(p, t, w);
+  for (const p of w.preds) {
+    if (p.st === 'back' && p.mouth.length) {
+      const [mx, my] = mouthPos(p), ty = p.mouth.find(m => m !== 'crate');
+      if (ty) drawSpr(ty, Math.round(mx) - 5, Math.round(my) - 5, (Math.floor(t * 14) & 1) === 1, Math.floor(t * 14));
+      else drawBox(mx, my);
+    }
+  }
+  for (const f of w.forks) drawFork(f, w, t);
+  for (const s of w.shocks) drawShock(s, t);
+  for (const c of w.crates) if (c.fall > 0) drawCrate(c, t);
+  for (const q of FX.parts) P(q.x, q.y, q.c);
+  for (const f of FX.floats) if (f.t > 0.15 || (Math.floor(t * 20) & 1)) txt(f.s, f.x, f.y, f.c, f.sc, 'c');
+  resetFrame();
+  // HUD
+  for (const p of w.preds) drawHud(w, p, me, labels ? labels[p.seat] : '', t);
+  const remain = Math.max(0, Math.ceil(w.time - w.t));
+  const tc = remain <= 10 && (Math.floor(t * 4) & 1) ? PAL.red : PAL.white;
+  if (w.time < 999) {
+    if (w.n === 3) txt(String(remain), w.L.timer[0], w.L.timer[1] - 5, tc === PAL.red ? PAL.red : PAL.ink, 2, 'c', null);
+    else txt(String(remain), w.L.timer[0], w.L.timer[1], tc, 2, 'c');
+  }
+  if (w.phase === 'count') {
+    const c = Math.ceil(w.countT);
+    txt(String(c), 128, 96, PAL.star, 8, 'c', PAL.purple);
+    for (const p of w.preds) if (labels && labels[p.seat] && labels[p.seat] !== 'CPU') {
+      const [hx, hy] = headPos(p);
+      const b = Math.floor(t * 6) & 1;
+      txt(labels[p.seat], hx + p.dx * 30, hy + p.dy * 30 - 3 - b, p.seat === me ? PAL.star : PAL.white, 1, 'c');
+    }
+  }
+  if (w.banner) {
+    const c = (Math.floor(t * 10) & 1) ? PAL.star : PAL.pink;
+    const bw = Math.min(250, txtW(w.banner.text, 2) + 12);
+    R(128 - bw / 2, 100, bw, 16, PAL.ink); R(128 - bw / 2 + 1, 101, bw - 2, 14, PAL.purple);
+    txt(w.banner.text, 128, 103, c, 2, 'c');
+  }
+  if (w.gross) drawGross(w, t);
+}
+
+function drawHud(w, p, me, label, t) {
+  const [x, y] = w.L.hud[p.side], D = PREDS[p.pred];
+  R(x, y, 44, 33, p.seat === me ? PAL.star : PAL.ink);
+  R(x + 1, y + 1, 42, 31, PAL.purple2);
+  txt(shortName(p.pred), x + 3, y + 3, D.hud);
+  if (label) txt(label, x + 41, y + 3, p.seat === me ? PAL.star : '#b8a8c8', 1, 'r');
+  txt(String(p.score), x + 3, y + 10, PAL.white, 2);
+  // item chips
+  let ix = x + 41;
+  const chip = (s, c) => { const wd = txtW(s); ix -= wd; txt(s, ix, y + 16, c); ix -= 3; };
+  if (p.items.mega > 0) chip('MAW', '#f06888');
+  if (p.items.magnet > 0) chip('MAG', '#88c0f8');
+  if (p.items.chili > 0) chip('HOT', '#f85818');
+  if (p.stinkOn > 0) chip('P-U', PAL.stink);
+  // special meter
+  const full = p.meter >= 100;
+  R(x + 3, y + 23, 38, 6, PAL.ink);
+  R(x + 4, y + 24, Math.round(36 * p.meter / 100), 4, full ? ((Math.floor(t * 8) & 1) ? PAL.star : PAL.white) : D.hud);
+  if (full && p.st === 'idle' && p.stun <= 0) txt('GO!', x + 22, y + 24, PAL.ink, 1, 'c', null);
+}
+/* =========================================================================
+   NET  -  PeerJS (WebRTC) room codes. The host runs the world; guests send
+   their buttons and draw the host's snapshots. The PeerJS broker only does
+   matchmaking, so no server of your own is needed.
+   ========================================================================= */
+const NET = { mode: 'off', peer: null, conn: null, conns: {}, code: '', snapT: 0, evq: [], lastHeard: 0, joinTimer: null, sentCh: false };
+const CODE_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const ROOM = c => 'rjhowlers-v1-' + String(c).toLowerCase();
+const genCode = () => Array.from({ length: 5 }, () => CODE_CH[(Math.random() * CODE_CH.length) | 0]).join('');
+const r1 = v => Math.round(v * 10) / 10, r2 = v => Math.round(v * 100) / 100;
+const peerMissing = () => typeof Peer === 'undefined';
+function netErr(e) {
+  const t = e && e.type;
+  return ({
+    'peer-unavailable': 'Room not found. Check the code, and make sure the host is still in the lobby.',
+    network: 'Network problem. Check your internet connection and try again.',
+    'browser-incompatible': 'This browser cannot do peer-to-peer play. Try Chrome, Edge or Firefox.',
+    'server-error': 'The matchmaking server is unreachable. Try again in a minute.',
+    'socket-error': 'Lost the matchmaking server. Try again.',
+    disconnected: 'Disconnected from the matchmaking server.',
+    'unavailable-id': 'That room code is taken. Making a new one.'
+  })[t] || ('Connection error' + (t ? ' (' + t + ')' : '') + '. Try again.');
+}
+
+function netClose() {
+  try {
+    if (NET.mode === 'host') for (const id in NET.conns) { try { NET.conns[id].conn.send({ t: 'bye' }); } catch (e) { /* ignore */ } }
+    if (NET.mode === 'guest' && NET.conn) { try { NET.conn.send({ t: 'bye' }); } catch (e) { /* ignore */ } }
+  } catch (e) { /* ignore */ }
+  setTimeout(() => {
+    for (const id in NET.conns) { try { NET.conns[id].conn.close(); } catch (e) { /* ignore */ } }
+    try { if (NET.conn) NET.conn.close(); } catch (e) { /* ignore */ }
+    try { if (NET.peer) NET.peer.destroy(); } catch (e) { /* ignore */ }
+  }, 120);
+  clearTimeout(NET.joinTimer);
+  Object.assign(NET, { mode: 'off', peer: null, conn: null, conns: {}, code: '', evq: [], lastHeard: 0 });
+}
+
+/* ---------------- host ---------------- */
+function hostOpen(onStatus) {
+  if (peerMissing()) { onStatus('Online play needs PeerJS, which did not load. Check your connection and refresh. Solo and party still work.', true); return; }
+  NET.mode = 'host'; NET.code = genCode(); NET.conns = {}; NET.evq = [];
+  const peer = new Peer(ROOM(NET.code));
+  NET.peer = peer;
+  peer.on('open', () => onStatus('Share this code with up to 3 friends.'));
+  peer.on('error', e => {
+    if (e && e.type === 'unavailable-id' && NET.mode === 'host') { try { peer.destroy(); } catch (x) { /* ignore */ } hostOpen(onStatus); onStatus('Making a fresh room code...'); uiRefreshLobby(); return; }
+    if (e && e.type === 'peer-unavailable') return;
+    onStatus(netErr(e), true);
+  });
+  peer.on('connection', conn => {
+    conn.on('open', () => {
+      if (SESSION && SESSION.type === 'host' && WORLD) { conn.send({ t: 'busy' }); setTimeout(() => conn.close(), 400); return; }
+      const seat = lobbyFreeSeat();
+      if (seat < 0) { conn.send({ t: 'full' }); setTimeout(() => conn.close(), 400); return; }
+      LOBBY.seats[seat] = { kind: 'remote', pred: lobbyFreePred(seat), label: 'P' + (seat + 1) };
+      NET.conns[conn.peer] = { conn, seat, last: Date.now() };
+      sfx('item');
+      uiRefreshLobby(); hostBroadcastLobby();
+    });
+    conn.on('data', d => hostData(conn, d));
+    conn.on('close', () => hostDrop(conn));
+    conn.on('error', () => hostDrop(conn));
+  });
+}
+function hostBroadcastLobby() {
+  for (const id in NET.conns) {
+    const c = NET.conns[id];
+    try {
+      c.conn.send({ t: 'lobby', n: LOBBY.n, diff: LOBBY.diff, time: LOBBY.time, you: c.seat,
+        seats: LOBBY.seats.map(s => ({ kind: s.kind, pred: s.pred, label: s.label })) });
+    } catch (e) { /* ignore */ }
+  }
+}
+function hostSend(msg) { for (const id in NET.conns) { try { NET.conns[id].conn.send(msg); } catch (e) { /* ignore */ } } }
+function hostData(conn, d) {
+  const c = NET.conns[conn.peer];
+  if (!c || !d) return;
+  c.last = Date.now();
+  if (d.t === 'pick' && !WORLD) { lobbyCycle(c.seat, d.dir > 0 ? 1 : -1); uiRefreshLobby(); hostBroadcastLobby(); }
+  else if (d.t === 'in' && WORLD && WORLD.preds[c.seat]) {
+    const p = WORLD.preds[c.seat];
+    if (p.kind === 'remote') { p.inp.ch = !!d.ch; if (d.sp) p.inp.sp = true; }
+  } else if (d.t === 'bye') hostDrop(conn);
+}
+function hostDrop(conn) {
+  const c = NET.conns[conn.peer];
+  if (!c) return;
+  delete NET.conns[conn.peer];
+  if (WORLD && SESSION && SESSION.type === 'host') {
+    const p = WORLD.preds[c.seat];
+    if (p) { p.kind = 'cpu'; SESSION.labels[c.seat] = 'CPU'; banner(WORLD, 'P' + (c.seat + 1) + ' LEFT. CPU TAKES OVER', 2); }
+    SESSION.cfg.seats[c.seat].kind = 'cpu';
+  }
+  if (LOBBY.seats[c.seat] && LOBBY.seats[c.seat].kind === 'remote') LOBBY.seats[c.seat] = { kind: 'open', pred: LOBBY.seats[c.seat].pred, label: '' };
+  if (!WORLD) { uiRefreshLobby(); hostBroadcastLobby(); }
+}
+
+function packWorld(w) {
+  const o = {
+    t: 'snap', ph: w.phase, ct: r2(w.countT), tt: r2(w.t),
+    P: w.preds.map(p => [r1(p.ext), r2(p.open), p.st, r2(p.stun), p.stunKind, Math.round(p.meter), p.score, p.spec,
+      r2(p.items.mega), r2(p.items.magnet), r2(p.items.chili), r2(p.stinkOn), p.mouth.join(','), r2(p.gulpT), p.kind]),
+    Q: w.prey.map(q => [q.id, PREY_KEYS.indexOf(q.type), r1(q.x), r1(q.y), r1(q.vx), r1(q.vy), q.face, r2(q.hole), r2(q.frozen), r2(q.pop), r2(q.hopAir)]),
+    C: w.crates.map(c => [r1(c.x), r1(c.y), r2(c.fall), r2(c.life)]),
+    L: w.lures.map(l => [l.o, r1(l.x), r1(l.y), l.phase]),
+    F: w.forks.map(f => [f.o, r1(f.x), r1(f.y), f.phase, f.prey.join(',')]),
+    S: w.shocks.map(s => [s.o, r1(s.x), r1(s.y), r1(s.r)]),
+    G: w.gross ? [w.gross.s, w.gross.pred, w.gross.mood, w.gross.text, r2(w.gross.t)] : 0,
+    B: w.banner ? [w.banner.text, r2(w.banner.t)] : 0,
+    E: NET.evq.splice(0)
+  };
+  if (w.phase === 'over') { o.rk = w.ranking; o.T = w.preds.map(p => p.tally); }
+  return o;
+}
+
+/* ---------------- guest ---------------- */
+function joinRoom(code, onStatus, onLobby, onStart) {
+  if (peerMissing()) { onStatus('Online play needs PeerJS, which did not load. Check your connection and refresh.', true); return; }
+  code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 5) { onStatus('Room codes are 5 letters and numbers.', true); return; }
+  netClose();
+  setTimeout(() => {
+    NET.mode = 'guest';
+    onStatus('Calling room ' + code + '...');
+    const peer = new Peer();
+    NET.peer = peer;
+    peer.on('error', e => { onStatus(netErr(e), true); });
+    peer.on('open', () => {
+      const conn = peer.connect(ROOM(code), { reliable: true });
+      NET.conn = conn;
+      NET.joinTimer = setTimeout(() => { if (!NET.lastHeard) onStatus('No answer from room ' + code + '. Check the code and try again.', true); }, 12000);
+      conn.on('open', () => { onStatus('Connected. Waiting for the host...'); });
+      conn.on('data', d => {
+        NET.lastHeard = Date.now();
+        if (!d) return;
+        if (d.t === 'lobby') onLobby(d);
+        else if (d.t === 'start') onStart(d);
+        else if (d.t === 'snap') guestSnap(d);
+        else if (d.t === 'full') onStatus('That room is full (4 predators max).', true);
+        else if (d.t === 'busy') onStatus('That room is mid-game. Try again when the round ends.', true);
+        else if (d.t === 'bye') guestLost('The host closed the room.');
+      });
+      conn.on('close', () => guestLost('Lost the connection to the host.'));
+    });
+  }, 160);
+}
+function guestSendInput(ch, sp) {
+  if (NET.mode !== 'guest' || !NET.conn || !NET.conn.open) return;
+  if (ch !== NET.sentCh || sp) { NET.sentCh = ch; try { NET.conn.send({ t: 'in', ch, sp: !!sp }); } catch (e) { /* ignore */ } }
+}
+function guestPick(dir) { if (NET.conn && NET.conn.open) try { NET.conn.send({ t: 'pick', dir }); } catch (e) { /* ignore */ } }
+
+function guestSnap(d) {
+  const w = WORLD;
+  if (!w || !SESSION || SESSION.type !== 'guest') return;
+  w.phase = d.ph; w.countT = d.ct; w.t = d.tt;
+  d.P.forEach((a, i) => {
+    const p = w.preds[i]; if (!p) return;
+    p.tExt = a[0]; p.open = a[1]; p.st = a[2]; p.stun = a[3]; p.stunKind = a[4]; p.meter = a[5]; p.score = a[6]; p.spec = a[7];
+    p.items.mega = a[8]; p.items.magnet = a[9]; p.items.chili = a[10]; p.stinkOn = a[11];
+    p.mouth = a[12] ? a[12].split(',') : []; p.gulpT = a[13]; p.kind = a[14];
+    if (p.kind === 'cpu' && SESSION.labels[i] !== 'CPU' && i !== SESSION.me) SESSION.labels[i] = 'CPU';
+    if (p.ext === undefined) p.ext = p.tExt;
+  });
+  const old = new Map(w.prey.map(q => [q.id, q]));
+  w.prey = d.Q.map(a => {
+    let q = old.get(a[0]);
+    if (!q) q = { id: a[0], x: a[2], y: a[3], anim: rnd(5) };
+    q.type = PREY_KEYS[a[1]]; q.tx = a[2]; q.ty = a[3]; q.vx = a[4]; q.vy = a[5]; q.face = a[6];
+    q.hole = a[7]; q.frozen = a[8]; q.pop = a[9]; q.hopAir = a[10];
+    if (q.hole > 0 || Math.abs(q.x - q.tx) + Math.abs(q.y - q.ty) > 30) { q.x = q.tx; q.y = q.ty; }
+    return q;
+  });
+  w.crates = d.C.map(a => ({ x: a[0], y: a[1], fall: a[2], life: a[3] }));
+  w.lures = d.L.map(a => ({ o: a[0], x: a[1], y: a[2], phase: a[3] }));
+  w.forks = d.F.map(a => ({ o: a[0], x: a[1], y: a[2], phase: a[3], prey: a[4] ? a[4].split(',') : [] }));
+  w.shocks = d.S.map(a => ({ o: a[0], x: a[1], y: a[2], r: a[3] }));
+  w.gross = d.G ? { s: d.G[0], pred: d.G[1], mood: d.G[2], text: d.G[3], t: d.G[4] } : null;
+  w.banner = d.B ? { text: d.B[0], t: d.B[1] } : null;
+  if (d.rk) { w.ranking = d.rk; d.T.forEach((tl, i) => { if (w.preds[i]) w.preds[i].tally = tl; }); }
+  for (const e of d.E) fxEvent(e, w);
+}
+function guestSmooth(w, dt) {
+  const k = Math.min(1, dt * 18);
+  for (const q of w.prey) {
+    if (q.tx === undefined) continue;
+    q.x += (q.tx - q.x) * k; q.y += (q.ty - q.y) * k;
+    q.anim += dt * (2 + Math.hypot(q.vx, q.vy) * 0.16);
+    if (q.hopAir > 0) q.hopAir -= dt;
+  }
+  for (const p of w.preds) if (p.tExt !== undefined) p.ext += (p.tExt - p.ext) * Math.min(1, dt * 25);
+}
+/* heartbeats: guests ping every second; anyone silent for 7s is dropped */
+function netTick(dt) {
+  NET.pingT = (NET.pingT || 0) + dt;
+  if (NET.pingT < 1) return;
+  NET.pingT = 0;
+  const now = Date.now();
+  if (NET.mode === 'guest' && NET.conn && NET.conn.open) {
+    try { NET.conn.send({ t: 'ping' }); } catch (e) { /* ignore */ }
+    if (NET.lastHeard && now - NET.lastHeard > 8000) guestLost('The host stopped answering.');
+  }
+  if (NET.mode === 'host') {
+    if (!WORLD) hostSend({ t: 'ping' });
+    for (const id in NET.conns) if (now - NET.conns[id].last > 7000) hostDrop(NET.conns[id].conn);
+  }
+}
+addEventListener('beforeunload', () => { if (NET.mode !== 'off') netClose(); });
+function guestLost(msg) {
+  if (NET.mode !== 'guest') return;
+  netClose();
+  uiNetLost(msg);
+}
+/* =========================================================================
+   UI + MAIN LOOP
+   ========================================================================= */
+const $ = s => document.querySelector(s);
+const cv = $('#cv'), ctx = cv.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+useCtx(ctx);
+
+let WORLD = null, SESSION = null, ATTRACT = null, PAUSED = false, GUEST = null;
+const LOBBY = { mode: 'solo', n: 4, diff: 1, time: 90, seats: [] };
+const ARENA_BLURB = { 2: 'Cactus Gulch', 3: 'Barnyard Brawl', 4: 'Savanna Slop Bowl' };
+const DIFF_NAMES = ['Chump', 'Hungry', 'Feral'];
+const PARTY_KEYS = [
+  { ch: 'KeyZ', sp: 'KeyX', lab: 'Z / X' }, { ch: 'KeyQ', sp: 'KeyW', lab: 'Q / W' },
+  { ch: 'KeyO', sp: 'KeyP', lab: 'O / P' }, { ch: 'ArrowLeft', sp: 'ArrowRight', lab: 'Arrows' }
+];
+const SOLO_CH = ['Space', 'KeyZ', 'Enter', 'KeyJ'], SOLO_SP = ['KeyX', 'ShiftLeft', 'ShiftRight', 'KeyK'];
+const COARSE = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+
+/* ---------------- sizing ---------------- */
+function fit() {
+  let u = Math.min(innerWidth / 256, innerHeight / 240);
+  if (u >= 2) u = Math.floor(u);
+  document.documentElement.style.setProperty('--u', u + 'px');
+}
+addEventListener('resize', fit); fit();
+
+/* ---------------- screens ---------------- */
+let SCREEN = 'title';
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === 's-' + id));
+  SCREEN = id || '';
+  if (id) {
+    if (!COARSE) setTimeout(() => {
+      const f = document.querySelector('#s-' + id + ' [data-autofocus]:not(:disabled)') || document.querySelector('#s-' + id + ' .btn:not(:disabled)');
+      if (f && f.offsetParent !== null) f.focus({ preventScroll: true });
+    }, 0);
+  } else if (document.activeElement) document.activeElement.blur();
+}
+function focusables() { const s = document.querySelector('.screen.on'); return s ? [...s.querySelectorAll('button:not(:disabled), input')] : []; }
+function moveFocus(d) {
+  const f = focusables(); if (!f.length) return;
+  let i = f.indexOf(document.activeElement);
+  i = i < 0 ? 0 : (i + d + f.length) % f.length;
+  f[i].focus(); sfx('menu');
+}
+function goBack() {
+  sfx('back');
+  if (SCREEN === 'menu') show('title');
+  else if (SCREEN === 'setup') { if (LOBBY.mode === 'host' || LOBBY.mode === 'guest') netClose(); show('menu'); }
+  else if (SCREEN === 'join') { netClose(); show('menu'); }
+  else if (SCREEN === 'howto') show('menu');
+  else if (SCREEN === 'pause') resume();
+}
+
+/* ---------------- logo + faces ---------------- */
+(function buildLogo() {
+  const cols = ['var(--gum)', 'var(--bile)', 'var(--mus)', 'var(--pink)', 'var(--wht)'];
+  let k = 0;
+  $('#logo').innerHTML = ['HUNGRY', 'HOWLERS'].map(word => '<span class="ln">' + [...word].map(ch => {
+    const r = ((k * 37) % 11) - 5, y = ((k * 53) % 5) - 2, c = cols[(k * 3) % cols.length];
+    const cls = k % 5 === 2 ? 'tw' : k % 7 === 4 ? 'tw2' : '';
+    k++;
+    return `<span class="${cls}" style="color:${c};rotate:${r}deg;translate:0 calc(var(--u)*${y})">${ch}</span>`;
+  }).join('') + '</span>').join('');
+  $('#faces').innerHTML = PRED_KEYS.map(k => `<canvas class="pt" width="64" height="56" data-face="${k}"></canvas>`).join('');
+  document.querySelectorAll('#faces canvas').forEach(c => renderPortraitTo(c.getContext('2d'), c.dataset.face, 'idle', 0));
+})();
+let faceT = 0, faceOn = -1;
+function animFaces(dt, t) {
+  if (SCREEN !== 'title') return;
+  faceT -= dt;
+  const cs = document.querySelectorAll('#faces canvas');
+  if (faceT <= 0) { faceOn = faceOn >= 0 ? -1 : (Math.random() * 4) | 0; faceT = faceOn >= 0 ? 0.6 : rnd(1, 2.2); cs.forEach((c, i) => renderPortraitTo(c.getContext('2d'), c.dataset.face, 'idle', t)); }
+  if (faceOn >= 0) { const c = cs[faceOn]; renderPortraitTo(c.getContext('2d'), c.dataset.face, 'triple', t); }
+}
+
+/* ---------------- lobby / setup ---------------- */
+function lobbyReset(mode) {
+  LOBBY.mode = mode;
+  LOBBY.seats = PRED_KEYS.map((k, i) => {
+    let kind = 'cpu';
+    if (i === 0) kind = mode === 'host' ? 'host' : 'human';
+    else if (mode === 'party' && i === 1) kind = 'human';
+    else if (mode === 'host') kind = 'open';
+    return { kind, pred: k, label: i === 0 ? 'P1' : '' };
+  });
+  if (mode === 'party') LOBBY.n = Math.max(LOBBY.n, 2);
+}
+function lobbyNormalize() {
+  const used = new Set();
+  for (let i = 0; i < LOBBY.n; i++) {
+    const s = LOBBY.seats[i];
+    if (used.has(s.pred)) s.pred = PRED_KEYS.find(k => !used.has(k));
+    used.add(s.pred);
+  }
+}
+function lobbyFreeSeat() {
+  for (let i = 1; i < LOBBY.n; i++) if (LOBBY.seats[i].kind === 'open') return i;
+  if (LOBBY.n < 4) { LOBBY.n++; lobbyNormalize(); return LOBBY.seats[LOBBY.n - 1].kind === 'open' ? LOBBY.n - 1 : -1; }
+  return -1;
+}
+function lobbyFreePred(seat) {
+  const used = new Set(LOBBY.seats.filter((s, i) => i !== seat && i < LOBBY.n).map(s => s.pred));
+  return used.has(LOBBY.seats[seat].pred) ? PRED_KEYS.find(k => !used.has(k)) : LOBBY.seats[seat].pred;
+}
+function lobbyCycle(seat, dir) {
+  const s = LOBBY.seats[seat], cur = s.pred;
+  const next = PRED_KEYS[(PRED_KEYS.indexOf(cur) + dir + 4) % 4];
+  const other = LOBBY.seats.findIndex((o, j) => j !== seat && j < LOBBY.n && o.pred === next);
+  if (other >= 0) LOBBY.seats[other].pred = cur;
+  s.pred = next;
+}
+
+function openSetup(mode) {
+  lobbyReset(mode);
+  $('#su-code').textContent = '';
+  $('#su-status').textContent = ''; $('#su-status').classList.remove('err');
+  $('#su-title').textContent = mode === 'solo' ? 'Solo vs bots' : mode === 'party' ? 'Party on one screen' : 'Host online room';
+  show('setup');
+  if (mode === 'host') {
+    LOBBY.n = 2;
+    hostOpen((msg, err) => { const el = $('#su-status'); el.textContent = msg; el.classList.toggle('err', !!err); $('#su-code').textContent = NET.code || ''; });
+    $('#su-code').textContent = NET.code;
+  }
+  uiRefreshLobby();
+}
+function uiRefreshLobby() {
+  if (SCREEN !== 'setup') return;
+  const guest = LOBBY.mode === 'guest', L = guest ? GUEST : LOBBY;
+  if (!L) return;
+  const act = document.activeElement, key = act && act.dataset ? act.dataset.k : null;
+  const minN = guest ? 2 : Math.max(2, LOBBY.mode === 'host' ? LOBBY.seats.reduce((m, s, i) => (s.kind === 'remote' ? i + 1 : m), 2) : 2);
+  $('#su-n').innerHTML = [2, 3, 4].map(n => `<button class="btn sm ${L.n === n ? 'sel' : ''}" data-k="n${n}" data-n="${n}" ${guest || n < minN ? 'disabled' : ''}>${n}</button>`).join('');
+  $('#su-arena').textContent = ARENA_BLURB[L.n];
+  $('#su-diff').innerHTML = DIFF_NAMES.map((d, i) => `<button class="btn sm ${L.diff === i ? 'sel' : ''}" data-k="d${i}" data-diff="${i}" ${guest ? 'disabled' : ''}>${d}</button>`).join('');
+  $('#su-time').innerHTML = [60, 90, 120].map(t => `<button class="btn sm ${L.time === t ? 'sel' : ''}" data-k="t${t}" data-time="${t}" ${guest ? 'disabled' : ''}>${t}s</button>`).join('');
+  const seats = $('#seats');
+  seats.style.setProperty('--n', L.n);
+  let html = '';
+  for (let i = 0; i < L.n; i++) {
+    const s = L.seats[i], D = PREDS[s.pred];
+    const mine = guest ? i === GUEST.you : (LOBBY.mode === 'host' ? i === 0 : s.kind === 'human' || LOBBY.mode !== 'host');
+    const canPick = guest ? i === GUEST.you : (LOBBY.mode !== 'host' || i === 0);
+    let who = '', keys = '';
+    if (LOBBY.mode === 'solo') who = i === 0 ? 'You' : 'CPU';
+    else if (LOBBY.mode === 'party') { who = s.kind === 'human' ? 'Player ' + (i + 1) : 'CPU'; keys = s.kind === 'human' ? PARTY_KEYS[i].lab : ''; }
+    else {
+      const meIdx = guest ? GUEST.you : 0;
+      who = i === meIdx ? 'You' : s.kind === 'open' ? 'Open: CPU' : s.kind === 'cpu' ? 'CPU' : 'Player ' + (i + 1);
+    }
+    const whoBtn = LOBBY.mode === 'party' ? `<button class="btn sm who" data-k="w${i}" data-who="${i}">${who}</button>` : `<div class="btn sm who" style="cursor:default">${who}</div>`;
+    html += `<div class="seat ${(guest ? i === GUEST.you : LOBBY.mode !== 'party' && i === 0) ? 'me' : ''}" style="--c:${D.hud}">
+      <canvas class="pt" width="64" height="56" data-pt="${s.pred}"></canvas>
+      <div class="nm">${D.name}</div>
+      <div class="pickrow"><button class="btn" data-k="p${i}" data-pick="${i}" data-dir="-1" ${canPick ? '' : 'disabled'} aria-label="Previous predator">&lt;</button>
+      <span class="sp">${D.kind}</span>
+      <button class="btn" data-k="n${i}x" data-pick="${i}" data-dir="1" ${canPick ? '' : 'disabled'} aria-label="Next predator">&gt;</button></div>
+      <div class="sp">${D.special}</div>
+      ${whoBtn}<div class="keys">${keys}</div></div>`;
+    void mine;
+  }
+  seats.innerHTML = html;
+  seats.querySelectorAll('canvas[data-pt]').forEach(c => renderPortraitTo(c.getContext('2d'), c.dataset.pt, 'idle', 0));
+  const st = $('#su-start');
+  st.style.display = guest ? 'none' : '';
+  st.disabled = LOBBY.mode === 'party' && !LOBBY.seats.slice(0, LOBBY.n).some(s => s.kind === 'human');
+  if (guest && !$('#su-status').classList.contains('err')) $('#su-status').textContent = 'Waiting for the host to start...';
+  if (key) { const el = document.querySelector(`#s-setup [data-k="${key}"]`); if (el && !el.disabled) el.focus({ preventScroll: true }); }
+}
+$('#s-setup').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  auInit();
+  if (LOBBY.mode === 'guest') { if (b.dataset.pick !== undefined) { guestPick(+b.dataset.dir); sfx('menu'); } return; }
+  if (b.dataset.n) { LOBBY.n = +b.dataset.n; lobbyNormalize(); }
+  else if (b.dataset.diff) LOBBY.diff = +b.dataset.diff;
+  else if (b.dataset.time) LOBBY.time = +b.dataset.time;
+  else if (b.dataset.pick !== undefined) lobbyCycle(+b.dataset.pick, +b.dataset.dir);
+  else if (b.dataset.who !== undefined) { const s = LOBBY.seats[+b.dataset.who]; s.kind = s.kind === 'human' ? 'cpu' : 'human'; }
+  else return;
+  sfx('menu');
+  uiRefreshLobby();
+  if (LOBBY.mode === 'host') hostBroadcastLobby();
+});
+$('#su-back').onclick = goBack;
+$('#su-start').onclick = () => {
+  auInit();
+  if (LOBBY.mode === 'host') { hostStartGame(); return; }
+  lobbyNormalize();
+  const cfg = {
+    n: LOBBY.n, diff: LOBBY.diff, time: LOBBY.time,
+    seats: LOBBY.seats.slice(0, LOBBY.n).map((s, i) => ({ pred: s.pred, kind: s.kind === 'human' ? 'human' : 'cpu', label: 'P' + (i + 1) }))
+  };
+  startGame(LOBBY.mode, cfg, 0);
+};
+
+function hostStartGame() {
+  lobbyNormalize();
+  const cfg = {
+    n: LOBBY.n, diff: LOBBY.diff, time: LOBBY.time,
+    seats: LOBBY.seats.slice(0, LOBBY.n).map((s, i) => ({ pred: s.pred, kind: s.kind === 'host' ? 'human' : s.kind === 'remote' ? 'remote' : 'cpu', label: 'P' + (i + 1) }))
+  };
+  for (const id in NET.conns) { const c = NET.conns[id]; try { c.conn.send({ t: 'start', cfg, you: c.seat }); } catch (e) { /* ignore */ } }
+  startGame('host', cfg, 0);
+}
+
+/* guest lobby */
+function guestOnLobby(d) {
+  GUEST = d;
+  if (WORLD) { WORLD = null; SESSION = null; clearTouch(); }
+  if (SCREEN !== 'setup' || LOBBY.mode !== 'guest') {
+    LOBBY.mode = 'guest';
+    $('#su-title').textContent = 'Online room';
+    $('#su-code').textContent = $('#j-code').value.toUpperCase();
+    $('#su-status').textContent = ''; $('#su-status').classList.remove('err');
+    show('setup');
+  }
+  uiRefreshLobby();
+}
+function guestOnStart(d) { startGame('guest', d.cfg, d.you); }
+function uiNetLost(msg) {
+  WORLD = null; SESSION = null; clearTouch();
+  show('join');
+  const el = $('#j-status'); el.textContent = msg; el.classList.add('err');
+}
+
+/* ---------------- menus wiring ---------------- */
+function pressStart() { auInit(); musicStart(); show('menu'); sfx('go'); }
+$('#b-start').onclick = pressStart;
+$('#s-title').addEventListener('pointerdown', e => { if (e.target.id !== 'b-start') pressStart(); });
+document.querySelectorAll('#s-menu [data-go]').forEach(b => b.onclick = () => {
+  auInit(); sfx('menu');
+  const g2 = b.dataset.go;
+  if (g2 === 'solo' || g2 === 'party' || g2 === 'host') openSetup(g2);
+  else if (g2 === 'join') { $('#j-status').textContent = ''; $('#j-status').classList.remove('err'); show('join'); }
+  else if (g2 === 'howto') show('howto');
+});
+$('#b-sfx').onclick = () => { AU.sfx = !AU.sfx; $('#b-sfx').textContent = 'Sound: ' + (AU.sfx ? 'on' : 'off'); sfx('menu'); };
+$('#b-mus').onclick = () => { auInit(); musicStart(); AU.music = !AU.music; $('#b-mus').textContent = 'Music: ' + (AU.music ? 'on' : 'off'); sfx('menu'); };
+$('#h-back').onclick = goBack;
+$('#j-back').onclick = goBack;
+$('#j-go').onclick = () => {
+  auInit();
+  const el = $('#j-status'); el.classList.remove('err');
+  joinRoom($('#j-code').value, (m, err) => { el.textContent = m; el.classList.toggle('err', !!err); }, guestOnLobby, guestOnStart);
+};
+$('#j-code').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5); });
+$('#j-code').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#j-go').click(); } });
+$('#pa-resume').onclick = () => resume();
+$('#pa-quit').onclick = () => quitToMenu();
+
+function quitToMenu() {
+  if (SESSION && (SESSION.type === 'host' || SESSION.type === 'guest')) netClose();
+  WORLD = null; SESSION = null; PAUSED = false; clearTouch(); fxReset();
+  show('menu');
+}
+function pauseGame() {
+  if (!WORLD || SCREEN === 'results') return;
+  const online = SESSION.type === 'host' || SESSION.type === 'guest';
+  PAUSED = !online;
+  KEYS.clear(); MOUSE.l = false; TOUCH.forEach(t => { t.ch = false; });
+  if (SESSION.type === 'host' || SESSION.type === 'solo') WORLD.preds[SESSION.me].inp.ch = false;
+  if (SESSION.type === 'party') WORLD.preds.forEach(p => { if (p.kind === 'human') p.inp.ch = false; });
+  if (SESSION.type === 'guest') guestSendInput(false, false);
+  $('#pa-title').textContent = online ? 'Menu (the game keeps going)' : 'Paused';
+  show('pause');
+}
+function resume() { PAUSED = false; show(null); }
+
+/* ---------------- start a match ---------------- */
+function startGame(type, cfg, me) {
+  const labels = cfg.seats.map((s, i) => {
+    if (type === 'solo') return s.kind === 'human' ? 'YOU' : 'CPU';
+    if (type === 'party') return s.kind === 'human' ? 'P' + (i + 1) : 'CPU';
+    return i === me ? 'YOU' : s.kind === 'cpu' ? 'CPU' : s.label;
+  });
+  SESSION = { type, cfg, me, labels, shown: false, overT: 0 };
+  WORLD = makeWorld(cfg);
+  if (type === 'guest') { WORLD.prey = []; WORLD.guest = true; }
+  fxReset(); PAUSED = false; NET.evq = []; NET.sentCh = false;
+  show(null);
+  setupTouch();
+}
+
+/* ---------------- results ---------------- */
+function showResults() {
+  const w = WORLD, rk = w.ranking || w.preds.map(p => p.seat);
+  const top = w.preds[rk[0]];
+  const tie = rk.length > 1 && w.preds[rk[1]].score === top.score;
+  $('#r-title').textContent = tie ? "It's a tie!" : shortName(top.pred) + ' ate the most!';
+  const lab = SESSION.labels[top.seat];
+  $('#r-sub').textContent = tie ? 'Nobody leaves hungry. Everybody leaves gross.' : (lab === 'YOU' ? 'That was you. Disgusting. Well done.' : (lab === 'CPU' ? 'The bot wins this one.' : lab + ' wins the buffet.'));
+  let place = 0, last = null;
+  $('#r-list').innerHTML = rk.map((s, i) => {
+    const p = w.preds[s], D = PREDS[p.pred];
+    if (p.score !== last) { place = i + 1; last = p.score; }
+    const fav = Object.entries(p.tally || {}).filter(([k]) => !PREY[k].bad).sort((a, b) => b[1] - a[1])[0];
+    const yuck = (p.tally && ((p.tally.skunk || 0) + (p.tally.porcupine || 0))) || 0;
+    const sub = (fav ? 'Mostly ' + PREY[fav[0]].name.toLowerCase() + (fav[1] > 1 ? 's' : '') + ' (' + fav[1] + ')' : 'Ate nothing') + (yuck ? ', ' + yuck + ' gross one' + (yuck > 1 ? 's' : '') : '');
+    return `<div class="rrow ${place === 1 ? 'win' : ''}"><span class="rk">${place}</span><canvas class="pt" width="64" height="56" data-pt="${p.pred}"></canvas>
+      <span class="rn" style="color:${place === 1 ? 'var(--ink)' : D.hud}">${D.name} <span style="color:inherit">(${SESSION.labels[s]})</span><small>${sub}</small></span><span class="rs">${p.score}</span></div>`;
+  }).join('');
+  document.querySelectorAll('#r-list canvas[data-pt]').forEach(c => renderPortraitTo(c.getContext('2d'), c.dataset.pt, 'idle', 0));
+  const b = $('#r-btns'), t = SESSION.type;
+  $('#r-status').textContent = t === 'guest' ? 'Waiting for the host to pick what happens next...' : '';
+  b.innerHTML = (t === 'host' ? '<button class="btn sm" id="r-lobby">Back to lobby</button>' : '') +
+    `<button class="btn sm" id="r-menu">${t === 'guest' ? 'Leave room' : 'Main menu'}</button>` +
+    (t !== 'guest' ? '<button class="btn go" id="r-again">Rematch</button>' : '');
+  $('#r-menu').onclick = quitToMenu;
+  if ($('#r-again')) $('#r-again').onclick = () => { if (t === 'host') hostStartGame(); else startGame(t, SESSION.cfg, 0); };
+  if ($('#r-lobby')) $('#r-lobby').onclick = () => { WORLD = null; SESSION = null; clearTouch(); show('setup'); uiRefreshLobby(); hostBroadcastLobby(); };
+  clearTouch();
+  show('results');
+}
+
+/* ---------------- input ---------------- */
+const KEYS = new Set(), SPQ = new Set();
+const MOUSE = { l: false, rq: false };
+const TOUCH = [0, 1, 2, 3].map(() => ({ ch: false, sp: false }));
+const GAME_CODES = new Set([...SOLO_CH, ...SOLO_SP, ...PARTY_KEYS.flatMap(k => [k.ch, k.sp])]);
+addEventListener('keydown', e => {
+  auInit();
+  if (WORLD && !SCREEN) {
+    if (e.code === 'Escape') { pauseGame(); e.preventDefault(); return; }
+    if (GAME_CODES.has(e.code)) e.preventDefault();
+    KEYS.add(e.code); if (!e.repeat) SPQ.add(e.code);
+    return;
+  }
+  if (SCREEN === 'title') { if (!e.repeat) { e.preventDefault(); pressStart(); } return; }
+  const inInput = document.activeElement && document.activeElement.tagName === 'INPUT';
+  if (e.key === 'Escape') { e.preventDefault(); goBack(); return; }
+  if (e.key === 'ArrowDown' || (e.key === 'ArrowRight' && !inInput)) { e.preventDefault(); moveFocus(1); }
+  else if (e.key === 'ArrowUp' || (e.key === 'ArrowLeft' && !inInput)) { e.preventDefault(); moveFocus(-1); }
+});
+addEventListener('keyup', e => { KEYS.delete(e.code); });
+addEventListener('blur', () => { KEYS.clear(); MOUSE.l = false; TOUCH.forEach(t => { t.ch = false; }); });
+cv.addEventListener('pointerdown', e => { if (!WORLD || SCREEN || e.pointerType === 'touch') return; auInit(); if (e.button === 0) MOUSE.l = true; else if (e.button === 2) MOUSE.rq = true; });
+addEventListener('pointerup', e => { if (e.button === 0) MOUSE.l = false; });
+cv.addEventListener('contextmenu', e => e.preventDefault());
+
+const PADPREV = {};
+function readPads() {
+  const out = [];
+  const pads = (navigator.getGamepads && navigator.getGamepads()) || [];
+  for (const p of pads) {
+    if (!p || !p.connected) continue;
+    const prev = PADPREV[p.index] || {};
+    const b = i => !!(p.buttons[i] && p.buttons[i].pressed);
+    const cur = { a: b(0), s: b(1) || b(2) || b(3) || b(5), up: b(12) || p.axes[1] < -0.6, dn: b(13) || p.axes[1] > 0.6, st: b(9), bk: b(1) };
+    out.push({ a: cur.a, sp: cur.s && !prev.s, up: cur.up && !prev.up, dn: cur.dn && !prev.dn, aE: cur.a && !prev.a, st: cur.st && !prev.st, bk: cur.bk && !prev.bk });
+    PADPREV[p.index] = cur;
+  }
+  return out;
+}
+function readSolo(pads) {
+  let ch = SOLO_CH.some(k => KEYS.has(k)) || MOUSE.l || TOUCH[0].ch;
+  let sp = SOLO_SP.some(k => SPQ.has(k)) || MOUSE.rq || TOUCH[0].sp;
+  for (const p of pads) { ch = ch || p.a; sp = sp || p.sp; }
+  return { ch, sp };
+}
+function applyInputs(pads) {
+  const w = WORLD, S = SESSION;
+  if (S.type === 'solo' || S.type === 'host') {
+    const p = w.preds[S.me], r = readSolo(pads);
+    p.inp.ch = r.ch; if (r.sp) p.inp.sp = true;
+  } else if (S.type === 'party') {
+    let j = 0;
+    w.preds.forEach((p, i) => {
+      if (p.kind !== 'human') return;
+      const k = PARTY_KEYS[i], pad = pads[j++];
+      p.inp.ch = KEYS.has(k.ch) || TOUCH[i].ch || !!(pad && pad.a);
+      if (SPQ.has(k.sp) || TOUCH[i].sp || (pad && pad.sp)) p.inp.sp = true;
+    });
+  } else if (S.type === 'guest') {
+    const r = readSolo(pads);
+    guestSendInput(r.ch, r.sp);
+  }
+  SPQ.clear(); MOUSE.rq = false; TOUCH.forEach(t => { t.sp = false; });
+}
+function menuPads(pads) {
+  for (const p of pads) {
+    if (SCREEN === 'title' && (p.aE || p.st)) { pressStart(); return; }
+    if (p.dn) moveFocus(1);
+    if (p.up) moveFocus(-1);
+    if (p.aE && document.activeElement && document.activeElement.click) document.activeElement.click();
+    if (p.bk) goBack();
+    if (p.st && WORLD && SCREEN === 'pause') resume();
+  }
+}
+
+/* ---------------- touch buttons ---------------- */
+function clearTouch() { $('#touch').innerHTML = ''; TOUCH.forEach(t => { t.ch = false; t.sp = false; }); }
+function touchBtn(cls, label, seat, style, rot) {
+  const b = document.createElement('button');
+  b.className = 'tb ' + cls; b.textContent = label;
+  Object.assign(b.style, style);
+  if (rot) b.style.rotate = rot + 'deg';
+  const down = e => { e.preventDefault(); auInit(); b.classList.add('down'); if (cls === 'ch') TOUCH[seat].ch = true; else if (cls === 'sp') TOUCH[seat].sp = true; else pauseGame(); try { b.setPointerCapture(e.pointerId); } catch (x) { /* ignore */ } };
+  const up = e => { e.preventDefault(); b.classList.remove('down'); if (cls === 'ch') TOUCH[seat].ch = false; };
+  b.addEventListener('pointerdown', down);
+  b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up);
+  $('#touch').appendChild(b);
+}
+function setupTouch() {
+  clearTouch();
+  if (!COARSE || !WORLD) return;
+  const S = SESSION;
+  touchBtn('pause', 'II', 0, {});
+  if (S.type !== 'party') {
+    touchBtn('ch', 'CHOMP', 0, { right: '3%', bottom: '17%' });
+    touchBtn('sp', 'SPECIAL', 0, { left: '3%', bottom: '17%' });
+    return;
+  }
+  WORLD.preds.forEach((p, i) => {
+    if (p.kind !== 'human') return;
+    const pos = {
+      B: [{ left: '58%', bottom: '1%' }, { left: '27%', bottom: '2%' }, 0],
+      T: [{ left: '30%', top: '1%' }, { left: '62%', top: '2%' }, 180],
+      L: [{ left: '1%', top: '60%' }, { left: '2%', top: '28%' }, 90],
+      R: [{ right: '1%', top: '28%' }, { right: '2%', top: '62%' }, -90]
+    }[p.side];
+    touchBtn('ch', 'CHOMP', i, pos[0], pos[2]);
+    touchBtn('sp', 'SPECIAL', i, pos[1], pos[2]);
+  });
+}
+
+/* ---------------- main loop ---------------- */
+function newAttract() {
+  ATTRACT = makeWorld({ n: 4, diff: 2, time: 9999, seats: PRED_KEYS.map(k => ({ pred: k, kind: 'cpu' })) });
+  ATTRACT.countT = 0.01;
+}
+newAttract();
+let last = performance.now(), acc = 0, T = 0;
+const STEP = 1 / 60;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now; T += dt;
+  const pads = readPads();
+  if (NET.mode !== 'off') netTick(dt);
+  if (WORLD && SESSION) {
+    if (!SCREEN || SCREEN === 'pause' || SCREEN === 'results') {
+      if (!SCREEN) applyInputs(pads); else { SPQ.clear(); menuPads(pads); }
+    }
+    if (SESSION.type === 'guest') {
+      guestSmooth(WORLD, dt);
+    } else if (!PAUSED) {
+      acc += dt;
+      let n = 0;
+      while (acc >= STEP && n < 5) {
+        stepWorld(WORLD, STEP);
+        for (const e of WORLD.ev) { fxEvent(e, WORLD); if (SESSION.type === 'host') NET.evq.push(e); }
+        WORLD.ev.length = 0;
+        if (NET.evq.length > 80) NET.evq.splice(0, NET.evq.length - 80);
+        acc -= STEP; n++;
+      }
+      if (n >= 5) acc = 0;
+      if (SESSION.type === 'host') {
+        NET.snapT += dt;
+        if (NET.snapT >= (WORLD.phase === 'over' ? 0.25 : 0.05)) { NET.snapT = 0; hostSend(packWorld(WORLD)); }
+      }
+    }
+    if (!PAUSED) fxStep(dt);
+    renderWorld(WORLD, T, SESSION.me, SESSION.labels);
+    if (WORLD.phase === 'over' && !SESSION.shown) { SESSION.overT += dt; if (SESSION.overT > 0.6) { SESSION.shown = true; showResults(); } }
+    if (SCREEN === 'results') { const c = $('#r-face'); const top = WORLD.preds[(WORLD.ranking || [0])[0]]; if (c && top) renderPortraitTo(c.getContext('2d'), top.pred, 'triple', T); }
+  } else {
+    menuPads(pads);
+    acc += dt;
+    let n = 0;
+    while (acc >= STEP && n < 5) { stepWorld(ATTRACT, STEP); for (const e of ATTRACT.ev) fxEvent(e, ATTRACT, true); ATTRACT.ev.length = 0; acc -= STEP; n++; }
+    if (n >= 5) acc = 0;
+    if (ATTRACT.gross) ATTRACT.gross = null;
+    fxStep(dt);
+    renderWorld(ATTRACT, T, -1, null);
+    animFaces(dt, T);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
