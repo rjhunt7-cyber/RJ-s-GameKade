@@ -377,6 +377,23 @@
       ]
     },
     {
+      "id": "rjs-8-bit-hungry-howlers",
+      "title": "RJs 8 Bit Hungry Howlers",
+      "path": "games/rjs-8-bit-hungry-howlers.html",
+      "kind": "file",
+      "added": "2026-11-06T19:10:26.276Z",
+      "players": "multi",
+      "categories": [
+        "puzzles",
+        "pvp",
+        "arcade",
+        "party",
+        "classic",
+        "multi"
+      ],
+      "thumbnail": "games/rjs-8-bit-hungry-howlers.jpg?v=mw5cngu0"
+    },
+    {
       "id": "rjs-8-bit-worm",
       "title": "Rjs 8 Bit Worm",
       "path": "games/rjs-8-bit-worm.html",
@@ -480,6 +497,6 @@
       ]
     }
   ],
-  "count": 33,
-  "updated": "2026-11-05T20:26:22.350Z"
+  "count": 34,
+  "updated": "2026-11-06T19:10:26.277Z"
 }
