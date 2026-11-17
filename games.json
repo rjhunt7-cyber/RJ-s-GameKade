@@ -198,7 +198,8 @@
         "shooter",
         "arcade",
         "1p"
-      ]
+      ],
+      "description": "Grave Rush is the first ever game added to the gamekade. it is a simple arcade game where you try to survive as many rounds of zombie waves as you can, throughout the rounds you can upgrade weapons, pick up new weapons, use perks and every round you must refill your ammo, but be careful with your shots, you get enough ammo to kill as many zombies that spawn, no more, no less."
     },
     {
       "id": "grave-rush-3d",
@@ -510,5 +511,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:33:43.109Z"
+  "updated": "2026-11-17T19:35:42.366Z"
 }
