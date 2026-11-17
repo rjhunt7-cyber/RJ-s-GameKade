@@ -291,7 +291,8 @@
         "puzzles",
         "arcade",
         "multi"
-      ]
+      ],
+      "description": "Monolith Dominion is a civilization game where you and other civilizations live side by side developing farm land, and your economy for resources to use for raising armies and preparing your people for defending the civilization you have created. if you have a stale mate with another civilization you can create a building to end the game in 15 minutes."
     },
     {
       "id": "monsters-vs-androids",
@@ -516,5 +517,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:46:19.664Z"
+  "updated": "2026-11-17T19:49:28.213Z"
 }
