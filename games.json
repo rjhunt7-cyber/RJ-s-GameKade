@@ -434,7 +434,8 @@
         "classic",
         "multi"
       ],
-      "thumbnail": "games/rjs-8-bit-worm.jpg?v=mvv2r21a"
+      "thumbnail": "games/rjs-8-bit-worm.jpg?v=mvv2r21a",
+      "description": "snake. if you have played snake or games like it. then you have played worm. accept our take is multiplayer and has a few surprises."
     },
     {
       "id": "rjs-bot-cage-combat",
@@ -525,5 +526,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:10:54.314Z"
+  "updated": "2026-11-17T20:12:06.286Z"
 }
