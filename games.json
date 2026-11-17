@@ -232,7 +232,8 @@
         "arcade",
         "1p"
       ],
-      "thumbnail": "games/hit-man-pie.jpg?v=mvu02qiy"
+      "thumbnail": "games/hit-man-pie.jpg?v=mvu02qiy",
+      "description": "In Hit Man Pie, you play as Rocco the raccoon, your a hit man hired by RJ the squirl, each round you are given a list of the people to hit with your pie gun, you must aim in and move around the building tops for the best most clear shot, but hit the wrong person shame on you, hit enough you'll end up in the slammer."
     },
     {
       "id": "keystone-drift",
@@ -512,5 +513,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:36:34.879Z"
+  "updated": "2026-11-17T19:39:40.041Z"
 }
