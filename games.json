@@ -482,7 +482,8 @@
         "sidescroller",
         "arcade",
         "1p"
-      ]
+      ],
+      "description": "RJ's nutty adventure is a classic side scroller action packed game where we focus on the gamekades mascot RJ the squirrel, in this game your stomping on enemies jumping on platforms and making your way to the goal of each level, in each world their is a boss to fight and at the end, the EVIL AJ the rottweiler."
     },
     {
       "id": "rowdy-links",
@@ -528,5 +529,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:16:07.430Z"
+  "updated": "2026-11-17T20:18:00.326Z"
 }
