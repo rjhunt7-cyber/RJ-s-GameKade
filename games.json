@@ -352,7 +352,8 @@
         "arcade",
         "classic",
         "2p"
-      ]
+      ],
+      "description": "this is a game of connect four where you play against friends or bots to try and connect 4 pieces of your color the fastest."
     },
     {
       "id": "rj-s-8bit-tic-tac-toe",
@@ -520,5 +521,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:57:00.856Z"
+  "updated": "2026-11-17T20:00:52.328Z"
 }
