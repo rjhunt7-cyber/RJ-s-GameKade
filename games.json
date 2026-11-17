@@ -167,7 +167,8 @@
       "categories": [
         "fps",
         "multi"
-      ]
+      ],
+      "description": "Dead scope is a part of the dead series, it is the first game in this series and features all kinds of maps with snipers only!! if you wanna work on your scoping without the hassle of other guns, jump in and see who is the best marksman between you and your friends. if you have no friends, their are also bots!"
     },
     {
       "id": "ghost-road",
@@ -508,5 +509,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:30:01.318Z"
+  "updated": "2026-11-17T19:32:05.089Z"
 }
