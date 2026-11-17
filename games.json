@@ -137,7 +137,8 @@
         "puzzles",
         "arcade",
         "2p"
-      ]
+      ],
+      "description": "Cob and Dune is a co op game meant for 2 friends to progress through series of levels that require team work, problem solving, and a cool temper. You and your friend make it throughout the levels by using your characters unique trait, cob is a clay monster and dune is a sand monster."
     },
     {
       "id": "dead-chamber",
@@ -506,5 +507,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:23:04.797Z"
+  "updated": "2026-11-17T19:25:28.116Z"
 }
