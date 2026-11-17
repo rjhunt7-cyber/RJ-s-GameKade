@@ -13,7 +13,8 @@
         "pvp",
         "classic",
         "2p"
-      ]
+      ],
+      "description": "8 bit chess is your everyday online chess game made in the 8 bit art-style. play against your friends or bots and enjoy your favorite game anytime you have access to a browser. multiplayer with friends works via local hosting and joining your friends hosted game with a room code."
     },
     {
       "id": "8-bit-tag",
@@ -498,5 +499,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-06T19:10:26.277Z"
+  "updated": "2026-11-17T19:07:05.321Z"
 }
