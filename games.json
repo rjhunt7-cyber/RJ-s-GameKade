@@ -182,7 +182,8 @@
         "puzzles",
         "horror",
         "multi"
-      ]
+      ],
+      "description": "Ghost road is a horror game that you can play with your friends and reach quotas together for your museum. in this game, the player is a ghost hunter who rides around in a black muscle car that rides from town to town busting ghosts, each of these towns has haunted relics to collect and bring back to the museum."
     },
     {
       "id": "grave-rush",
@@ -509,5 +510,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:32:05.089Z"
+  "updated": "2026-11-17T19:33:43.109Z"
 }
