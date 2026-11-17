@@ -28,7 +28,8 @@
         "arcade",
         "party",
         "multi"
-      ]
+      ],
+      "description": "tag is a universal childhood game and 8 bit tag aims to capture that experience in a 2d arcade style game with your friends. you can play with a large party of friends, every round is 2 minutes and their is 10 rounds in a game. If you are tagged than you are it! and if your it when the timer runs out, you lost the round."
     },
     {
       "id": "a-pets-9-to-5",
@@ -499,5 +500,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:10:35.471Z"
+  "updated": "2026-11-17T19:10:51.778Z"
 }
