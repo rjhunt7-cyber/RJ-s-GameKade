@@ -320,7 +320,8 @@
       "categories": [
         "arcade",
         "multi"
-      ]
+      ],
+      "description": "Pantheon clash is a brawling game where you and your friends can play in giant party lobby's or against bots, or even a normal 1v1. the characters are a collection from various mythological religions across the world. you can play as Sun Wukong using his staff to take on Ares and his war axe!!!"
     },
     {
       "id": "rj-s-8-bit-pool",
@@ -518,5 +519,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:52:45.029Z"
+  "updated": "2026-11-17T19:55:59.330Z"
 }
