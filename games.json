@@ -90,7 +90,8 @@
         "sidescroller",
         "arcade",
         "2p"
-      ]
+      ],
+      "description": "Ballistic is a \"beat em up\" side-scroller that stays faithful to the classic arcade style. You play either solo or with a duo and try to progress by using various weapons and your fists against waves of enemies from every corner from the street life, follow along with the story and see how far you can make it."
     },
     {
       "id": "belfry-bat",
@@ -503,5 +504,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:15:42.875Z"
+  "updated": "2026-11-17T19:18:33.911Z"
 }
