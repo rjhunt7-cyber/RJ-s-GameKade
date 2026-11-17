@@ -106,7 +106,8 @@
         "classic",
         "1p"
       ],
-      "thumbnail": "games/belfry-bat.jpg?v=mvv2yhkm"
+      "thumbnail": "games/belfry-bat.jpg?v=mvv2yhkm",
+      "description": "Belfry Bat is a stamina based game where the player must keep the bat in the middle of the screen, the bat will constantly fall and if it falls to far before hitting space and flapping upward then it shall hit an obstacle or the ground. the game keeps a score of how far you make it each time, always try to beat your personal best!"
     },
     {
       "id": "block-party",
@@ -504,5 +505,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:18:33.911Z"
+  "updated": "2026-11-17T19:21:13.076Z"
 }
