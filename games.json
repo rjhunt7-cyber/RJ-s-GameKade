@@ -336,7 +336,8 @@
         "classic",
         "2p"
       ],
-      "thumbnail": "games/rj-s-8-bit-pool.jpg?v=mvtyqvyp"
+      "thumbnail": "games/rj-s-8-bit-pool.jpg?v=mvtyqvyp",
+      "description": "This is a standard port of pool made in the 8 bit style, play against your friends or bots and relax with some good old fashioned pool."
     },
     {
       "id": "rj-s-8bit-4-in-a-row",
@@ -519,5 +520,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:55:59.330Z"
+  "updated": "2026-11-17T19:57:00.856Z"
 }
