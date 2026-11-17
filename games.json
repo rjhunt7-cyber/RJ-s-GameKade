@@ -122,7 +122,8 @@
         "arcade",
         "party",
         "multi"
-      ]
+      ],
+      "description": "Block party is a party game meant for a bunch of friends to hop on and avoid getting squashed by blocks from the sky, the blocks fall down and stack and the round ends when you reach the top, their are all kinds of little weapons around the map that spawn routinely that you can use against other players to keep everyone on their toes!!"
     },
     {
       "id": "cob-and-dune",
@@ -505,5 +506,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:21:13.076Z"
+  "updated": "2026-11-17T19:23:04.797Z"
 }
