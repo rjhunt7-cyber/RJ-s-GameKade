@@ -153,7 +153,8 @@
         "pvp",
         "multi"
       ],
-      "thumbnail": "games/dead-chamber.jpg?v=mvwmuqjl"
+      "thumbnail": "games/dead-chamber.jpg?v=mvwmuqjl",
+      "description": "Dead chamber is a part of the Dead series, it is a gun game that you can play with either friends or bots. you run around all kinds of maps available and select any gun out of shot guns, smgs, rifles and AR's not to mention of course snipers, whichever one you pick doesn't matter, all that matters is how good you are at using them to get the highest score on the score board. if you get bored their is also a campaign that you can play alone or with a friend also via room code."
     },
     {
       "id": "dead-scope",
@@ -507,5 +508,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:25:28.116Z"
+  "updated": "2026-11-17T19:30:01.318Z"
 }
