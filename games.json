@@ -306,7 +306,8 @@
         "puzzles",
         "arcade",
         "1p"
-      ]
+      ],
+      "description": "Monsters vs Androids is a mobile or computer game where you must use your monster characters to defend your selected map from androids, the androids come in waves and each monster has a different power to help defend yourself from letting the androids through. The androids themselves has their own abilities that will be an issue unless the player is capable to adapt. make sure to watch out for the boss androids."
     },
     {
       "id": "pantheon-clash",
@@ -517,5 +518,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:49:28.213Z"
+  "updated": "2026-11-17T19:52:45.029Z"
 }
