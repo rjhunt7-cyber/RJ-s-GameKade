@@ -417,7 +417,8 @@
         "classic",
         "multi"
       ],
-      "thumbnail": "games/rjs-8-bit-hungry-howlers.jpg?v=mw5cngu0"
+      "thumbnail": "games/rjs-8-bit-hungry-howlers.jpg?v=mw5cngu0",
+      "description": "in this game you are a predator that needs fed!! use your special moves to lure prey to your mouth and gobble them up!! play as the fox or wolf, or you can play as the hygiene or the cayote, each animal has a different ability tailored to their personality."
     },
     {
       "id": "rjs-8-bit-worm",
@@ -524,5 +525,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:08:18.587Z"
+  "updated": "2026-11-17T20:10:54.314Z"
 }
