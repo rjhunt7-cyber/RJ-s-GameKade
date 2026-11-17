@@ -60,7 +60,8 @@
         "arcade",
         "classic",
         "multi"
-      ]
+      ],
+      "description": "Aces arcade is a series of card games digitally translated to a 8 bit style where you can play your poker or solitaire among other famous game."
     },
     {
       "id": "ball-parkour",
@@ -501,5 +502,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:12:42.070Z"
+  "updated": "2026-11-17T19:13:37.024Z"
 }
