@@ -276,7 +276,8 @@
         "pvp",
         "arcade",
         "2p"
-      ]
+      ],
+      "description": "meme fighter is a collection of all your favorite brain rot memes thrown into a giant combat tournament, select anyone in the selection screen and give all those characters a good brawl. learn combos and special moves to finish them off once you have drained their health bar to zero."
     },
     {
       "id": "monolith-dominion",
@@ -515,5 +516,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:43:26.314Z"
+  "updated": "2026-11-17T19:46:19.664Z"
 }
