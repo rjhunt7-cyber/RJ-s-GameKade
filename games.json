@@ -75,7 +75,8 @@
         "puzzles",
         "sports",
         "1p"
-      ]
+      ],
+      "description": "Ball parkour is a game based on players stamina, you control a ball and try not to fall off the edge as it gets faster and more obstacles appear in your path. try to make it as long as you can and the top of the screen will record how far you go, always try to beat your own personal best!!!"
     },
     {
       "id": "ballistic",
@@ -502,5 +503,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:13:37.024Z"
+  "updated": "2026-11-17T19:15:42.875Z"
 }
