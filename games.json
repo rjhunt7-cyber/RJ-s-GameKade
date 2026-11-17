@@ -399,7 +399,8 @@
         "racing",
         "arcade",
         "multi"
-      ]
+      ],
+      "description": "classic racing game where you and a bunch of cpu's duke it out on the race track, you can invite friends and play in cup tournaments. race together and get 3 laps as quick as possible, use your toon boost and power ups to gain the lead and prove victorious."
     },
     {
       "id": "rjs-8-bit-hungry-howlers",
@@ -523,5 +524,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:05:55.721Z"
+  "updated": "2026-11-17T20:08:18.587Z"
 }
