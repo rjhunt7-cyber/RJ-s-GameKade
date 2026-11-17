@@ -451,7 +451,8 @@
         "party",
         "multi"
       ],
-      "thumbnail": "games/rjs-bot-cage-combat.jpg?v=mw3zx9u3"
+      "thumbnail": "games/rjs-bot-cage-combat.jpg?v=mw3zx9u3",
+      "description": "Bot Cage Combat is a game where you get to live the life of a bot fighter, customize your robot to compete against other robots, select different weapons and defense tools for the best resulting robot for the competition, each part you add effects your stats in different ways so choose wisely, then get into the cage and fight!!!"
     },
     {
       "id": "rjs-frozen-kitchen",
@@ -526,5 +527,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:12:06.286Z"
+  "updated": "2026-11-17T20:13:56.461Z"
 }
