@@ -466,7 +466,8 @@
         "puzzles",
         "arcade",
         "1p"
-      ]
+      ],
+      "description": "RJ's Frozen kitchen is a restaurant game where you take orders and put together different frozen treats for customers!! make milkshakes and ice creme and slushies, every frozen treat out their for any kind of customer, we dont discriminate! every one is welcome to get some of RJ's frozen treats. personally RJ likes the nut toppings."
     },
     {
       "id": "rjs-nutty-adventure",
@@ -527,5 +528,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:13:56.461Z"
+  "updated": "2026-11-17T20:16:07.430Z"
 }
