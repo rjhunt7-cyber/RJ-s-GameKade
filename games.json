@@ -513,7 +513,8 @@
         "sidescroller",
         "arcade",
         "1p"
-      ]
+      ],
+      "description": "Sparrows ward is a adventure game with that classic arcade style, you go around as a knight whos pesent girlfriend has been captured. sparrow finds a series of weapons, uses his combat skills and goes on a quest to bring his love back to where she belongs, but their is an evil villain at the center of it all....."
     },
     {
       "id": "toad-room-server",
@@ -530,5 +531,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:20:24.520Z"
+  "updated": "2026-11-17T20:24:07.290Z"
 }
