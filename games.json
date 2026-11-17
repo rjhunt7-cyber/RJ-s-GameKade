@@ -368,7 +368,8 @@
         "arcade",
         "classic",
         "2p"
-      ]
+      ],
+      "description": "your favorite tic tac toe port translated to the 8 bit style. play against friends or bots and use your brain to out smart them in tic tac toe"
     },
     {
       "id": "rj-s-ping-pong",
@@ -521,5 +522,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:00:52.328Z"
+  "updated": "2026-11-17T20:03:35.720Z"
 }
