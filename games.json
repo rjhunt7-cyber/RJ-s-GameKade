@@ -384,7 +384,8 @@
         "arcade",
         "classic",
         "2p"
-      ]
+      ],
+      "description": "classic game of ping pong on a 2d screen where you hit a white square back and fort and defend your side. their are a bunch of others games added that are worth a try aswell."
     },
     {
       "id": "rj-s-rubber-hose-rally",
@@ -522,5 +523,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:03:35.720Z"
+  "updated": "2026-11-17T20:05:55.721Z"
 }
