@@ -44,7 +44,8 @@
         "party",
         "1p"
       ],
-      "thumbnail": "games/a-pets-9-to-5.jpg?v=mvv8fb6j"
+      "thumbnail": "games/a-pets-9-to-5.jpg?v=mvv8fb6j",
+      "description": "A pets 9 to 5 is a collection of mini games that emulate what different animals jobs are at a farm house, you have the options to play as a dog, cat, snake, bunny, owl or parrot each with their own chores and tasks. this game is a great way to pass time and see how high your score can get!!!"
     },
     {
       "id": "aces-arcade",
@@ -500,5 +501,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:10:51.778Z"
+  "updated": "2026-11-17T19:12:42.070Z"
 }
