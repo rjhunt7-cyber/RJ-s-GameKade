@@ -261,7 +261,8 @@
         "puzzles",
         "horror",
         "1p"
-      ]
+      ],
+      "description": "Knightmares is a solo horror game where you play as a knight who must uncover the mystery of what has happened in the kingdom, you go around collecting books with keys you are given at the start of each round. Each key acts as a compass after holding it for a certain amount of time, but every second you hold the key it calls Them....."
     },
     {
       "id": "meme-fighter",
@@ -514,5 +515,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T19:41:46.605Z"
+  "updated": "2026-11-17T19:43:26.314Z"
 }
