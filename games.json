@@ -498,7 +498,8 @@
         "arcade",
         "party",
         "multi"
-      ]
+      ],
+      "description": "Rowdy links is a golf game where you and your friends can play on large golf courses or mini golf courses, you ride around on golf carts and drink special \"beverages\" and inhale special \"rolls\" to have enhanced golf skills and bring your skill level up to par. work your way through each course and make sure to not get to rowdy or the golf police won't be happy."
     },
     {
       "id": "sparrows-ward",
@@ -529,5 +530,5 @@
     }
   ],
   "count": 34,
-  "updated": "2026-11-17T20:18:00.326Z"
+  "updated": "2026-11-17T20:20:24.520Z"
 }
