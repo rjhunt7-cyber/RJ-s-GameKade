@@ -1489,6 +1489,15 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
 .car .flip > .flip__btn { opacity: 0; pointer-events: none; }
 .car .flip.is-open > .flip__btn { opacity: 1; pointer-events: auto; }
 .car .flip.is-front:not(.is-open) > .flip__btn { opacity: 0; pointer-events: none; }
+
+/* shelf mode: the cartridges don't react to the mouse themselves (no hover redraws while gliding); the carousel does the maths */
+.car__ring, .car__ring * { pointer-events: none !important; }
+.car { cursor: pointer; }
+/* shelf mode: the yellow arrow lives under the shelf, so gliding over the games never has to hold still */
+.car .flip > .flip__btn { display: none !important; }
+.car__more { margin: 10px auto 0; display: inline-flex; align-items: center; gap: 10px; }
+.car__more-ico { display: inline-grid; place-items: center; width: 28px; height: 28px; background: var(--coin); color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
+.car__more-ico svg { width: 18px; height: 18px; }
 </style>
 </head>
 <body>
@@ -2221,7 +2230,9 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
           '<div class="car__tilt"><ul class="car__ring">' + shown.map(cardHTML).join('') + '</ul></div>' +
           '<button class="car__nav car__nav--prev" type="button" aria-label="Previous game">' + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="20" height="35" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7 0h1v14H7zM6 1h1v12H6zM5 2h1v10H5zM4 3h1v8H4zM3 4h1v6H3zM2 5h1v4H2zM1 6h1v2H1z"/></svg>' + '</button>' +
           '<button class="car__nav car__nav--next" type="button" aria-label="Next game">' + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="20" height="35" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="currentColor" d="M0 0h1v14H0zM1 1h1v12H1zM2 2h1v10H2zM3 3h1v8H3zM4 4h1v6H4zM5 5h1v4H5zM6 6h1v2H6z"/></svg>' + '</button></div>' +
-        '<div class="car__info" aria-live="polite"><p class="car__title"></p><p class="car__cats"></p><p class="car__hint">Scroll to spin \u00b7 click the game in front to play</p></div>';
+        '<div class="car__info"><p class="car__title" aria-live="polite"></p><p class="car__cats"></p>' +
+          '<button class="btn px car__more" type="button"><span class="car__more-ico">' + ARROW + '</span>Read description</button>' +
+          '<p class="car__hint">Scroll to spin \u00b7 click a game to play</p></div>';
       paint(shelf);
       var el = shelf.querySelector('.car'), ring = el.querySelector('.car__ring'), tilt = el.querySelector('.car__tilt'), lis = Array.prototype.slice.call(ring.children);
       lis.forEach(function (li) { var sh = document.createElement('span'); sh.className = 'car__shade'; li.querySelector('.flip__inner').appendChild(sh); });
@@ -2230,6 +2241,11 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       car.cur = car.target = start;
       carGeometry();
       bindCarousel(el);
+      shelf.querySelector('.car__more').addEventListener('click', function () {
+        if (!car || car.front < 0) return;
+        var li = car.lis[car.front];
+        inspect(li.getAttribute('data-id'), li.classList.contains('is-open') ? li.querySelector('.flip__front') : li.querySelector('.c3--l'), li, 0, this);
+      });
     }
     function carGeometry() {
       if (!car) return;
@@ -2260,11 +2276,14 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       var g = car.geo, ang = sv * (g.D + g.gap) / car.R, z = car.R * Math.cos(ang) - car.R;
       return car.R * Math.sin(ang) * car.P / (car.P - z);
     }
-    function carHover() {                                     // the turn-out point follows the mouse smoothly, measured on the resting shelf
-      if (!car || !car.hov || !car.geo) return;
+    function carSlotAt(mo) {                                 // which slot sits under a point, measured on the resting shelf
       var lim = Math.PI / 2 * car.R / (car.geo.D + car.geo.gap), lo = Math.max(-car.n / 2, -lim), hi = Math.min(car.n / 2, lim);
-      for (var it = 0; it < 28; it++) { var mid = (lo + hi) / 2; if (carRestX(mid) < car.mo) lo = mid; else hi = mid; }
-      car.cT = (lo + hi) / 2;
+      for (var it = 0; it < 28; it++) { var mid = (lo + hi) / 2; if (carRestX(mid) < mo) lo = mid; else hi = mid; }
+      return (lo + hi) / 2;
+    }
+    function carHover() {                                     // the turn-out point follows the mouse smoothly
+      if (!car || !car.hov || !car.geo) return;
+      car.cT = carSlotAt(car.mo);
     }
     function carTurn(w) {                                       // spot width on the ring -> how far it's turned (0..1)
       var g = car.geo, room = w - Math.min(10, Math.max(0, w - g.D));
@@ -2288,6 +2307,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
         if (hide) return;
         // where it sits on the ring (further round = further back = smaller)
         var x = car.R * Math.sin(ang), z = car.R * Math.cos(ang) - car.R, sc = car.P / (car.P - z);
+        li._x = x * sc; li._t = t; li._sc = sc;
         li.style.transform = 'translate3d(' + (x * sc).toFixed(2) + 'px,' + (z * 0.04).toFixed(2) + 'px,0) scale(' + sc.toFixed(4) + ')';
         // and the turn, the same as the old shelf: slides back onto its side, lifts a little as it turns out
         if (!li._in) li._in = li.querySelector('.flip__inner');
@@ -2301,7 +2321,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
         var isFront = i === front && Math.abs(d) < 0.5;
         if (li._front !== isFront) { li._front = isFront; li.classList.toggle('is-front', isFront); }
       });
-      var info = showT > 0.5 ? show : front;
+      var info = showT > 0.5 ? show : (car.keepInfo && car.front >= 0 ? car.front : front);
       if (info !== car.front && info >= 0) {
         car.front = info; carPos = front;
         var gm = shown[info];
@@ -2327,7 +2347,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
     function carKick() { if (car && !car.raf) { car.last = 0; car.raf = requestAnimationFrame(carTick); } }
     function carGo(delta, absolute, fast) {
       if (!car || !car.n) return;
-      car.cT = 0; car.hov = false;                          // spinning brings the middle game out; the next mouse move picks up again
+      car.cT = 0; car.hov = false; car.keepInfo = false;                          // spinning brings the middle game out; the next mouse move picks up again
       car.target = absolute ? delta : car.target + delta;
       car.fast = !!fast;
       carKick();
@@ -2359,15 +2379,13 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
         var r = el.getBoundingClientRect();
         car.mxT = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width / 2) / (r.width / 2)));
         car.myT = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height * 0.47) / (r.height / 2)));
-        car.mo = e.clientX - r.left - r.width / 2; car.hov = true;
-        // on the turned-out cover (or its yellow arrow) the shelf holds still, so you can reach anything on it
-        var hitEl = document.elementFromPoint(e.clientX, e.clientY), hitLi = hitEl && hitEl.closest && hitEl.closest('.car__ring > .flip');
-        if (!(hitLi && hitLi.classList.contains('is-open') && car.amp > 0.9)) carHover();
+        car.mo = e.clientX - r.left - r.width / 2; car.hov = true; car.keepInfo = false;
+        carHover();
         var li = e.target.closest && e.target.closest('.car__ring > .flip');
         if (li !== hoverLi) { if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = li; if (li) li.classList.add('is-hover'); }
         carKick();
       });
-      el.addEventListener('pointerleave', function () { car.hov = false; car.mxT = 0; car.myT = 0; car.cT = 0; car.ampT = carRestAmp(); if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = null; carKick(); });
+      el.addEventListener('pointerleave', function () { car.keepInfo = true; car.hov = false; car.mxT = 0; car.myT = 0; car.cT = 0; car.ampT = carRestAmp(); if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = null; carKick(); });
       el.addEventListener('pointerdown', function (e) {
         if (e.button !== 0 || e.target.closest('.car__nav, .flip__btn')) return;
         drag = { x: e.clientX, base: car.target, id: e.pointerId }; moved = false;
@@ -2382,17 +2400,16 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       el.addEventListener('pointerup', endDrag); el.addEventListener('pointercancel', endDrag);
       el.addEventListener('click', function (e) {
         if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; return; }
-        var li = e.target.closest('.car__ring > .flip');
-        if (!li || e.target.closest('.flip__btn')) return;
-        if (e.target.closest('.flip__front')) return;          // clicked a cover you can see: it plays
-        if (!li.classList.contains('is-open')) {
-          e.preventDefault(); e.stopPropagation();
-          if (li.classList.contains('is-front')) { go('#/game/' + encodeURIComponent(li.getAttribute('data-id'))); return; }   // the middle game always plays
-          // a game on its side: spin it to the middle
-          var i = car.lis.indexOf(li), n = car.n, d = ((i - car.target) % n + n) % n; if (d > n / 2) d -= n;
-          car.cT = 0;
-          carGo(Math.round(d));
-        }
+        if (e.target.closest('.car__nav') || !car.n || !car.geo) return;
+        e.preventDefault(); e.stopPropagation();
+        var r = el.getBoundingClientRect(), mo = e.clientX - r.left - r.width / 2;
+        // the most turned-out cartridge: clicking anywhere on its cover plays it
+        var best = null; car.lis.forEach(function (li) { if (!li._hide && li._t > 0.5 && (!best || li._t > best._t)) best = li; });
+        if (best && Math.abs(mo - best._x) < car.geo.cw * best._sc * (0.25 + 0.25 * best._t)) { go('#/game/' + encodeURIComponent(best.getAttribute('data-id'))); return; }
+        // otherwise: the middle game plays, a game at the side spins to the middle
+        var n = car.n, d = Math.round(carSlotAt(mo));
+        if (d === 0 && car.front >= 0) { go('#/game/' + encodeURIComponent(car.lis[(((Math.round(car.cur) % n) + n) % n)].getAttribute('data-id'))); return; }
+        car.cT = 0; carGo(d);
       }, true);
     }
     function restLeft(R) { return Math.max(0, (R.wrap.clientWidth - (R.items.length * M.slot - M.gap)) / 2); }
