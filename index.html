@@ -1387,6 +1387,64 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
   .loader.is-in .ld__led { animation: none; background: #ff3a3a; }
   .flip__inner { transition: none; }
 }
+
+/* ==========================================================================
+   Covers turn left/right only; smaller, lower labels; the shelf-mode carousel
+   ========================================================================== */
+.flip__inner { transform: rotateY(var(--tilt, 0deg)); }
+.flip:hover .flip__inner, .flip:focus-within .flip__inner { transform: rotateY(calc(var(--tilt, 0deg) * .35)) translateZ(12px); }
+.cart__foot { display: flex; align-items: center; gap: 8px; margin: 24px 0 6px; }
+.cart__foot .cart__name { flex: 1; min-width: 0; min-height: 40px; max-height: 40px; padding: 1px 6px; font-size: 16px; line-height: 18px; border-width: 2px; }
+.cart__foot .badge { position: static; flex: none; align-self: center; padding: 1px 6px; font-size: 16px; line-height: 20px; box-shadow: 2px 2px 0 0 var(--plastic-dk); }
+
+/* ---- Shelf mode: a ring of cartridges you spin with the scroll wheel ---- */
+.shelf3d.is-car { display: block; padding: 0 0 36px; }
+.car {
+  position: relative; height: clamp(380px, 68vh, 760px); perspective: 1700px; perspective-origin: 50% 42%;
+  overflow: hidden; outline: none; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  background: radial-gradient(ellipse 55% 60% at 50% 46%, rgba(80, 200, 110, .16), transparent 70%);
+}
+.car:focus-visible { box-shadow: inset 0 0 0 4px var(--coin); }
+.car__ring { position: absolute; left: 50%; top: 47%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
+.car__ring > .flip { position: absolute; width: var(--cw, 300px); left: calc(var(--cw, 300px) / -2); top: calc(var(--ch, 400px) / -2); transform-style: preserve-3d; perspective: none; list-style: none; }
+.car .flip__inner, .car .flip:hover .flip__inner, .car .flip:focus-within .flip__inner { transform: none; transition: none; }
+.car .cart__foot .cart__name { font-size: 24px; line-height: 26px; min-height: 58px; max-height: 58px; }
+.car .cart__foot .badge { font-size: 24px; line-height: 28px; }
+.car__shade { position: absolute; inset: -6px; z-index: 3; background: #03100a; opacity: 0; pointer-events: none; transform: translateZ(1px); }
+.car .flip > .flip__btn { opacity: 0; pointer-events: none; transform: translateZ(2px); transition: opacity .2s; }
+.car .flip.is-front > .flip__btn { opacity: 1; pointer-events: auto; }
+.car .flip:not(.is-front) .flip__front { cursor: pointer; }
+.car__nav {
+  position: absolute; top: 47%; z-index: 5; width: 52px; height: 52px; margin-top: -26px; padding: 0; border: 0; cursor: pointer;
+  display: grid; place-items: center; background: var(--arcade); color: var(--moon); box-shadow: 0 0 0 4px var(--ink), 6px 6px 0 4px var(--ink);
+}
+.car__nav:hover { background: var(--arcade-hi); color: var(--coin); }
+.car__nav:focus-visible { outline: 4px solid var(--coin); outline-offset: 4px; }
+.car__nav--prev { left: 18px; } .car__nav--next { right: 18px; }
+.car__nav--prev svg { transform: scaleX(-1); }
+.car__info { margin: 8px auto 0; text-align: center; min-height: 92px; }
+.car__title { margin: 0; font-size: 24px; line-height: 30px; color: var(--coin); text-shadow: 3px 3px 0 var(--ink); }
+.car__cats { margin: 4px 0 0; font: 600 14px/20px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--electric); }
+.car__hint { margin: 8px 0 0; font-size: 13px; color: var(--ice); }
+@media (max-width: 600px) { .car { height: clamp(340px, 62vh, 560px); } .car__nav { width: 44px; height: 44px; margin-top: -22px; } .car__nav--prev { left: 8px; } .car__nav--next { right: 8px; } .car .cart__foot .cart__name { font-size: 16px; line-height: 18px; min-height: 40px; max-height: 40px; } .car .cart__foot .badge { font-size: 16px; line-height: 20px; } }
+
+/* ---- carousel: real gray cartridges, five in view, triangles, hover tilt ---- */
+.car.is-covers .cart { --bg: var(--plastic); --hi: var(--plastic-hi); --lo: var(--plastic-lo); color: var(--ink); }
+.car__tilt { position: absolute; left: 50%; top: 47%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
+.car__tilt > .car__ring { left: 0; top: 0; }
+.car__nav { width: 64px; height: 64px; margin-top: -32px; }
+.car__nav--prev svg { transform: none; }
+.car__nav svg { display: block; transition: transform .12s steps(2, end); }
+.car__nav:active svg { transform: scale(.85); }
+.car__nav.is-pulse { animation: nav-pulse .26s steps(3, end); }
+@keyframes nav-pulse { 50% { transform: scale(1.12); } }
+.car .flip.is-hover .car__shade { opacity: 0 !important; }
+.cart__foot .cart__name { overflow-wrap: normal; word-break: normal; padding: 1px 3px; letter-spacing: -1px; }
+.cart__foot .badge { padding: 1px 4px; }
+.car .cart__foot .cart__name { letter-spacing: 0; }
+.is-covers .cart { padding-left: 9px; padding-right: 9px; }
+.is-covers .cart::after { margin-left: -9px !important; margin-right: -9px !important; }
+@media (max-width: 600px) { .car__nav { width: 48px; height: 48px; margin-top: -24px; } }
 </style>
 </head>
 <body>
@@ -1845,8 +1903,8 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
     '</div>';
   }
   function badgeHTML(mode) {
-    var p = PLAYERS[mode];
-    return p ? '<span class="badge" title="' + p[1] + '"><span class="visually-hidden">' + p[1] + '</span><span aria-hidden="true">' + p[0] + '</span></span>' : '';
+    var p = PLAYERS[mode], short = mode === 'multi' ? 'MP' : p && p[0];
+    return p ? '<span class="badge" title="' + p[1] + '"><span class="visually-hidden">' + p[1] + '</span><span aria-hidden="true">' + short + '</span></span>' : '';
   }
   function descHTML(text) {
     var t = String(text || '').trim();
@@ -2087,8 +2145,12 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       if (!force && n === perRow && mode === lastMode) return;
       perRow = n; lastMode = mode;
       shelf.classList.toggle('is-covers', coversMode);
+      if (car && car.raf) cancelAnimationFrame(car.raf);
+      car = null;
       items = []; rows = [];
       if (coversMode) { shelf.innerHTML = '<ul class="shelf">' + shown.map(cardHTML).join('') + '</ul>'; paint(shelf); fitNames(); return; }
+      shelf.classList.remove('is-car');
+      if (!coversMode) { buildCarousel(); return; }
       var groups = [];
       for (var i = 0; i < shown.length; i += n) groups.push(shown.slice(i, i + n));
       shelf.innerHTML = groups.map(function (r) { return '<div class="shelf-row"><ul class="shelf-row__items">' + r.map(boxHTML).join('') + '</ul></div>'; }).join('');
@@ -2102,6 +2164,135 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       });
       paint(shelf);
       rows.forEach(drawRow);
+    }
+    // ---- Shelf mode: every game on one big ring; the scroll wheel spins it
+    var car = null, carPos = 0;
+    function buildCarousel() {
+      shelf.classList.add('is-car');
+      shelf.innerHTML = '<div class="car is-covers" tabindex="0" aria-label="Game carousel. Scroll, swipe or use the arrow keys to spin it. Press Enter to play the game in front.">' +
+          '<div class="car__tilt"><ul class="car__ring">' + shown.map(cardHTML).join('') + '</ul></div>' +
+          '<button class="car__nav car__nav--prev" type="button" aria-label="Previous game">' + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="20" height="35" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7 0h1v14H7zM6 1h1v12H6zM5 2h1v10H5zM4 3h1v8H4zM3 4h1v6H3zM2 5h1v4H2zM1 6h1v2H1z"/></svg>' + '</button>' +
+          '<button class="car__nav car__nav--next" type="button" aria-label="Next game">' + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 14" width="20" height="35" shape-rendering="crispEdges" aria-hidden="true" focusable="false"><path fill="currentColor" d="M0 0h1v14H0zM1 1h1v12H1zM2 2h1v10H2zM3 3h1v8H3zM4 4h1v6H4zM5 5h1v4H5zM6 6h1v2H6z"/></svg>' + '</button></div>' +
+        '<div class="car__info" aria-live="polite"><p class="car__title"></p><p class="car__cats"></p><p class="car__hint">Scroll to spin \u00b7 click the game in front to play</p></div>';
+      paint(shelf);
+      var el = shelf.querySelector('.car'), ring = el.querySelector('.car__ring'), tilt = el.querySelector('.car__tilt'), lis = Array.prototype.slice.call(ring.children);
+      lis.forEach(function (li) { var sh = document.createElement('span'); sh.className = 'car__shade'; li.querySelector('.flip__inner').appendChild(sh); });
+      car = { el: el, ring: ring, tilt: tilt, lis: lis, n: lis.length, cur: 0, target: 0, raf: 0, last: 0, front: -1, R: 0, step: 0, mx: 0, my: 0, mxT: 0, myT: 0, fast: false };
+      var start = Math.min(carPos, Math.max(0, car.n - 1));
+      car.cur = car.target = start;
+      carGeometry();
+      bindCarousel(el);
+    }
+    function carGeometry() {
+      if (!car) return;
+      var el = car.el, H = el.clientHeight, Wd = el.clientWidth, n = car.n;
+      car.ring.style.setProperty('--cw', '300px');
+      var h300 = car.lis.length ? car.lis[0].offsetHeight : 400;
+      var cw = Math.min(300 * (H * 0.74) / h300, Wd * (Wd < 600 ? 0.56 : 0.3));
+      car.ring.style.setProperty('--cw', cw.toFixed(1) + 'px');
+      var ch = car.lis.length ? car.lis[0].offsetHeight : cw * 1.3;
+      car.ring.style.setProperty('--ch', ch.toFixed(1) + 'px');
+      car.step = n ? 360 / n : 0;
+      // the first neighbour sits just clear of the middle cartridge (never in front of it); the second peeks in at the edge
+      var th = Math.min(car.step, 90) * Math.PI / 180, x1 = (cw / 2) * (1 + Math.cos(th)) + cw * 0.12;
+      car.R = n > 1 ? x1 / Math.sin(Math.min(car.step, 90) * Math.PI / 180) : 0;
+      car.lis.forEach(function (li, i) { li.style.transform = 'rotateY(' + (i * car.step).toFixed(3) + 'deg) translateZ(' + car.R.toFixed(1) + 'px)'; });
+      carDraw();
+    }
+    function carDraw() {
+      var n = car.n;
+      car.tilt.style.transform = 'rotateX(' + (-car.my * 5).toFixed(3) + 'deg) rotateY(' + (car.mx * 8).toFixed(3) + 'deg)';
+      car.ring.style.transform = 'translateZ(' + (-car.R).toFixed(1) + 'px) rotateY(' + (-car.cur * car.step).toFixed(3) + 'deg)';
+      var front = n ? (((Math.round(car.cur) % n) + n) % n) : -1;
+      car.lis.forEach(function (li, i) {
+        var d = ((i - car.cur) % n + n) % n; if (d > n / 2) d -= n;
+        var a = Math.abs(d);
+        // five in view: the middle one, two dimmed on each side; the rest fade into the dark
+        li.querySelector('.car__shade').style.opacity = (a <= 1 ? a * 0.42 : a <= 2 ? 0.42 + (a - 1) * 0.26 : Math.min(1, 0.68 + (a - 2) * 0.64)).toFixed(3);
+        li.style.visibility = a > 2.55 || Math.abs(d * car.step) > 100 ? 'hidden' : '';
+        var isFront = i === front && a < 0.5;
+        if (li.classList.contains('is-front') !== isFront) {
+          li.classList.toggle('is-front', isFront);
+          li.querySelectorAll('a, button').forEach(function (x) { if (!x.closest('.flip__back')) x.tabIndex = isFront ? 0 : -1; });
+        }
+      });
+      if (front !== car.front && front >= 0) {
+        car.front = front; carPos = front;
+        var g = shown[front];
+        shelf.querySelector('.car__title').textContent = g ? g.title : '';
+        shelf.querySelector('.car__cats').textContent = g ? catLine(g) : '';
+      }
+    }
+    function carTick(now) {
+      if (!car) return;
+      var dt = Math.min(64, now - (car.last || now)); car.last = now;
+      var f = dt / 16.67, k = reduce ? 1 : 1 - Math.pow(1 - (car.fast ? 0.24 : 0.14), f), km = reduce ? 1 : 1 - Math.pow(1 - 0.12, f), d = car.target - car.cur;
+      if (Math.abs(d) < 0.0008) { car.cur = car.target; car.fast = false; } else car.cur += d * k;
+      var dmx = car.mxT - car.mx, dmy = car.myT - car.my;
+      if (Math.abs(dmx) < 0.001 && Math.abs(dmy) < 0.001) { car.mx = car.mxT; car.my = car.myT; } else { car.mx += dmx * km; car.my += dmy * km; }
+      carDraw();
+      car.raf = (car.cur !== car.target || car.mx !== car.mxT || car.my !== car.myT) ? requestAnimationFrame(carTick) : 0;
+    }
+    function carKick() { if (car && !car.raf) { car.last = 0; car.raf = requestAnimationFrame(carTick); } }
+    function carGo(delta, absolute, fast) {
+      if (!car || !car.n) return;
+      car.target = absolute ? delta : car.target + delta;
+      car.fast = !!fast;
+      carKick();
+    }
+    function bindCarousel(el) {
+      var acc = 0, lastWheel = 0, drag = null, moved = false;
+      el.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        var dlt = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+        if (e.deltaMode === 1) dlt *= 40;
+        acc += dlt;
+        var now = performance.now();
+        if (Math.abs(acc) >= 50 || (Math.abs(acc) >= 4 && now - lastWheel > 220)) { var steps = Math.max(1, Math.min(3, Math.round(Math.abs(acc) / 100))); carGo(acc > 0 ? steps : -steps, false, true); acc = 0; lastWheel = now; }
+      }, { passive: false });
+      el.addEventListener('keydown', function (e) {
+        if (e.target !== el) return;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); carGo(1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); carGo(-1); }
+        else if (e.key === 'Enter' && car.front >= 0) { e.preventDefault(); go('#/game/' + encodeURIComponent(shown[car.front].id)); }
+      });
+      function pulse(b) { b.classList.remove('is-pulse'); void b.offsetWidth; b.classList.add('is-pulse'); }
+      el.querySelector('.car__nav--prev').addEventListener('click', function (e) { e.stopPropagation(); pulse(this); carGo(-1); });
+      el.querySelector('.car__nav--next').addEventListener('click', function (e) { e.stopPropagation(); pulse(this); carGo(1); });
+      // the cartridges lean toward the mouse, and the one under it brightens
+      var hoverLi = null;
+      el.addEventListener('pointermove', function (e) {
+        if (e.pointerType === 'touch') return;
+        var r = el.getBoundingClientRect();
+        car.mxT = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width / 2) / (r.width / 2)));
+        car.myT = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height * 0.47) / (r.height / 2)));
+        var li = e.target.closest && e.target.closest('.car__ring > .flip');
+        if (li !== hoverLi) { if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = li; if (li) li.classList.add('is-hover'); }
+        carKick();
+      });
+      el.addEventListener('pointerleave', function () { car.mxT = 0; car.myT = 0; if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = null; carKick(); });
+      el.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0 || e.target.closest('.car__nav, .flip__btn')) return;
+        drag = { x: e.clientX, base: car.target, id: e.pointerId }; moved = false;
+      });
+      el.addEventListener('pointermove', function (e) {
+        if (!drag || e.pointerId !== drag.id) return;
+        var dx = e.clientX - drag.x;
+        if (Math.abs(dx) > 8) moved = true;
+        if (moved) { var cw = parseFloat(car.ring.style.getPropertyValue('--cw')) || 300; car.target = drag.base - dx / (cw * 0.9); car.cur = car.target; carDraw(); }
+      });
+      function endDrag() { if (!drag) return; drag = null; if (moved) carGo(Math.round(car.target), true); }
+      el.addEventListener('pointerup', endDrag); el.addEventListener('pointercancel', endDrag);
+      el.addEventListener('click', function (e) {
+        if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; return; }
+        var li = e.target.closest('.car__ring > .flip');
+        if (!li || e.target.closest('.flip__btn')) return;
+        if (!li.classList.contains('is-front')) {             // a game at the side: spin it to the front
+          e.preventDefault(); e.stopPropagation();
+          var i = car.lis.indexOf(li), n = car.n, d = ((i - car.target) % n + n) % n; if (d > n / 2) d -= n;
+          carGo(Math.round(d));
+        }
+      }, true);
     }
     function restLeft(R) { return Math.max(0, (R.wrap.clientWidth - (R.items.length * M.slot - M.gap)) / 2); }
     function drawRow(R) {
@@ -2378,7 +2569,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       if (pool.length) go('#/game/' + encodeURIComponent(pool[Math.floor(Math.random() * pool.length)].id));
     });
     var resizeTimer = 0;
-    window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(function () { if (current === 'home') { layout(false); if (coversMode) fitNames(); } }, 120); });
+    window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(function () { if (current === 'home') { layout(false); if (coversMode) fitNames(); else carGeometry(); } }, 120); });
 
     return { enter: function () { loadGames().then(render).catch(showError); setTimeout(function () { layout(false); }, 0); } };
   })();
