@@ -1245,6 +1245,243 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
   .title-screen.is-leaving { animation: ts-out .2s steps(2, end) forwards; }
 }
 
+/* ==========================================================================
+   Clean 3D cartridges, the close-up description view, and the console loader
+   ========================================================================== */
+/* no circuit board, no top ridges, no fake drop shadow: real depth instead */
+.cart__pcb, .is-covers .cart::before { display: none !important; content: none !important; }
+.shelf > .flip { perspective: 1100px; }
+.shelf > .flip:nth-child(6n+1) { --tilt: -9deg; } .shelf > .flip:nth-child(6n+2) { --tilt: 6deg; }
+.shelf > .flip:nth-child(6n+3) { --tilt: -5deg; } .shelf > .flip:nth-child(6n+4) { --tilt: 9deg; }
+.shelf > .flip:nth-child(6n+5) { --tilt: -7deg; } .shelf > .flip:nth-child(6n+6) { --tilt: 5deg; }
+.flip__inner {
+  transform-style: preserve-3d; transform-origin: 50% 50% -13px;
+  transform: rotateX(4deg) rotateY(var(--tilt, 0deg));
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+}
+.flip:hover .flip__inner, .flip:focus-within .flip__inner { transform: rotateX(2deg) rotateY(calc(var(--tilt, 0deg) * .35)) translateZ(12px); }
+.flip.is-inspecting { visibility: hidden; }
+.flip__face.px { --lift: 0px; --shade: transparent; }
+.flip__front:hover, .flip__front:focus-visible { transform: none; --lift: 0px; }
+.flip__back { transform: translateZ(-26px) rotateY(180deg); }
+.c3 { position: absolute; pointer-events: none; }
+.c3--l { top: 0; bottom: 0; left: 0; width: 26px; transform-origin: 0 50%; transform: rotateY(90deg); background: linear-gradient(90deg, #4e4e56, #6c6c74); }
+.c3--r { top: 0; bottom: 0; right: 0; width: 26px; transform-origin: 100% 50%; transform: rotateY(-90deg); background: linear-gradient(90deg, #6c6c74, #4a4a52); }
+.c3--t { left: 0; right: 0; top: 0; height: 26px; transform-origin: 50% 0; transform: rotateX(-90deg); background: #a4a4ac; }
+.c3--b { left: 0; right: 0; bottom: 0; height: 26px; transform-origin: 50% 100%; transform: rotateX(90deg); background: #3e3e46; }
+
+/* the shell: label well, a white name label, and a plain molded lip with the NES-style arrow */
+.is-covers .cart { padding: 14px 14px 0; }
+.is-covers .cart__label { box-shadow: 0 0 0 4px var(--plastic-dk), 0 0 0 7px #a0a0a8; }
+.cart__foot { position: relative; display: block; margin: 16px 0 0; min-height: 0; }
+.cart__foot .cart__name {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  min-height: 52px; max-height: 52px; overflow: hidden; margin: 0; padding: 4px 8px;
+  background: #f8f8f0; color: var(--ink); border: 3px solid var(--ink);
+  font-size: 16px; line-height: 20px; overflow-wrap: anywhere; -webkit-line-clamp: unset;
+}
+.cart__foot .badge { position: absolute; top: -12px; right: -6px; z-index: 1; font-size: 16px; line-height: 20px; padding: 0 6px; box-shadow: 2px 2px 0 0 var(--plastic-dk); }
+.is-covers .cart::after {
+  content: '' !important; display: block !important; height: 18px; margin: 14px -14px 0; border: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 5' shape-rendering='crispEdges'%3E%3Cpath fill='%23606068' d='M0 0h9v1H0zM1 1h7v1H1zM2 2h5v1H2zM3 3h3v1H3zM4 4h1v1H4z'/%3E%3C/svg%3E") center / 18px 10px no-repeat, var(--plastic-lo);
+  box-shadow: inset 0 3px 0 0 #707078;
+}
+.is-covers .cart:hover .cart__name, .is-covers .cart:focus-visible .cart__name { color: var(--ink); text-decoration: none; }
+
+/* the back: a gray description box with green text */
+.cb .flip__title { font-size: 16px; line-height: 20px; }
+.cb .flip__cats { font: 600 12px/16px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--electric); }
+.flip__desc { background: #3a3f45; color: #a8e848; box-shadow: 0 0 0 3px var(--ink); }
+.flip__none { color: #7fa060; }
+.is-covers .flip__back.cart::after { margin-top: 0; }
+
+/* ---- the close-up view: lifts the cartridge out, turns it over, dims everything else ---- */
+.inspect { position: fixed; inset: 0; z-index: 5000; perspective: 1800px; }
+.inspect__dim { position: absolute; inset: 0; background: rgba(2, 8, 4, .84); opacity: 0; }
+.inspect__card { position: absolute; transform-style: preserve-3d; will-change: transform; --plastic: #888890; --plastic-hi: #b0b0b8; --plastic-lo: #606068; --plastic-dk: #282830; }
+.inspect__ul { list-style: none; margin: 0; padding: 0; transform-style: preserve-3d; }
+.inspect .flip { perspective: none; transform-style: preserve-3d; visibility: visible; }
+.inspect .flip__inner { transform: none !important; transition: none; }
+.inspect .flip > .flip__btn { display: none; }
+.inspect .flip__desc { font-size: 16px; line-height: 1.55; }
+.inspect .seal { width: 60px; height: 60px; }
+.inspect .seal__ribbon { font-size: 10px; line-height: 12px; }
+.inspect .cb .flip__title { font-size: 24px; line-height: 28px; }
+.inspect .cb .flip__cats { font-size: 14px; line-height: 18px; }
+.inspect .flip__actions .btn { min-height: 44px; font-size: 16px; }
+.inspect__close { position: absolute; z-index: 2; opacity: 0; }
+.inspect__close svg { transform: scaleX(-1); }
+.inspect__hint { position: absolute; left: 0; right: 0; bottom: 18px; margin: 0; text-align: center; font-size: 13px; color: var(--ice); opacity: 0; }
+
+/* ---- Shelf mode: NES-style cartridges ---- */
+.shelf3d { --art-h: 150px; --bar-h: 64px; --box-h: calc(10px + var(--art-h) + var(--bar-h) + 18px); }
+.box__front { box-shadow: inset 0 0 0 4px var(--plastic-dk), inset 4px 4px 0 4px var(--plastic-hi), inset -4px -4px 0 4px var(--plastic-lo); }
+.box__art { box-shadow: 0 0 0 4px var(--plastic-dk), 0 0 0 7px #a0a0a8; }
+.box__bar { position: relative; display: block; height: var(--bar-h); padding: 14px 0 0; }
+.box__bar .box__name {
+  display: flex; align-items: center; justify-content: center; text-align: center; height: 46px; overflow: hidden; padding: 2px 6px;
+  background: #f8f8f0; color: var(--ink); border: 3px solid var(--ink); font-size: 16px; line-height: 20px; -webkit-line-clamp: unset; overflow-wrap: anywhere;
+}
+.box__bar .badge { position: absolute; top: 2px; right: -4px; z-index: 1; }
+.cart__foot .badge, .box__bar .badge { left: auto; width: auto; }
+.box__front::after {
+  content: ''; position: absolute; left: 4px; right: 4px; bottom: 4px; height: 18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 5' shape-rendering='crispEdges'%3E%3Cpath fill='%23606068' d='M0 0h9v1H0zM1 1h7v1H1zM2 2h5v1H2zM3 3h3v1H3zM4 4h1v1H4z'/%3E%3C/svg%3E") center / 18px 10px no-repeat, var(--plastic-lo);
+  box-shadow: inset 0 3px 0 0 #707078;
+}
+.box__back .cb { margin-bottom: 18px; }
+.box__back .flip__desc { font-size: 12px; }
+
+/* ---- no animals in the background (the floor, trees and fireflies stay) ---- */
+.critter { display: none !important; }
+
+/* ---- the loading screen: the game's cartridge goes into a top-loader console ---- */
+.loader {
+  position: fixed; inset: 0; z-index: 4000; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, #164a28 0%, #0b2414 55%, var(--night) 100%);
+}
+.loader.is-out { animation: ld-out .38s steps(6, end) forwards; pointer-events: none; }
+.ld__box { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+.ld__console { position: relative; width: min(480px, 84vw); aspect-ratio: 120 / 58; background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNTgiIHdpZHRoPSIxMjAiIGhlaWdodD0iNTgiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyIgYXJpYS1oaWRkZW49InRydWUiIGZvY3VzYWJsZT0iZmFsc2UiPjxwYXRoIGZpbGw9IiMwODEwMDgiIGQ9Ik0zOCAxaDQ0djFoLTQ0ek0zNyAyaDF2MWgtMXpNODIgMmgxdjFoLTF6TTM3IDNoMXYxaC0xek04MiAzaDF2MWgtMXpNMzcgNGgxdjFoLTF6TTgyIDRoMXYxaC0xek0zNyA1aDF2MWgtMXpNODIgNWgxdjFoLTF6TTM2IDZoMnYxaC0yek04MiA2aDJ2MWgtMnpNMzUgN2gxdjFoLTF6TTg0IDdoMXYxaC0xek0zNSA4aDF2MWgtMXpNODQgOGgxdjFoLTF6TTM1IDloMXYxaC0xek04NCA5aDF2MWgtMXpNMzUgMTBoMXYxaC0xek04NCAxMGgxdjFoLTF6TTM1IDExaDF2MWgtMXpNODQgMTFoMXYxaC0xek0zNSAxMmgxdjFoLTF6TTg0IDEyaDF2MWgtMXpNOCAxM2gyOHYxaC0yOHpNODQgMTNoMjh2MWgtMjh6TTcgMTRoMXYxaC0xek0xMTIgMTRoMXYxaC0xek02IDE1aDF2MWgtMXpNMTEzIDE1aDF2MWgtMXpNNiAxNmgxdjFoLTF6TTExMyAxNmgxdjFoLTF6TTUgMTdoMXYxaC0xek0xMTQgMTdoMXYxaC0xek01IDE4aDF2MWgtMXpNMTE1IDE4aDF2MWgtMXpNNCAxOWgxdjFoLTF6TTExNSAxOWgxdjFoLTF6TTMgMjBoMXYxaC0xek0xMTYgMjBoMXYxaC0xek0zIDIxaDF2MWgtMXpNMTE2IDIxaDF2MWgtMXpNMiAyMmgxdjFoLTF6TTExNyAyMmgxdjFoLTF6TTIgMjNoMXYxaC0xek0xMTcgMjNoMXYxaC0xek0yIDI0aDF2MWgtMXpNMTE3IDI0aDF2MWgtMXpNMiAyNWgxdjFoLTF6TTExNyAyNWgxdjFoLTF6TTIgMjZoMXYxaC0xek0xMTcgMjZoMXYxaC0xek0yIDI3aDF2MWgtMXpNMTE3IDI3aDF2MWgtMXpNMiAyOGgxdjFoLTF6TTExNyAyOGgxdjFoLTF6TTIgMjloMXYxaC0xek0xMTcgMjloMXYxaC0xek0yIDMwaDF2MWgtMXpNMTE3IDMwaDF2MWgtMXpNMiAzMWgxdjFoLTF6TTExNyAzMWgxdjFoLTF6TTIgMzJoMXYxaC0xek0xMTcgMzJoMXYxaC0xek0yIDMzaDF2MWgtMXpNMTE3IDMzaDF2MWgtMXpNMiAzNGgxdjFoLTF6TTExNyAzNGgxdjFoLTF6TTIgMzVoMXYxaC0xek0xMTcgMzVoMXYxaC0xek0yIDM2aDF2MWgtMXpNMTE3IDM2aDF2MWgtMXpNMiAzN2gxdjFoLTF6TTExNyAzN2gxdjFoLTF6TTIgMzhoMXYxaC0xek0xMTcgMzhoMXYxaC0xek0yIDM5aDF2MWgtMXpNMTE3IDM5aDF2MWgtMXpNMiA0MGgxdjFoLTF6TTExNyA0MGgxdjFoLTF6TTIgNDFoMXYxaC0xek0xMTcgNDFoMXYxaC0xek0yIDQyaDF2MWgtMXpNMTE3IDQyaDF2MWgtMXpNMiA0M2gxdjFoLTF6TTExNyA0M2gxdjFoLTF6TTIgNDRoMXYxaC0xek0xMTcgNDRoMXYxaC0xek0yIDQ1aDF2MWgtMXpNMTE3IDQ1aDF2MWgtMXpNMiA0NmgxdjFoLTF6TTExNyA0NmgxdjFoLTF6TTIgNDdoMXYxaC0xek0xMTcgNDdoMXYxaC0xek0yIDQ4aDF2MWgtMXpNMTE3IDQ4aDF2MWgtMXpNMiA0OWgxdjFoLTF6TTExNyA0OWgxdjFoLTF6TTIgNTBoMXYxaC0xek0xMTcgNTBoMXYxaC0xek0yIDUxaDF2MWgtMXpNMTE3IDUxaDF2MWgtMXpNMiA1MmgxdjFoLTF6TTExNyA1MmgxdjFoLTF6TTMgNTNoNnYxaC02ek0xNyA1M2g4NnYxaC04NnpNMTExIDUzaDZ2MWgtNnpNOCA1NGgxdjFoLTF6TTE3IDU0aDF2MWgtMXpNMTAyIDU0aDF2MWgtMXpNMTExIDU0aDF2MWgtMXpNOCA1NWgxdjFoLTF6TTE3IDU1aDF2MWgtMXpNMTAyIDU1aDF2MWgtMXpNMTExIDU1aDF2MWgtMXpNOSA1Nmg4djFoLTh6TTEwMyA1Nmg4djFoLTh6Ii8+PHBhdGggZmlsbD0iI2UwZTBlNiIgZD0iTTM4IDJoNDR2MWgtNDR6Ii8+PHBhdGggZmlsbD0iI2M4YzhkMCIgZD0iTTM4IDNoNXYxaC01ek03NyAzaDV2MWgtNXpNMzggNGg1djFoLTV6TTc3IDRoNXYxaC01ek0zOCA1aDV2MWgtNXpNNzcgNWg1djFoLTV6TTM4IDZoNDR2MWgtNDR6Ii8+PHBhdGggZmlsbD0iIzEwMTAxNCIgZD0iTTQzIDNoMzR2MWgtMzR6TTQzIDRoMzR2MWgtMzR6TTQzIDVoMzR2MWgtMzR6Ii8+PHBhdGggZmlsbD0iI2E0YTRhZSIgZD0iTTM2IDdoNDh2MWgtNDh6TTM2IDhoNDh2MWgtNDh6TTM2IDloMjB2MWgtMjB6TTY0IDloMjB2MWgtMjB6TTM2IDEwaDIwdjFoLTIwek02NCAxMGgyMHYxaC0yMHpNMzYgMTFoNDh2MWgtNDh6TTM2IDEyaDQ4djFoLTQ4eiIvPjxwYXRoIGZpbGw9IiNjMGMwY2EiIGQ9Ik01NiA5aDh2MWgtOHpNNTYgMTBoOHYxaC04eiIvPjxwYXRoIGZpbGw9IiM4NDg0OGUiIGQ9Ik0zNiAxM2g0OHYxaC00OHpNMzYgMTRoNDh2MWgtNDh6TTM2IDE1aDQ4djFoLTQ4eiIvPjxwYXRoIGZpbGw9IiNlY2VjZjAiIGQ9Ik04IDE0aDI4djFoLTI4ek04NCAxNGgyOHYxaC0yOHoiLz48cGF0aCBmaWxsPSIjZDhkOGRlIiBkPSJNNyAxNWgyOXYxaC0yOXpNODQgMTVoMjl2MWgtMjl6TTcgMTZoMTA2djFoLTEwNnpNNiAxN2gxMDh2MWgtMTA4ek02IDE4aDEwOXYxaC0xMDl6TTUgMTloMTEwdjFoLTExMHpNNCAyMGgxMTJ2MWgtMTEyek00IDIxaDExMnYxaC0xMTJ6TTMgMjJoMTE0djFoLTExNHoiLz48cGF0aCBmaWxsPSIjY2FjYWQyIiBkPSJNMyAyM2gxMTR2MWgtMTE0eiIvPjxwYXRoIGZpbGw9IiNiOGI4YzIiIGQ9Ik0zIDI0aDExNHYxaC0xMTR6TTMgMjVoMTE0djFoLTExNHpNMyAyNmgxMTR2MWgtMTE0ek0zIDI3aDExNHYxaC0xMTR6TTMgMjhoMTE0djFoLTExNHpNMyAyOWgxMTR2MWgtMTE0ek0zIDM5aDExNHYxaC0xMTR6TTMgNDBoMTE0djFoLTExNHpNMyA0MWg3djFoLTd6TTIwIDQxaDR2MWgtNHpNMzQgNDFoODN2MWgtODN6TTMgNDJoN3YxaC03ek0yMCA0Mmg0djFoLTR6TTM0IDQyaDgzdjFoLTgzek0zIDQzaDd2MWgtN3pNMjAgNDNoNHYxaC00ek0zNCA0M2g4M3YxaC04M3pNMyA0NGg3djFoLTd6TTIwIDQ0aDR2MWgtNHpNMzQgNDRoODN2MWgtODN6TTMgNDVoN3YxaC03ek0yMCA0NWg0djFoLTR6TTM0IDQ1aDgzdjFoLTgzek0zIDQ2aDExNHYxaC0xMTR6TTMgNDdoMTE0djFoLTExNHpNMyA0OGgxMTR2MWgtMTE0ek0zIDQ5aDExNHYxaC0xMTR6Ii8+PHBhdGggZmlsbD0iIzVhNWE2NCIgZD0iTTMgMzBoMTE0djFoLTExNHoiLz48cGF0aCBmaWxsPSIjNDU0NTRlIiBkPSJNMyAzMWgxMTR2MWgtMTE0ek0zIDMyaDgzdjFoLTgzek05NiAzMmgyMXYxaC0yMXpNMyAzM2g4M3YxaC04M3pNOTYgMzNoNXYxaC01ek0xMDUgMzNoMTJ2MWgtMTJ6TTMgMzRoODN2MWgtODN6TTk2IDM0aDV2MWgtNXpNMTA1IDM0aDEydjFoLTEyek0zIDM1aDgzdjFoLTgzek05NiAzNWg1djFoLTV6TTEwNSAzNWgxMnYxaC0xMnpNMyAzNmg4M3YxaC04M3pNOTYgMzZoMjF2MWgtMjF6TTMgMzdoMTE0djFoLTExNHpNMyAzOGgxMTR2MWgtMTE0eiIvPjxwYXRoIGZpbGw9IiM5YTlhYTQiIGQ9Ik04NiAzMmgxMHYxaC0xMHoiLz48cGF0aCBmaWxsPSIjN2M3Yzg2IiBkPSJNODYgMzNoMTB2MWgtMTB6TTg2IDM0aDEwdjFoLTEwek04NiAzNWgxMHYxaC0xMHpNODYgMzZoMTB2MWgtMTB6Ii8+PHBhdGggZmlsbD0iIzVhMTQxNCIgZD0iTTEwMSAzM2g0djFoLTR6TTEwMSAzNGg0djFoLTR6TTEwMSAzNWg0djFoLTR6Ii8+PHBhdGggZmlsbD0iIzJlMmUzNCIgZD0iTTEwIDQxaDEwdjFoLTEwek0yNCA0MWgxMHYxaC0xMHpNMTAgNDJoMXYxaC0xek0xOSA0MmgxdjFoLTF6TTI0IDQyaDF2MWgtMXpNMzMgNDJoMXYxaC0xek0xMCA0M2gxdjFoLTF6TTE5IDQzaDF2MWgtMXpNMjQgNDNoMXYxaC0xek0zMyA0M2gxdjFoLTF6TTEwIDQ0aDF2MWgtMXpNMTkgNDRoMXYxaC0xek0yNCA0NGgxdjFoLTF6TTMzIDQ0aDF2MWgtMXpNMTAgNDVoMTB2MWgtMTB6TTI0IDQ1aDEwdjFoLTEwek05IDUzaDh2MWgtOHpNMTAzIDUzaDh2MWgtOHpNOSA1NGg4djFoLTh6TTEwMyA1NGg4djFoLTh6TTkgNTVoOHYxaC04ek0xMDMgNTVoOHYxaC04eiIvPjxwYXRoIGZpbGw9IiMxODE4MWMiIGQ9Ik0xMSA0Mmg4djFoLTh6TTI1IDQyaDh2MWgtOHpNMTEgNDNoMXYxaC0xek0xMyA0M2gxdjFoLTF6TTE1IDQzaDF2MWgtMXpNMTcgNDNoMXYxaC0xek0yNSA0M2gxdjFoLTF6TTI3IDQzaDF2MWgtMXpNMjkgNDNoMXYxaC0xek0zMSA0M2gxdjFoLTF6TTExIDQ0aDh2MWgtOHpNMjUgNDRoOHYxaC04eiIvPjxwYXRoIGZpbGw9IiM4YThhOTIiIGQ9Ik0xMiA0M2gxdjFoLTF6TTE0IDQzaDF2MWgtMXpNMTYgNDNoMXYxaC0xek0xOCA0M2gxdjFoLTF6TTI2IDQzaDF2MWgtMXpNMjggNDNoMXYxaC0xek0zMCA0M2gxdjFoLTF6TTMyIDQzaDF2MWgtMXoiLz48cGF0aCBmaWxsPSIjOGM4Yzk2IiBkPSJNMyA1MGgxMTR2MWgtMTE0ek0zIDUxaDExNHYxaC0xMTR6TTMgNTJoMTE0djFoLTExNHoiLz48L3N2Zz4=") center / 100% 100% no-repeat; image-rendering: pixelated; }
+.ld__slot { position: absolute; left: 37.5%; width: 25%; bottom: calc(100% - 4.5 / 58 * 100%); height: min(420px, 60vh); overflow: hidden; }
+.ld__cart {
+  position: absolute; left: 4%; right: 4%; bottom: 0; aspect-ratio: 5 / 6; display: flex; flex-direction: column; gap: 6%; padding: 8%;
+  background: #8a8a92; box-shadow: 0 0 0 3px var(--ink), inset 0 3px 0 #b0b0b8, inset 0 -3px 0 #606068;
+  transform: translateY(72%);
+}
+.ld__label { flex: 1; background: var(--night) center / cover no-repeat; box-shadow: 0 0 0 3px var(--plastic-dk, #282830); image-rendering: auto; }
+.ld__name { flex: none; padding: 3px 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center; font-size: clamp(8px, 1.6vw, 12px); line-height: 1.3; color: var(--ink); background: #f8f8f0; border: 2px solid var(--ink); }
+.ld__led { position: absolute; left: 84.17%; top: 56.9%; width: 3.33%; height: 5.17%; background: #5a1414; }
+.ld__text { margin: 0; font-size: clamp(16px, 2.4vw, 22px); color: var(--moon); text-align: center; text-shadow: 3px 3px 0 var(--ink); }
+.ld__text b { color: var(--coin); font-weight: normal; }
+.ld__dots { display: inline-block; width: 2.2em; text-align: left; animation: ld-dots 1.2s steps(4, end) infinite; overflow: hidden; vertical-align: bottom; white-space: nowrap; }
+.loader.is-in .ld__console { animation: ld-pop .3s steps(4, end) both, ld-bump .2s steps(2, end) 1.35s; }
+.loader.is-in .ld__cart { animation: ld-drop .55s cubic-bezier(.3, .7, .4, 1) .15s both, ld-insert .4s cubic-bezier(.6, 0, .8, .4) .95s both; }
+.loader.is-in .ld__led { animation: ld-led .01s linear 1.35s forwards; }
+@keyframes ld-pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes ld-drop { 0% { transform: translateY(-170%); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes ld-insert { from { transform: translateY(0); } to { transform: translateY(72%); } }
+@keyframes ld-bump { 50% { transform: translateY(4px); } }
+@keyframes ld-led { to { background: #ff3a3a; box-shadow: 0 0 10px 3px rgba(255, 60, 60, .7); } }
+@keyframes ld-dots { from { width: 0; } to { width: 2.2em; } }
+@keyframes ld-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .loader.is-in .ld__console, .loader.is-in .ld__cart { animation: none; }
+  .loader.is-in .ld__led { animation: none; background: #ff3a3a; }
+  .flip__inner { transition: none; }
+}
+
+/* ==========================================================================
+   Covers turn left/right only; smaller, lower labels; the shelf-mode carousel
+   ========================================================================== */
+.flip__inner { transform: rotateY(var(--tilt, 0deg)); }
+.flip:hover .flip__inner, .flip:focus-within .flip__inner { transform: rotateY(calc(var(--tilt, 0deg) * .35)) translateZ(12px); }
+.cart__foot { display: flex; align-items: center; gap: 8px; margin: 24px 0 6px; }
+.cart__foot .cart__name { flex: 1; min-width: 0; min-height: 40px; max-height: 40px; padding: 1px 6px; font-size: 16px; line-height: 18px; border-width: 2px; }
+.cart__foot .badge { position: static; flex: none; align-self: center; padding: 1px 6px; font-size: 16px; line-height: 20px; box-shadow: 2px 2px 0 0 var(--plastic-dk); }
+
+/* ---- Shelf mode: a ring of cartridges you spin with the scroll wheel ---- */
+.shelf3d.is-car { display: block; padding: 0 0 36px; }
+.car {
+  position: relative; height: clamp(380px, 68vh, 760px);
+  overflow: hidden; outline: none; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  background: radial-gradient(ellipse 55% 60% at 50% 46%, rgba(80, 200, 110, .16), transparent 70%);
+}
+.car:focus-visible { box-shadow: inset 0 0 0 4px var(--coin); }
+.car__ring { position: absolute; left: 50%; top: 47%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
+.car__ring > .flip { position: absolute; width: var(--cw, 300px); left: calc(var(--cw, 300px) / -2); top: calc(var(--ch, 400px) / -2); transform-style: preserve-3d; perspective: none; list-style: none; }
+.car .flip__inner, .car .flip:hover .flip__inner, .car .flip:focus-within .flip__inner { transform: none; transition: none; }
+.car__ring > .flip { transform-origin: 50% 50%; transform-style: flat !important; perspective: 1100px; perspective-origin: 50% -60%; will-change: transform; }
+.car__ring > .flip > .flip__inner { will-change: transform; }
+/* only what you can see responds to the mouse: the invisible layout box of a cartridge on its side doesn't */
+.car__ring > .flip, .car__ring > .flip .flip__inner { pointer-events: none; }
+.car__ring > .flip .flip__front, .car__ring > .flip .c3--l, .car__ring > .flip > .flip__btn { pointer-events: auto; }
+.car__ring > .flip > .flip__btn { z-index: 5; }   /* the yellow arrow sits above the cover */
+.car .c3--t { background: var(--plastic-hi); box-shadow: inset 0 0 0 3px var(--plastic-dk); }
+/* each cartridge is its own small 3D object (like the old shelf), so the browser never sorts the whole ring in 3D */
+.car__tilt, .car__ring { transform-style: flat !important; transform: none !important; will-change: auto !important; }   /* turn around the cartridge's middle, so the spine stays where it is */
+.car .cart__foot .cart__name { font-size: 24px; line-height: 26px; min-height: 58px; max-height: 58px; }
+.car .cart__foot .badge { font-size: 24px; line-height: 28px; }
+.car__shade { position: absolute; inset: -6px; z-index: 3; background: #03100a; opacity: 0; pointer-events: none; transform: translateZ(1px); }
+.car .flip > .flip__btn { opacity: 0; pointer-events: none; transform: translateZ(2px); transition: opacity .2s; }
+.car .flip.is-front > .flip__btn { opacity: 1; pointer-events: auto; }
+.car .flip:not(.is-front) .flip__front { cursor: pointer; }
+.car__nav {
+  position: absolute; top: 47%; z-index: 5; width: 52px; height: 52px; margin-top: -26px; padding: 0; border: 0; cursor: pointer;
+  display: grid; place-items: center; background: var(--arcade); color: var(--moon); box-shadow: 0 0 0 4px var(--ink), 6px 6px 0 4px var(--ink);
+}
+.car__nav:hover { background: var(--arcade-hi); color: var(--coin); }
+.car__nav:focus-visible { outline: 4px solid var(--coin); outline-offset: 4px; }
+.car__nav--prev { left: 18px; } .car__nav--next { right: 18px; }
+.car__nav--prev svg { transform: scaleX(-1); }
+.car__info { margin: 8px auto 0; text-align: center; min-height: 92px; }
+.car__title { margin: 0; font-size: 24px; line-height: 30px; color: var(--coin); text-shadow: 3px 3px 0 var(--ink); }
+.car__cats { margin: 4px 0 0; font: 600 14px/20px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--electric); }
+.car__hint { margin: 8px 0 0; font-size: 13px; color: var(--ice); }
+@media (max-width: 600px) { .car { height: clamp(340px, 62vh, 560px); } .car__nav { width: 44px; height: 44px; margin-top: -22px; } .car__nav--prev { left: 8px; } .car__nav--next { right: 8px; } .car .cart__foot .cart__name { font-size: 16px; line-height: 18px; min-height: 40px; max-height: 40px; } .car .cart__foot .badge { font-size: 16px; line-height: 20px; } }
+
+/* ---- carousel: real gray cartridges, five in view, triangles, hover tilt ---- */
+.car.is-covers .cart { --bg: var(--plastic); --hi: var(--plastic-hi); --lo: var(--plastic-lo); color: var(--ink); }
+.car__tilt { position: absolute; left: 50%; top: 47%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
+.car__tilt > .car__ring { left: 0; top: 0; }
+.car__nav { width: 64px; height: 64px; margin-top: -32px; }
+.car__nav--prev svg { transform: none; }
+.car__nav svg { display: block; transition: transform .12s steps(2, end); }
+.car__nav:active svg { transform: scale(.85); }
+.car__nav.is-pulse { animation: nav-pulse .26s steps(3, end); }
+@keyframes nav-pulse { 50% { transform: scale(1.12); } }
+.car .flip.is-hover .car__shade { opacity: 0 !important; }
+.cart__foot .cart__name { overflow-wrap: normal; word-break: normal; padding: 1px 3px; letter-spacing: -1px; }
+.cart__foot .badge { padding: 1px 4px; }
+.car .cart__foot .cart__name { letter-spacing: 0; }
+.is-covers .cart { padding-left: 9px; padding-right: 9px; }
+.is-covers .cart::after { margin-left: -9px !important; margin-right: -9px !important; }
+@media (max-width: 600px) { .car__nav { width: 48px; height: 48px; margin-top: -24px; } }
+
+/* ---- cartridge depth is adjustable; the carousel uses thick cartridges with a real spine ---- */
+.flip { --depth: 26px; }
+.flip__inner { transform-origin: 50% 50% calc(var(--depth) / -2); }
+.flip__back { transform: translateZ(calc(-1 * var(--depth))) rotateY(180deg); }
+.c3--l, .c3--r { width: var(--depth); }
+.c3--t, .c3--b { height: var(--depth); }
+.c3--l { left: auto; right: 100%; transform-origin: 100% 50%; transform: rotateY(-90deg); }   /* the left edge, facing out the right way round */
+.c3--r { transform: rotateY(-90deg) scaleX(-1); transform-origin: 100% 50%; }
+.c3__spine { display: none; }
+.car .c3--l, .car .c3--r { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.car .c3--r > * { transform: scaleX(-1); }
+.car .c3--l, .car .c3--r { pointer-events: auto; cursor: pointer; }
+/* shelf mode: only the panels you can see are drawn (faster), and backs are plain plastic, never the description */
+.car .c3--r, .car .c3--b { display: none !important; }
+.car .flip__back { display: none; }   /* each cartridge faces you head-on here, so its back never shows */
+.car .car__shade { display: none; }
+/* one fixed fade over both sides dims the games toward the edges; it never changes, so it costs nothing per frame */
+.car::after { content: ''; position: absolute; inset: 0; z-index: 2000; pointer-events: none;
+  background: linear-gradient(90deg, rgba(3, 14, 8, .88) 0%, rgba(3, 14, 8, .45) 9%, rgba(3, 14, 8, 0) 24%, rgba(3, 14, 8, 0) 76%, rgba(3, 14, 8, .45) 91%, rgba(3, 14, 8, .88) 100%); }
+.car__nav { z-index: 2001; }
+.car .c3--l, .car .c3--r {
+  display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 0; box-sizing: border-box;
+  background: var(--plastic); box-shadow: inset 0 0 0 4px var(--plastic-dk), inset 4px 4px 0 4px var(--plastic-hi), inset -4px -4px 0 4px var(--plastic-lo);
+}
+.car .c3__spine { display: flex; flex: 1; min-height: 0; width: calc(100% - 18px); align-items: center; justify-content: center; overflow: hidden;
+  background: var(--art, none) center / auto 100% no-repeat, var(--night); box-shadow: 0 0 0 3px var(--plastic-dk); position: relative; }
+.car .c3__spine::before { content: ''; position: absolute; inset: 0; background: rgba(8, 8, 24, .55); }
+.car .c3__name { position: relative; writing-mode: vertical-rl; max-height: 100%; overflow: hidden; padding: 6px 0; font-size: 16px; line-height: 20px; color: var(--moon); text-align: center;
+  text-shadow: 2px 0 var(--ink), -2px 0 var(--ink), 0 2px var(--ink), 0 -2px var(--ink); }
+.car .c3__star { flex: none; width: 24px; height: 24px; background: #f8c838; clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 36%); box-shadow: 0 0 0 2px var(--ink); }
+.car .c3__badge { flex: none; padding: 2px 6px; font-size: 16px; line-height: 20px; background: var(--ink); color: var(--coin); }
+.car .flip > .flip__btn { opacity: 0; pointer-events: none; }
+.car .flip.is-open > .flip__btn { opacity: 1; pointer-events: auto; }
+.car .flip.is-front:not(.is-open) > .flip__btn { opacity: 0; pointer-events: none; }
+
+/* shelf mode: the cartridges don't react to the mouse themselves (no hover redraws while gliding); the carousel does the maths */
+.car__ring, .car__ring * { pointer-events: none !important; }
+.car { cursor: pointer; }
+/* shelf mode: the yellow arrow lives under the shelf, so gliding over the games never has to hold still */
+.car .flip > .flip__btn { display: none !important; }
+.car__more { margin: 10px auto 0; display: inline-flex; align-items: center; gap: 10px; }
+.car__more-ico { display: inline-grid; place-items: center; width: 28px; height: 28px; background: var(--coin); color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
+.car__more-ico svg { width: 18px; height: 18px; }
+
 /* game pages */
 body.gamepage { min-height: 100vh; display: flex; flex-direction: column; }
 .gp { flex: 1; width: 100%; max-width: 1120px; margin: 0 auto; padding: 36px 24px 48px; }
