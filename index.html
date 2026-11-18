@@ -1400,7 +1400,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
 /* ---- Shelf mode: a ring of cartridges you spin with the scroll wheel ---- */
 .shelf3d.is-car { display: block; padding: 0 0 36px; }
 .car {
-  position: relative; height: clamp(380px, 68vh, 760px); perspective: 1700px; perspective-origin: 50% 42%;
+  position: relative; height: clamp(380px, 68vh, 760px); perspective: 4200px; perspective-origin: 50% 42%;
   overflow: hidden; outline: none; touch-action: pan-y; user-select: none; -webkit-user-select: none;
   background: radial-gradient(ellipse 55% 60% at 50% 46%, rgba(80, 200, 110, .16), transparent 70%);
 }
@@ -1408,6 +1408,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
 .car__ring { position: absolute; left: 50%; top: 47%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
 .car__ring > .flip { position: absolute; width: var(--cw, 300px); left: calc(var(--cw, 300px) / -2); top: calc(var(--ch, 400px) / -2); transform-style: preserve-3d; perspective: none; list-style: none; }
 .car .flip__inner, .car .flip:hover .flip__inner, .car .flip:focus-within .flip__inner { transform: none; transition: none; }
+.car__ring > .flip { transform-origin: 50% 50% calc(var(--depth) / -2); }   /* turn around the cartridge's middle, so the spine stays where it is */
 .car .cart__foot .cart__name { font-size: 24px; line-height: 26px; min-height: 58px; max-height: 58px; }
 .car .cart__foot .badge { font-size: 24px; line-height: 28px; }
 .car__shade { position: absolute; inset: -6px; z-index: 3; background: #03100a; opacity: 0; pointer-events: none; transform: translateZ(1px); }
@@ -1445,6 +1446,33 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
 .is-covers .cart { padding-left: 9px; padding-right: 9px; }
 .is-covers .cart::after { margin-left: -9px !important; margin-right: -9px !important; }
 @media (max-width: 600px) { .car__nav { width: 48px; height: 48px; margin-top: -24px; } }
+
+/* ---- cartridge depth is adjustable; the carousel uses thick cartridges with a real spine ---- */
+.flip { --depth: 26px; }
+.flip__inner { transform-origin: 50% 50% calc(var(--depth) / -2); }
+.flip__back { transform: translateZ(calc(-1 * var(--depth))) rotateY(180deg); }
+.c3--l, .c3--r { width: var(--depth); }
+.c3--t, .c3--b { height: var(--depth); }
+.c3--l { transform: rotateY(90deg) scaleX(-1); transform-origin: 0 50%; }
+.c3--r { transform: rotateY(-90deg) scaleX(-1); transform-origin: 100% 50%; }
+.c3__spine { display: none; }
+.car .c3--l, .car .c3--r { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.car .c3--l > *, .car .c3--r > * { transform: scaleX(-1); }
+.car .c3--l, .car .c3--r { pointer-events: auto; cursor: pointer; }
+.car .c3--l, .car .c3--r {
+  display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 0; box-sizing: border-box;
+  background: var(--plastic); box-shadow: inset 0 0 0 4px var(--plastic-dk), inset 4px 4px 0 4px var(--plastic-hi), inset -4px -4px 0 4px var(--plastic-lo);
+}
+.car .c3__spine { display: flex; flex: 1; min-height: 0; width: calc(100% - 18px); align-items: center; justify-content: center; overflow: hidden;
+  background: var(--art, none) center / auto 100% no-repeat, var(--night); box-shadow: 0 0 0 3px var(--plastic-dk); position: relative; }
+.car .c3__spine::before { content: ''; position: absolute; inset: 0; background: rgba(8, 8, 24, .55); }
+.car .c3__name { position: relative; writing-mode: vertical-rl; max-height: 100%; overflow: hidden; padding: 6px 0; font-size: 16px; line-height: 20px; color: var(--moon); text-align: center;
+  text-shadow: 2px 0 var(--ink), -2px 0 var(--ink), 0 2px var(--ink), 0 -2px var(--ink); }
+.car .c3__star { flex: none; width: 24px; height: 24px; background: #f8c838; clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 36%); box-shadow: 0 0 0 2px var(--ink); }
+.car .c3__badge { flex: none; padding: 2px 6px; font-size: 16px; line-height: 20px; background: var(--ink); color: var(--coin); }
+.car .flip > .flip__btn { opacity: 0; pointer-events: none; }
+.car .flip.is-open > .flip__btn { opacity: 1; pointer-events: auto; }
+.car .flip.is-front:not(.is-open) > .flip__btn { opacity: 0; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -1924,7 +1952,11 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
           '<span class="cart__label">' + label + '<span class="cart__play" aria-hidden="true"><span data-icon="play"></span>Play</span></span>' +
           '<span class="cart__foot"><span class="cart__name">' + esc(g.title) + '</span>' + badgeHTML(mode) + '</span></a>' +
         '<div class="cart px flip__face flip__back">' + backHTML(g, base) + '</div>' +
-        '<span class="c3 c3--l"></span><span class="c3 c3--r"></span><span class="c3 c3--t"></span><span class="c3 c3--b"></span>' +
+        '<span class="c3 c3--l"' + (g.thumbnail ? ' style="--art:url(&quot;' + esc(base + g.thumbnail) + '&quot;)"' : '') + '><span class="c3__star"></span><span class="c3__spine"><span class="c3__name">' + esc(g.title) + '</span></span>' +
+          (mode ? '<span class="c3__badge">' + ({ '1p': '1P', '2p': '2P', multi: 'MP' })[mode] + '</span>' : '') + '</span>' +
+        '<span class="c3 c3--r"' + (g.thumbnail ? ' style="--art:url(&quot;' + esc(base + g.thumbnail) + '&quot;)"' : '') + '><span class="c3__star"></span><span class="c3__spine"><span class="c3__name">' + esc(g.title) + '</span></span>' +
+          (mode ? '<span class="c3__badge">' + ({ '1p': '1P', '2p': '2P', multi: 'MP' })[mode] + '</span>' : '') + '</span>' +
+        '<span class="c3 c3--t"></span><span class="c3 c3--b"></span>' +
       '</div>' +
       '<button class="flip__btn" type="button" aria-expanded="false" aria-label="Show the description of ' + esc(g.title) + '">' + ARROW + '</button>' +
     '</li>';
@@ -2177,7 +2209,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       paint(shelf);
       var el = shelf.querySelector('.car'), ring = el.querySelector('.car__ring'), tilt = el.querySelector('.car__tilt'), lis = Array.prototype.slice.call(ring.children);
       lis.forEach(function (li) { var sh = document.createElement('span'); sh.className = 'car__shade'; li.querySelector('.flip__inner').appendChild(sh); });
-      car = { el: el, ring: ring, tilt: tilt, lis: lis, n: lis.length, cur: 0, target: 0, raf: 0, last: 0, front: -1, R: 0, step: 0, mx: 0, my: 0, mxT: 0, myT: 0, fast: false };
+      car = { el: el, ring: ring, tilt: tilt, lis: lis, n: lis.length, cur: 0, target: 0, raf: 0, last: 0, front: -1, R: 0, step: 0, mx: 0, my: 0, mxT: 0, myT: 0, c: 0, cT: 0, fast: false, geo: null, amp: carRestAmp(), ampT: carRestAmp() };
       var start = Math.min(carPos, Math.max(0, car.n - 1));
       car.cur = car.target = start;
       carGeometry();
@@ -2192,35 +2224,68 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       car.ring.style.setProperty('--cw', cw.toFixed(1) + 'px');
       var ch = car.lis.length ? car.lis[0].offsetHeight : cw * 1.3;
       car.ring.style.setProperty('--ch', ch.toFixed(1) + 'px');
-      car.step = n ? 360 / n : 0;
-      // the first neighbour sits just clear of the middle cartridge (never in front of it); the second peeks in at the edge
-      var th = Math.min(car.step, 90) * Math.PI / 180, x1 = (cw / 2) * (1 + Math.cos(th)) + cw * 0.12;
-      car.R = n > 1 ? x1 / Math.sin(Math.min(car.step, 90) * Math.PI / 180) : 0;
-      car.lis.forEach(function (li, i) { li.style.transform = 'rotateY(' + (i * car.step).toFixed(3) + 'deg) translateZ(' + car.R.toFixed(1) + 'px)'; });
+      var D = Math.round(Math.max(40, cw * 0.2));
+      car.lis.forEach(function (li) { li.style.setProperty('--depth', D + 'px'); });
+      // turning: how wide a cartridge is on the ring at each angle, so neighbours make room
+      var ext = [], best = 0, bestK = 400;
+      for (var k = 0; k <= 400; k++) { var th = (k / 400) * Math.PI / 2, w = cw * Math.sin(th) + D * Math.cos(th); ext.push(w); if (w > best) { best = w; bestK = k; } }
+      var sig = 0.72, gap = 10;
+      car.geo = { cw: cw, D: D, gap: gap, ext: ext, max: best, kMax: bestK, sig: sig, E: (best + 14 - D) / (2 * G(0.5, sig) - 1) };
+      car.R = Math.max(Wd * 0.8, cw * 2.2);
       carDraw();
     }
+    // at rest every cartridge sits on its side; only phones/tablets (no hover) keep the middle one turned out
+    function carRestAmp() { return window.matchMedia && matchMedia('(hover: none)').matches ? 1 : 0; }
+    // which cartridge is under the mouse, measured on the layout as it is drawn right now
+    function carHover() {                                     // the cartridge actually under the mouse turns out
+      if (!car || !car.hov) return;
+      var el = document.elementFromPoint(car.px, car.py), li = el && el.closest && el.closest('.car__ring > .flip');
+      if (!li) return;
+      var i = car.lis.indexOf(li);
+      if (i < 0) return;
+      var n = car.n, d = ((i - car.cur) % n + n) % n; if (d > n / 2) d -= n;
+      car.cT = Math.round(d);
+      if (car.amp < 0.1) car.c = car.cT;                      // from rest: turn out right where it is, no sliding over from the middle
+    }
+    function carTurn(w) {                                       // spot width on the ring -> how far it's turned (0..1)
+      var g = car.geo, room = w - Math.min(10, Math.max(0, w - g.D));
+      if (room <= g.D + 0.5) return 0;
+      if (room >= g.max) return Math.min(1, g.kMax / 400 + (1 - g.kMax / 400) * Math.min(1, (w - 10 - g.max) / 4));
+      var lo = 0, hi = g.kMax;
+      while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (g.ext[mid] < room) lo = mid; else hi = mid; }
+      return (lo + (room - g.ext[lo]) / Math.max(0.001, g.ext[hi] - g.ext[lo])) / 400;
+    }
+    function carX(sv, c) { var g = car.geo; return sv * (g.D + g.gap) + g.E * car.amp * (G(sv - c, g.sig) - 0.5); }   // the turned-out cartridge stays put; neighbours move aside   // arc position of slot sv
     function carDraw() {
-      var n = car.n;
-      car.tilt.style.transform = 'rotateX(' + (-car.my * 5).toFixed(3) + 'deg) rotateY(' + (car.mx * 8).toFixed(3) + 'deg)';
-      car.ring.style.transform = 'translateZ(' + (-car.R).toFixed(1) + 'px) rotateY(' + (-car.cur * car.step).toFixed(3) + 'deg)';
-      var front = n ? (((Math.round(car.cur) % n) + n) % n) : -1;
+      var n = car.n, g = car.geo;
+      if (!g) return;
+      car.tilt.style.transform = 'rotateX(' + (-car.my * 4).toFixed(3) + 'deg) rotateY(' + (car.mx * 5).toFixed(3) + 'deg)';
+      car.ring.style.transform = 'translateZ(' + (-car.R).toFixed(1) + 'px)';
+      var front = n ? (((Math.round(car.cur) % n) + n) % n) : -1, c = car.c, show = -1, showT = 0;
       car.lis.forEach(function (li, i) {
         var d = ((i - car.cur) % n + n) % n; if (d > n / 2) d -= n;
-        var a = Math.abs(d);
-        // five in view: the middle one, two dimmed on each side; the rest fade into the dark
-        li.querySelector('.car__shade').style.opacity = (a <= 1 ? a * 0.42 : a <= 2 ? 0.42 + (a - 1) * 0.26 : Math.min(1, 0.68 + (a - 2) * 0.64)).toFixed(3);
-        li.style.visibility = a > 2.55 || Math.abs(d * car.step) > 100 ? 'hidden' : '';
-        var isFront = i === front && a < 0.5;
-        if (li.classList.contains('is-front') !== isFront) {
-          li.classList.toggle('is-front', isFront);
-          li.querySelectorAll('a, button').forEach(function (x) { if (!x.closest('.flip__back')) x.tabIndex = isFront ? 0 : -1; });
-        }
+        var w = g.D + g.E * car.amp * (G(d + 0.5 - c, g.sig) - G(d - 0.5 - c, g.sig));
+        var t = carTurn(w), ang = carX(d, c) / car.R, sg = 1;
+        var hide = Math.abs(ang) > 1.35;
+        if (li._hide !== hide) { li._hide = hide; li.style.visibility = hide ? 'hidden' : ''; }
+        if (hide) return;
+        var deg = ang * 180 / Math.PI;      // placed on the ring, but facing you like a shelf: spine forward until it turns out
+        li.style.transform = 'rotateY(' + deg.toFixed(3) + 'deg) translateZ(' + car.R.toFixed(1) + 'px) rotateY(' + (-deg + sg * 90 * (1 - t)).toFixed(3) + 'deg)';
+        if (!li._sh) { li._sh = li.querySelector('.car__shade'); li._f = Array.prototype.filter.call(li.querySelectorAll('a, button'), function (x) { return !x.closest('.flip__back'); }); }
+        var op = Math.min(0.75, Math.abs(ang) * 0.9).toFixed(2);
+        if (li._op !== op) { li._op = op; li._sh.style.opacity = op; }
+        var open = t > 0.88;
+        if (li._open !== open) { li._open = open; li.classList.toggle('is-open', open); li._f.forEach(function (x) { x.tabIndex = open ? 0 : -1; }); }
+        if (t > showT) { showT = t; show = i; }
+        var isFront = i === front && Math.abs(d) < 0.5;
+        if (li._front !== isFront) { li._front = isFront; li.classList.toggle('is-front', isFront); }
       });
-      if (front !== car.front && front >= 0) {
-        car.front = front; carPos = front;
-        var g = shown[front];
-        shelf.querySelector('.car__title').textContent = g ? g.title : '';
-        shelf.querySelector('.car__cats').textContent = g ? catLine(g) : '';
+      var info = showT > 0.5 ? show : front;
+      if (info !== car.front && info >= 0) {
+        car.front = info; carPos = front;
+        var gm = shown[info];
+        shelf.querySelector('.car__title').textContent = gm ? gm.title : '';
+        shelf.querySelector('.car__cats').textContent = gm ? catLine(gm) : '';
       }
     }
     function carTick(now) {
@@ -2228,14 +2293,20 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       var dt = Math.min(64, now - (car.last || now)); car.last = now;
       var f = dt / 16.67, k = reduce ? 1 : 1 - Math.pow(1 - (car.fast ? 0.24 : 0.14), f), km = reduce ? 1 : 1 - Math.pow(1 - 0.12, f), d = car.target - car.cur;
       if (Math.abs(d) < 0.0008) { car.cur = car.target; car.fast = false; } else car.cur += d * k;
+      var da = car.ampT - car.amp;
+      if (Math.abs(da) < 0.002) car.amp = car.ampT; else car.amp += da * (reduce ? 1 : 1 - Math.pow(1 - 0.14, f));
+      var dc = car.cT - car.c;
+      if (Math.abs(dc) < 0.001) car.c = car.cT; else car.c += dc * (reduce ? 1 : 1 - Math.pow(1 - 0.16, f));
       var dmx = car.mxT - car.mx, dmy = car.myT - car.my;
       if (Math.abs(dmx) < 0.001 && Math.abs(dmy) < 0.001) { car.mx = car.mxT; car.my = car.myT; } else { car.mx += dmx * km; car.my += dmy * km; }
       carDraw();
-      car.raf = (car.cur !== car.target || car.mx !== car.mxT || car.my !== car.myT) ? requestAnimationFrame(carTick) : 0;
+      if (car.hov && car.c === car.cT && car.amp === car.ampT) carHover();   // re-check what's under the mouse only once things settle
+      car.raf = (car.cur !== car.target || car.mx !== car.mxT || car.my !== car.myT || car.c !== car.cT || car.amp !== car.ampT) ? requestAnimationFrame(carTick) : 0;
     }
     function carKick() { if (car && !car.raf) { car.last = 0; car.raf = requestAnimationFrame(carTick); } }
     function carGo(delta, absolute, fast) {
       if (!car || !car.n) return;
+      car.cT = 0; car.hov = false;                          // spinning brings the middle game out; the next mouse move picks up again
       car.target = absolute ? delta : car.target + delta;
       car.fast = !!fast;
       carKick();
@@ -2252,8 +2323,8 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       }, { passive: false });
       el.addEventListener('keydown', function (e) {
         if (e.target !== el) return;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); carGo(1); }
-        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); carGo(-1); }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); car.ampT = 1; carGo(1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); car.ampT = 1; carGo(-1); }
         else if (e.key === 'Enter' && car.front >= 0) { e.preventDefault(); go('#/game/' + encodeURIComponent(shown[car.front].id)); }
       });
       function pulse(b) { b.classList.remove('is-pulse'); void b.offsetWidth; b.classList.add('is-pulse'); }
@@ -2263,14 +2334,17 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       var hoverLi = null;
       el.addEventListener('pointermove', function (e) {
         if (e.pointerType === 'touch') return;
+        car.ampT = 1;
         var r = el.getBoundingClientRect();
         car.mxT = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width / 2) / (r.width / 2)));
         car.myT = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height * 0.47) / (r.height / 2)));
+        car.px = e.clientX; car.py = e.clientY; car.hov = true;
+        carHover();
         var li = e.target.closest && e.target.closest('.car__ring > .flip');
         if (li !== hoverLi) { if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = li; if (li) li.classList.add('is-hover'); }
         carKick();
       });
-      el.addEventListener('pointerleave', function () { car.mxT = 0; car.myT = 0; if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = null; carKick(); });
+      el.addEventListener('pointerleave', function () { car.hov = false; car.mxT = 0; car.myT = 0; car.cT = 0; car.ampT = carRestAmp(); if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = null; carKick(); });
       el.addEventListener('pointerdown', function (e) {
         if (e.button !== 0 || e.target.closest('.car__nav, .flip__btn')) return;
         drag = { x: e.clientX, base: car.target, id: e.pointerId }; moved = false;
@@ -2287,9 +2361,12 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
         if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; return; }
         var li = e.target.closest('.car__ring > .flip');
         if (!li || e.target.closest('.flip__btn')) return;
-        if (!li.classList.contains('is-front')) {             // a game at the side: spin it to the front
+        if (!li.classList.contains('is-open')) {
           e.preventDefault(); e.stopPropagation();
+          if (li.classList.contains('is-front')) { go('#/game/' + encodeURIComponent(li.getAttribute('data-id'))); return; }   // the middle game always plays
+          // a game on its side: spin it to the middle
           var i = car.lis.indexOf(li), n = car.n, d = ((i - car.target) % n + n) % n; if (d > n / 2) d -= n;
+          car.cT = 0;
           carGo(Math.round(d));
         }
       }, true);
