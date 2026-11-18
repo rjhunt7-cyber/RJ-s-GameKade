@@ -1408,7 +1408,13 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
 .car__ring { position: absolute; left: 50%; top: 47%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
 .car__ring > .flip { position: absolute; width: var(--cw, 300px); left: calc(var(--cw, 300px) / -2); top: calc(var(--ch, 400px) / -2); transform-style: preserve-3d; perspective: none; list-style: none; }
 .car .flip__inner, .car .flip:hover .flip__inner, .car .flip:focus-within .flip__inner { transform: none; transition: none; }
-.car__ring > .flip { transform-origin: 50% 50% calc(var(--depth) / -2); will-change: transform; }
+.car__ring > .flip { transform-origin: 50% 50%; transform-style: flat !important; perspective: 1100px; perspective-origin: 50% -60%; will-change: transform; }
+.car__ring > .flip > .flip__inner { will-change: transform; }
+/* only what you can see responds to the mouse: the invisible layout box of a cartridge on its side doesn't */
+.car__ring > .flip, .car__ring > .flip .flip__inner { pointer-events: none; }
+.car__ring > .flip .flip__front, .car__ring > .flip .c3--l, .car__ring > .flip > .flip__btn { pointer-events: auto; }
+.car__ring > .flip > .flip__btn { z-index: 5; }   /* the yellow arrow sits above the cover */
+.car .c3--t { background: var(--plastic-hi); box-shadow: inset 0 0 0 3px var(--plastic-dk); }
 /* each cartridge is its own small 3D object (like the old shelf), so the browser never sorts the whole ring in 3D */
 .car__tilt, .car__ring { transform-style: flat !important; transform: none !important; will-change: auto !important; }   /* turn around the cartridge's middle, so the spine stays where it is */
 .car .cart__foot .cart__name { font-size: 24px; line-height: 26px; min-height: 58px; max-height: 58px; }
@@ -1455,14 +1461,14 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
 .flip__back { transform: translateZ(calc(-1 * var(--depth))) rotateY(180deg); }
 .c3--l, .c3--r { width: var(--depth); }
 .c3--t, .c3--b { height: var(--depth); }
-.c3--l { transform: rotateY(90deg) scaleX(-1); transform-origin: 0 50%; }
+.c3--l { left: auto; right: 100%; transform-origin: 100% 50%; transform: rotateY(-90deg); }   /* the left edge, facing out the right way round */
 .c3--r { transform: rotateY(-90deg) scaleX(-1); transform-origin: 100% 50%; }
 .c3__spine { display: none; }
 .car .c3--l, .car .c3--r { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-.car .c3--l > *, .car .c3--r > * { transform: scaleX(-1); }
+.car .c3--r > * { transform: scaleX(-1); }
 .car .c3--l, .car .c3--r { pointer-events: auto; cursor: pointer; }
 /* shelf mode: only the panels you can see are drawn (faster), and backs are plain plastic, never the description */
-.car .c3--r, .car .c3--b { display: none; }
+.car .c3--r, .car .c3--b { display: none !important; }
 .car .flip__back { display: none; }   /* each cartridge faces you head-on here, so its back never shows */
 .car .car__shade { display: none; }
 /* one fixed fade over both sides dims the games toward the edges; it never changes, so it costs nothing per frame */
@@ -2235,11 +2241,13 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       var ch = car.lis.length ? car.lis[0].offsetHeight : cw * 1.3;
       car.ring.style.setProperty('--ch', ch.toFixed(1) + 'px');
       var D = Math.round(Math.max(40, cw * 0.2));
-      car.lis.forEach(function (li) { li.style.setProperty('--depth', D + 'px'); });
+      // the viewpoint scales with the cartridge, in the old shelf's proportions (1100px away and a little above, for a 216px box)
+      var persp = Math.round(cw * 5.1), eye = Math.round(-ch * 0.22);
+      car.lis.forEach(function (li) { li.style.setProperty('--depth', D + 'px'); li.style.perspective = persp + 'px'; li.style.perspectiveOrigin = '50% ' + eye + 'px'; });
       // turning: how wide a cartridge is on the ring at each angle, so neighbours make room
       var ext = [], best = 0, bestK = 400;
       for (var k = 0; k <= 400; k++) { var th = (k / 400) * Math.PI / 2, w = cw * Math.sin(th) + D * Math.cos(th); ext.push(w); if (w > best) { best = w; bestK = k; } }
-      var sig = 0.72, gap = 10;
+      var sig = 0.82, gap = 6;
       car.geo = { cw: cw, D: D, gap: gap, ext: ext, max: best, kMax: bestK, sig: sig, E: (best + 14 - D) / (2 * G(0.5, sig) - 1) };
       car.R = Math.max(Wd * 0.8, cw * 2.2);
       car.P = 2600;
@@ -2248,15 +2256,15 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
     // at rest every cartridge sits on its side; only phones/tablets (no hover) keep the middle one turned out
     function carRestAmp() { return window.matchMedia && matchMedia('(hover: none)').matches ? 1 : 0; }
     // which cartridge is under the mouse, measured on the layout as it is drawn right now
-    function carHover() {                                     // the cartridge actually under the mouse turns out
-      if (!car || !car.hov) return;
-      var el = document.elementFromPoint(car.px, car.py), li = el && el.closest && el.closest('.car__ring > .flip');
-      if (!li) return;
-      var i = car.lis.indexOf(li);
-      if (i < 0) return;
-      var n = car.n, d = ((i - car.cur) % n + n) % n; if (d > n / 2) d -= n;
-      car.cT = Math.round(d);
-      if (car.amp < 0.1) car.c = car.cT;                      // from rest: turn out right where it is, no sliding over from the middle
+    function carRestX(sv) {                                  // where slot sv sits on screen when everything is on its side
+      var g = car.geo, ang = sv * (g.D + g.gap) / car.R, z = car.R * Math.cos(ang) - car.R;
+      return car.R * Math.sin(ang) * car.P / (car.P - z);
+    }
+    function carHover() {                                     // the turn-out point follows the mouse smoothly, measured on the resting shelf
+      if (!car || !car.hov || !car.geo) return;
+      var lim = Math.PI / 2 * car.R / (car.geo.D + car.geo.gap), lo = Math.max(-car.n / 2, -lim), hi = Math.min(car.n / 2, lim);
+      for (var it = 0; it < 28; it++) { var mid = (lo + hi) / 2; if (carRestX(mid) < car.mo) lo = mid; else hi = mid; }
+      car.cT = (lo + hi) / 2;
     }
     function carTurn(w) {                                       // spot width on the ring -> how far it's turned (0..1)
       var g = car.geo, room = w - Math.min(10, Math.max(0, w - g.D));
@@ -2266,7 +2274,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (g.ext[mid] < room) lo = mid; else hi = mid; }
       return (lo + (room - g.ext[lo]) / Math.max(0.001, g.ext[hi] - g.ext[lo])) / 400;
     }
-    function carX(sv, c) { var g = car.geo; return sv * (g.D + g.gap) + g.E * car.amp * (G(sv - c, g.sig) - 0.5); }   // the turned-out cartridge stays put; neighbours move aside   // arc position of slot sv
+    function carX(sv, c) { var g = car.geo; return sv * (g.D + g.gap) + g.E * 0.84 * car.amp * (G(sv - c, g.sig) - 0.5); }   // turned-out cartridges stay put; neighbours move aside, snug (in perspective a turned cover's far edge shrinks back)   // arc position of slot sv
     function carDraw() {
       var n = car.n, g = car.geo;
       if (!g) return;
@@ -2278,10 +2286,13 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
         var hide = Math.abs(ang) > 1.35;
         if (li._hide !== hide) { li._hide = hide; li.style.visibility = hide ? 'hidden' : ''; }
         if (hide) return;
-        // where it sits on the ring (further round = further back = smaller), drawn head-on with its own perspective
+        // where it sits on the ring (further round = further back = smaller)
         var x = car.R * Math.sin(ang), z = car.R * Math.cos(ang) - car.R, sc = car.P / (car.P - z);
-        li.style.transform = 'translate3d(' + (x * sc).toFixed(1) + 'px,' + (z * 0.05).toFixed(1) + 'px,0) scale(' + sc.toFixed(4) + ') perspective(1500px) rotateX(' + (-5 - car.my * 2.5).toFixed(2) + 'deg) rotateY(' + (sg * 90 * (1 - t) + car.mx * 3).toFixed(2) + 'deg)';
-        var zi = 1000 - Math.round(Math.abs(x) / 4);
+        li.style.transform = 'translate3d(' + (x * sc).toFixed(2) + 'px,' + (z * 0.04).toFixed(2) + 'px,0) scale(' + sc.toFixed(4) + ')';
+        // and the turn, the same as the old shelf: slides back onto its side, lifts a little as it turns out
+        if (!li._in) li._in = li.querySelector('.flip__inner');
+        li._in.style.transform = 'translate3d(0,' + (-8 * t).toFixed(2) + 'px,' + (-g.cw / 2 * (1 - t) + 12 * t).toFixed(2) + 'px) rotateY(' + (sg * 90 * (1 - t)).toFixed(3) + 'deg)';
+        var zi = 1 + Math.round(t * 100) + (500 - Math.min(499, Math.round(Math.abs(x) / 8)));
         if (li._z !== zi) { li._z = zi; li.style.zIndex = zi; }
         if (!li._sh) { li._sh = li.querySelector('.car__shade'); li._f = Array.prototype.filter.call(li.querySelectorAll('a, button'), function (x) { return !x.closest('.flip__back'); }); }
         var open = t > 0.88;
@@ -2304,13 +2315,13 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
       var f = dt / 16.67, k = reduce ? 1 : 1 - Math.pow(1 - (car.fast ? 0.24 : 0.14), f), km = reduce ? 1 : 1 - Math.pow(1 - 0.12, f), d = car.target - car.cur;
       if (Math.abs(d) < 0.0008) { car.cur = car.target; car.fast = false; } else car.cur += d * k;
       var da = car.ampT - car.amp;
-      if (Math.abs(da) < 0.002) car.amp = car.ampT; else car.amp += da * (reduce ? 1 : 1 - Math.pow(1 - 0.14, f));
+      if (Math.abs(da) < 0.002) car.amp = car.ampT; else car.amp += da * (reduce ? 1 : 1 - Math.pow(1 - 0.12, f));
       var dc = car.cT - car.c;
-      if (Math.abs(dc) < 0.001) car.c = car.cT; else car.c += dc * (reduce ? 1 : 1 - Math.pow(1 - 0.16, f));
+      if (car.amp < 0.05) car.c = car.cT;                    // arriving from rest: open right where the mouse is
+      if (Math.abs(dc) < 0.002) car.c = car.cT; else car.c += dc * (reduce ? 1 : 1 - Math.pow(1 - 0.18, f));
       var dmx = car.mxT - car.mx, dmy = car.myT - car.my;
       if (Math.abs(dmx) < 0.001 && Math.abs(dmy) < 0.001) { car.mx = car.mxT; car.my = car.myT; } else { car.mx += dmx * km; car.my += dmy * km; }
       carDraw();
-      if (car.hov && car.c === car.cT && car.amp === car.ampT) carHover();   // re-check what's under the mouse only once things settle
       car.raf = (car.cur !== car.target || car.mx !== car.mxT || car.my !== car.myT || car.c !== car.cT || car.amp !== car.ampT) ? requestAnimationFrame(carTick) : 0;
     }
     function carKick() { if (car && !car.raf) { car.last = 0; car.raf = requestAnimationFrame(carTick); } }
@@ -2348,8 +2359,10 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
         var r = el.getBoundingClientRect();
         car.mxT = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width / 2) / (r.width / 2)));
         car.myT = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height * 0.47) / (r.height / 2)));
-        car.px = e.clientX; car.py = e.clientY; car.hov = true;
-        carHover();
+        car.mo = e.clientX - r.left - r.width / 2; car.hov = true;
+        // on the turned-out cover (or its yellow arrow) the shelf holds still, so you can reach anything on it
+        var hitEl = document.elementFromPoint(e.clientX, e.clientY), hitLi = hitEl && hitEl.closest && hitEl.closest('.car__ring > .flip');
+        if (!(hitLi && hitLi.classList.contains('is-open') && car.amp > 0.9)) carHover();
         var li = e.target.closest && e.target.closest('.car__ring > .flip');
         if (li !== hoverLi) { if (hoverLi) hoverLi.classList.remove('is-hover'); hoverLi = li; if (li) li.classList.add('is-hover'); }
         carKick();
@@ -2371,6 +2384,7 @@ html.has-title body::before { content: ''; position: fixed; inset: 0; z-index: 9
         if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; return; }
         var li = e.target.closest('.car__ring > .flip');
         if (!li || e.target.closest('.flip__btn')) return;
+        if (e.target.closest('.flip__front')) return;          // clicked a cover you can see: it plays
         if (!li.classList.contains('is-open')) {
           e.preventDefault(); e.stopPropagation();
           if (li.classList.contains('is-front')) { go('#/game/' + encodeURIComponent(li.getAttribute('data-id'))); return; }   // the middle game always plays
